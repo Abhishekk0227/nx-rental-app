@@ -1,5 +1,5 @@
 /* ==========================================================================
-   VELORENT DESIGN SYSTEM (VANILLA CSS - PREMIUM ERP EDITION)
+   NX Rental DESIGN SYSTEM (VANILLA CSS - PREMIUM ERP EDITION)
    ========================================================================== */
 
 /* --- CSS Variables & Themes --- */
@@ -517,6 +517,16 @@ h6 {
   animation: modalAppear 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Form inside modal must stretch as a flex child so modal-body can scroll */
+.modal-content > form,
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
 @keyframes modalAppear {
   from { opacity: 0; transform: translateY(20px) scale(0.97); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
@@ -559,11 +569,44 @@ h6 {
 
 .modal-body {
   padding: 24px;
-  max-height: calc(90vh - 130px);
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   background: #ffffff;
+
+  /* ── Override dark-theme CSS variables for white modal background ── */
+  --primary: #1e293b;
+  --primary-hover: #334155;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #f1f5f9;
+  --bg-tertiary: #e2e8f0;
+  --bg-glass: rgba(248, 250, 252, 0.9);
+  --border-light: #e2e8f0;
+  --border-focus: #6366f1;
 }
+
+/* Headings inside modal body — ensure always dark */
+.modal-body h1,
+.modal-body h2,
+.modal-body h3,
+.modal-body h4,
+.modal-body h5,
+.modal-body h6 {
+  color: #1e293b !important;
+}
+
+/* General text in modal body */
+.modal-body p,
+.modal-body span:not(.badge):not([class*='status']):not([class*='btn']),
+.modal-body strong,
+.modal-body li {
+  color: inherit;
+}
+
 
 /* Form controls inside modal must use light theme */
 .modal-body .form-group label,
@@ -943,7 +986,7 @@ h6 {
 }
 
 /* ==========================================================================
-   VeloRent - LIGHT THEME OVERRIDE
+   NX Rental - LIGHT THEME OVERRIDE
    ========================================================================== */
 
 /* --- Override Global to Light --- */
@@ -1248,10 +1291,10 @@ body {
   font-family: var(--font-title);
   font-size: 1.65rem;
   font-weight: 700;
-  color: #1e293b;
+  color: var(--text-primary);
   margin-bottom: 4px;
   background: none !important;
-  -webkit-text-fill-color: #1e293b !important;
+  -webkit-text-fill-color: unset !important;
 }
 
 .fo-breadcrumb {
@@ -1940,7 +1983,7 @@ select.form-control {
 
 /* ==========================================================================
    UNIFIED RESPONSIVE DESIGN SYSTEM
-   Mobile-first additions — covers all VeloRent pages
+   Mobile-first additions — covers all NX Rental pages
    ========================================================================== */
 
 /* ── Mobile Sidebar Drawer ── */
@@ -2248,37 +2291,42 @@ select.form-control {
 
 /* ==========================================================================
    THEME TEXT VISIBILITY FIXES
-   Ensure all text is readable in both light mode (current theme)
+   Dark theme app — all page-level text must be light/white on dark backgrounds
    ========================================================================== */
 
-/* Force all page text to use proper light-theme colors */
+/* Page-level headings — white on dark background */
 .fo-page-title {
-  color: #1e293b !important;
-  -webkit-text-fill-color: #1e293b !important;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: unset !important;
   background: none !important;
 }
 
+/* Stat cards — these are on dark bg-secondary panels */
 .fo-stat-value {
-  color: #1e293b !important;
-  -webkit-text-fill-color: #1e293b !important;
+  color: var(--text-primary) !important;
+  -webkit-text-fill-color: unset !important;
 }
 
-.fo-section-title { color: #1e293b !important; }
-.fo-stat-label { color: #64748b !important; }
-.fo-breadcrumb { color: #94a3b8 !important; }
-.fo-last-updated { color: #94a3b8 !important; }
+.fo-section-title { color: var(--text-primary) !important; }
+.fo-stat-label { color: var(--text-secondary) !important; }
+.fo-breadcrumb { color: var(--text-secondary) !important; }
+.fo-last-updated { color: var(--text-secondary) !important; }
+.fo-cell-bold { color: var(--text-primary) !important; }
+.fo-table td { color: var(--text-secondary) !important; }
+.fo-table th { color: var(--text-muted) !important; }
+
+/* Sidebar & Header elements — these are on dark sidebar background */
+.fo-logo-title { color: var(--text-primary) !important; }
+.fo-user-name { color: var(--text-primary) !important; }
+.fo-user-role { color: var(--text-secondary) !important; }
+
+/* Vehicle card info — these cards are on dark bg-secondary */
+.vehicle-card-info-title { color: var(--text-primary) !important; }
+
+/* Utility class for explicitly dark text (inside light modal/form contexts) */
 .fo-util-name { color: #334155 !important; }
-.fo-cell-bold { color: #1e293b !important; }
-.fo-table td { color: #334155 !important; }
-.fo-table th { color: #94a3b8 !important; }
 
-/* Fix hardcoded dark-text inline styles throughout components */
-.vehicle-card-info-title { color: #0f172a !important; }
-.fo-logo-title { color: #1e293b !important; }
-.fo-user-name { color: #1e293b !important; }
-.fo-user-role { color: #94a3b8 !important; }
-
-/* Booking form section headers — use indigo in light mode */
+/* Booking form section headers — inside light-bg forms */
 .bform-section-title {
   color: #4f46e5 !important;
   font-size: 0.95rem;
@@ -2289,7 +2337,7 @@ select.form-control {
   margin-bottom: 12px;
 }
 
-/* Fix inline section boxes in booking/vehicle forms */
+/* Fix inline section boxes in booking/vehicle forms (light bg) */
 .bform-section-box {
   background: #f8f9fb;
   border: 1px solid #e5e7eb;
@@ -2297,6 +2345,7 @@ select.form-control {
   border-radius: 8px;
   margin-bottom: 16px;
 }
+
 
 /* ==========================================================================
    RESPONSIVE GRID UTILITY CLASSES
@@ -2957,10 +3006,43 @@ select.form-control {
 
 .vm-tab-content {
   flex: 1;
-  padding: 20px;
+  padding: 20px 20px 0 20px;
   overflow-y: auto;
   background: #fff;
+  display: flex;
+  flex-direction: column;
 }
+
+/* Override global modal form rule — tab content handles its own scroll */
+.vm-tab-content form {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 !important;
+  overflow: hidden !important;
+  min-height: 0 !important;
+  height: auto !important;
+}
+
+/* Tab content scrollable area */
+.vm-tab-content form > div:first-child {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-bottom: 8px;
+}
+
+/* Sticky footer inside vm-tab-content — always pinned at bottom */
+.vm-tab-content .modal-footer {
+  position: sticky;
+  bottom: 0;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb !important;
+  padding: 14px 0 14px 0 !important;
+  margin: 0 !important;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
 
 /* Tab content form groups */
 .vm-tab-content .form-group label {
@@ -3055,6 +3137,7 @@ select.form-control {
   display: flex;
   flex-direction: column;
   max-height: 92vh;
+  height: 92vh;
   animation: slideUpModal 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -3129,8 +3212,30 @@ select.form-control {
 .av-modal-body {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0;
+  min-height: 0;
   overscroll-behavior: contain;
+  /* Custom scrollbar for premium feel */
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.av-modal-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.av-modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.av-modal-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+.av-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 /* ── FORM SECTIONS ── */
@@ -3388,6 +3493,7 @@ textarea.av-input {
     width: 100%;
     border-radius: 20px 20px 0 0;
     max-height: 96vh;
+    height: 96vh;
     margin-top: auto;
   }
 
@@ -3462,4 +3568,4 @@ textarea.av-input {
   .av-btn-cancel,
   .av-btn-submit { flex: 1; justify-content: center; }
 }
-
+

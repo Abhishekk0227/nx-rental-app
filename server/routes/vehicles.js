@@ -63,8 +63,25 @@ router.put('/:vehicleId', async (req, res) => {
       const vehicle = await Vehicle.findOne({ vehicleId: req.params.vehicleId });
       if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
-      // Merge body properties dynamically
-      Object.assign(vehicle, req.body);
+      const body = req.body;
+      // Deep merge: for nested objects (bookingConfig, pricingPlans, etc.)
+      // use Object.assign so sibling keys are preserved, then markModified
+      Object.keys(body).forEach(key => {
+        if (
+          body[key] !== null &&
+          typeof body[key] === 'object' &&
+          !Array.isArray(body[key]) &&
+          vehicle[key] !== null &&
+          typeof vehicle[key] === 'object' &&
+          !Array.isArray(vehicle[key])
+        ) {
+          Object.assign(vehicle[key], body[key]);
+          vehicle.markModified(key);
+        } else {
+          vehicle[key] = body[key];
+        }
+      });
+
       const updatedVehicle = await vehicle.save();
       res.json(updatedVehicle);
     } else {

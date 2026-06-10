@@ -121,6 +121,7 @@ const vehicleSchema = new mongoose.Schema({
   // Booking settings
   bookingConfig: {
     bufferTime: { type: Number, default: 30 }, // in minutes
+    minBookingHours: { type: Number, default: 0 }, // 0 = no minimum enforced
     status: { type: String, default: 'Active' },
     bookingEnabled: { type: Boolean, default: true },
     instantBooking: { type: Boolean, default: true }
@@ -186,22 +187,21 @@ const vehicleSchema = new mongoose.Schema({
 });
 
 // Auto-increment vehicleId: VEH-00001, VEH-00002, etc.
-// Sort by createdAt descending to reliably get the last created vehicle.
+// Finds the actual maximum VEH- number to prevent duplicate key errors.
 vehicleSchema.pre('save', async function(next) {
   if (!this.vehicleId) {
     try {
-      // Find all vehicles with the VEH- prefix and extract the max number
-      const lastVehicle = await this.constructor.findOne(
+      // Fetch ALL vehicleIds with VEH- prefix and find the actual max
+      const allVehicles = await this.constructor.find(
         { vehicleId: { $regex: /^VEH-\d+$/ } },
-        { vehicleId: 1 },
-        { sort: { createdAt: -1 } }
-      );
-      let nextNum = 1;
-      if (lastVehicle?.vehicleId) {
-        const num = parseInt(lastVehicle.vehicleId.replace('VEH-', ''), 10);
-        if (!isNaN(num)) nextNum = num + 1;
-      }
-      this.vehicleId = `VEH-${String(nextNum).padStart(5, '0')}`;
+        { vehicleId: 1 }
+      ).lean();
+      let maxNum = 0;
+      allVehicles.forEach(v => {
+        const num = parseInt(v.vehicleId.replace('VEH-', ''), 10);
+        if (!isNaN(num) && num > maxNum) maxNum = num;
+      });
+      this.vehicleId = `VEH-${String(maxNum + 1).padStart(5, '0')}`;
     } catch (err) {
       return next(err);
     }

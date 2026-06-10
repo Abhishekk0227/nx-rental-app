@@ -398,7 +398,15 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
 
   return (
     <div className="animate-slide-up">
-      
+
+      {/* PAGE HEADER */}
+      <div className="fo-page-header">
+        <div>
+          <h1 className="fo-page-title">Available Vehicles</h1>
+          <p className="fo-breadcrumb">FleetOps / <span style={{ color: 'var(--secondary)' }}>Available Vehicles</span></p>
+        </div>
+      </div>
+
       {/* KPI SUMMARY GRID */}
       <div className="fo-stat-grid">
         <div className="fo-stat-card">

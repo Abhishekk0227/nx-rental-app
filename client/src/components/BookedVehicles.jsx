@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, AlertTriangle, Clock, Calendar, CheckCircle, Search, SlidersHorizontal, Car, Bike, User, Phone, MapPin, ArrowRight, Banknote, CreditCard, Wallet, Monitor, Eye, Pencil, RotateCw, Truck, Printer, FileText, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { RefreshCw, AlertTriangle, Clock, Calendar, CheckCircle, Search, SlidersHorizontal, Car, Bike, User, Phone, MapPin, ArrowRight, Banknote, CreditCard, Wallet, Monitor, Eye, Pencil, RotateCw, Truck, Printer, FileText, X, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 export default function BookedVehicles({ 
   bookings, 
@@ -233,6 +233,11 @@ export default function BookedVehicles({
   const [zoneFilter, setZoneFilter] = useState('All');
   const [sortFilter, setSortFilter] = useState('Latest Booking');
   const [showFilterBar, setShowFilterBar] = useState(false);
+
+  // Delete booking state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState(null);
+  const [deleteInProgress, setDeleteInProgress] = useState(false);
 
   // Starting Date Filters
   const [startFilterType, setStartFilterType] = useState('All'); // 'All' | 'Today' | 'Yesterday' | 'Custom'
@@ -2084,6 +2089,36 @@ export default function BookedVehicles({
     setActiveModal(null);
   };
 
+
+  // ─── Hard Delete Booking ───────────────────────────────────────────────────
+  const handleDeleteBooking = async () => {
+    if (!bookingToDelete) return;
+    setDeleteInProgress(true);
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${bookingToDelete.bookingId}`,
+        { method: 'DELETE' }
+      );
+      if (res.ok) {
+        // Remove from local bookings array immediately so UI refreshes
+        const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
+        if (idx !== -1) bookings.splice(idx, 1);
+        alert(`Booking ${bookingToDelete.bookingId} permanently deleted.`);
+      } else {
+        const err = await res.json();
+        alert(`Failed to delete: ${err.message || 'Server error'}`);
+      }
+    } catch (e) {
+      // Offline fallback — remove from local array
+      const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
+      if (idx !== -1) bookings.splice(idx, 1);
+      alert(`Booking ${bookingToDelete.bookingId} removed (offline mode).`);
+    }
+    setDeleteInProgress(false);
+    setShowDeleteConfirm(false);
+    setBookingToDelete(null);
+  };
+
   const handleAdminOverrideSubmit = (e) => {
     e.preventDefault();
     onAdminOverride(selectedBooking.bookingId, {
@@ -2113,7 +2148,7 @@ export default function BookedVehicles({
     printWindow.document.write(`
       <html>
         <head>
-          <title>VELORENT Rental Bill - Invoice #${booking.bookingId}</title>
+          <title>NX Rental Rental Bill - Invoice #${booking.bookingId}</title>
           <style>
             body { font-family: 'Inter', sans-serif; color: #333; margin: 30px; }
             .header { display: flex; justify-content: space-between; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
@@ -2130,7 +2165,7 @@ export default function BookedVehicles({
         <body onload="window.print()">
           <div class="header">
             <div>
-              <h2 style="margin: 0; color: #4f46e5;">VELORENT RENTALS</h2>
+              <h2 style="margin: 0; color: #4f46e5;">NX Rental RENTALS</h2>
               <span style="font-size: 0.85rem; color: #666;">Indore Branch Office</span>
             </div>
             <div style="text-align: right;">
@@ -2155,7 +2190,7 @@ export default function BookedVehicles({
           </div>
 
           <div class="footer">
-            <p>Thank you for choosing Velorent Rentals. For help, contact +91 98765 43210.</p>
+            <p>Thank you for choosing NX Rental Rentals. For help, contact +91 98765 43210.</p>
             <p>Authorized Handover Operator: ${booking.workerId || 'Ramesh Kumar'}</p>
           </div>
         </body>
@@ -2730,12 +2765,10 @@ export default function BookedVehicles({
       {viewState === 'list' && (
         <>
           {/* Header section with Stats widgets */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+          <div className="fo-page-header">
             <div>
-              <h2 style={{ fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                Booked Vehicles
-              </h2>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>View and manage current active vehicle rentals</p>
+              <h1 className="fo-page-title">Booked Vehicles</h1>
+              <p className="fo-breadcrumb">FleetOps / <span style={{ color: 'var(--secondary)' }}>Booked Vehicles</span></p>
             </div>
             
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -3002,6 +3035,36 @@ export default function BookedVehicles({
                       </div>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+
+                        {/* Row 1: Vehicle Name + Reg Number (prominent) */}
+                        {(() => {
+                          const resolvedV = vehicles.find(v => v.vehicleId === b.vehicleId);
+                          const vName = resolvedV?.name || b.vehicleDetails?.name || b.vehicleName || 'Unknown Vehicle';
+                          const vReg  = resolvedV?.regNumber || b.vehicleDetails?.regNumber || b.vehicleRegNumber || '';
+                          return (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#1e293b' }}>
+                                {vName}
+                              </span>
+                              {vReg && (
+                                <span style={{
+                                  fontSize: '0.72rem',
+                                  fontWeight: 600,
+                                  color: '#6366f1',
+                                  background: 'rgba(99,102,241,0.08)',
+                                  border: '1px solid rgba(99,102,241,0.25)',
+                                  borderRadius: '6px',
+                                  padding: '1px 8px',
+                                  letterSpacing: '0.5px'
+                                }}>
+                                  {vReg}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })()}
+
+                        {/* Row 2: Status badge + Time badge + Customer + Phone + Location */}
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                           
                           {/* Status and Time badges */}
@@ -3016,20 +3079,20 @@ export default function BookedVehicles({
                           )}
 
                           {/* Customer Name, Phone, and Zone Location in strip */}
-                          <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#1e293b', marginLeft: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <User size={13}/> {b.customerName}
+                          <span style={{ fontSize: '0.82rem', fontWeight: 600, color: '#475569', marginLeft: '4px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <User size={12}/> {b.customerName}
                           </span>
                           <span style={{ color: 'var(--text-muted)' }}>•</span>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <Phone size={12}/> {b.customerPhone}
+                          <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <Phone size={11}/> {b.customerPhone}
                           </span>
                           <span style={{ color: 'var(--text-muted)' }}>•</span>
-                          <span style={{ fontSize: '0.8rem', color: '#f87171', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                            <MapPin size={12}/> {b.pickupLocation || 'Vijay Nagar'}
+                          <span style={{ fontSize: '0.78rem', color: '#f87171', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                            <MapPin size={11}/> {b.pickupLocation || 'Vijay Nagar'}
                           </span>
                         </div>
 
-                        {/* Timing details with Calendar icon */}
+                        {/* Row 3: Timing details with Calendar icon */}
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Calendar size={13} color="#94a3b8"/>
                           <span>
@@ -3065,6 +3128,27 @@ export default function BookedVehicles({
 
                     {/* Right side buttons mapping Mockup 3 */}
                     <div style={{ display: 'flex', gap: '8px', marginLeft: '12px' }}>
+
+                      {/* Delete Booking Button — visible for all statuses */}
+                      <button
+                        className="btn btn-secondary"
+                        title="Permanently delete this booking"
+                        onClick={() => { setBookingToDelete(b); setShowDeleteConfirm(true); }}
+                        style={{
+                          padding: '6px 10px',
+                          fontSize: '0.8rem',
+                          border: '1px solid #ef4444',
+                          color: '#ef4444',
+                          background: 'transparent',
+                          borderRadius: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}
+                      >
+                        <Trash2 size={13}/>
+                      </button>
+
                       <button 
                         className="btn btn-secondary" 
                         onClick={() => { setSelectedBooking(b); setViewState('view-booking'); }}
@@ -3078,7 +3162,7 @@ export default function BookedVehicles({
                           <button 
                             className="btn btn-secondary" 
                             onClick={() => openEdit(b)}
-                            style={{ padding: '6px 14px', fontSize: '0.8rem', border: '1px solid var(--primary)', color: 'var(--primary)', background: 'transparent' }}
+                            style={{ padding: '6px 14px', fontSize: '0.8rem', border: '1px solid var(--secondary)', color: 'var(--secondary)', background: 'transparent' }}
                           >
                             Edit
                           </button>
@@ -3086,7 +3170,7 @@ export default function BookedVehicles({
                           <button 
                             className="btn btn-primary" 
                             onClick={() => openDropPage(b)}
-                            style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'var(--primary)', borderColor: 'var(--primary)', color: 'white' }}
+                            style={{ padding: '6px 14px', fontSize: '0.8rem', background: 'var(--secondary)', borderColor: 'var(--secondary)', color: 'white' }}
                           >
                             Dropoff
                           </button>
@@ -4646,7 +4730,7 @@ export default function BookedVehicles({
                   Vehicle Return / Drop-Off
                 </h2>
                 <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-                  Booking ID: <strong style={{ color: 'var(--primary)' }}>{selectedBooking.bookingId}</strong>
+                  Booking ID: <strong style={{ color: 'var(--secondary)' }}>{selectedBooking.bookingId}</strong>
                 </span>
               </div>
             </div>
@@ -4667,7 +4751,7 @@ export default function BookedVehicles({
                 
                 {/* Section 1 – Booking Snapshot (Read Only) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Booking Information
                   </h3>
                   
@@ -4713,7 +4797,7 @@ export default function BookedVehicles({
 
                 {/* Section 2 – Current Booking Financial Snapshot (Read Only) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Booking Financial Details
                   </h3>
                   
@@ -4778,7 +4862,7 @@ export default function BookedVehicles({
                   {/* Card 1: Booking Modifications */}
                   {hasEdits && (
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Booking Modifications
                       </h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -4795,7 +4879,7 @@ export default function BookedVehicles({
                   {/* Card 2: Duration & Extension Summary */}
                   {hasExtensions && (
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Duration & Extension Summary
                       </h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
@@ -4830,7 +4914,7 @@ export default function BookedVehicles({
 
                         {/* Subsection: Current Active Booking Rules */}
                         <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-light)' }}>
-                          <h4 style={{ fontSize: '0.8rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
+                          <h4 style={{ fontSize: '0.8rem', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
                             Current Active Booking Rules
                           </h4>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -4861,7 +4945,7 @@ export default function BookedVehicles({
                   {/* Card 3: Vehicle Replacement Summary */}
                   {hasSwaps && (
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Vehicle Replacement History
                       </h3>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '0.85rem' }}>
@@ -4910,7 +4994,7 @@ export default function BookedVehicles({
                   {/* Card 4: Payment & Deposit Timeline */}
                   <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 16px 0' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: 0, color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '0.9rem', margin: 0, color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Payment & Deposit Timeline
                       </h3>
                       <button
@@ -4940,7 +5024,7 @@ export default function BookedVehicles({
                                   </div>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '2px' }}>
                                     <strong style={{ color: 'var(--text-primary)', fontSize: '0.85rem' }}>₹{item.amount}</strong>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: '600' }}>{item.mode}</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--secondary)', fontWeight: '600' }}>{item.mode}</span>
                                   </div>
                                 </div>
                                 {idx < paymentTimelineItems.length - 1 && (
@@ -4949,9 +5033,9 @@ export default function BookedVehicles({
                               </React.Fragment>
                             ))}
                             <div style={{ alignSelf: 'center', color: 'var(--text-muted)', fontSize: '1rem', margin: '2px 0' }}>↓</div>
-                            <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px dashed var(--primary)', borderRadius: '8px', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px dashed var(--secondary)', borderRadius: '8px', padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 'bold' }}>Total Rental Paid</span>
-                              <strong style={{ color: 'var(--primary)', fontSize: '0.9rem' }}>₹{runningTotalPaid}</strong>
+                              <strong style={{ color: 'var(--secondary)', fontSize: '0.9rem' }}>₹{runningTotalPaid}</strong>
                             </div>
                           </div>
                         </div>
@@ -4994,7 +5078,7 @@ export default function BookedVehicles({
 
                 {/* Section 3 – Return Details */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Vehicle Return Details
                   </h3>
                   
@@ -5028,7 +5112,7 @@ export default function BookedVehicles({
                   const isEV = selectedBooking.vehicleDetails?.category?.toLowerCase() === 'ev';
                   return (
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Vehicle Inspection & Damage Report
                       </h3>
                       
@@ -5159,7 +5243,7 @@ export default function BookedVehicles({
 
                 {/* Section 5 – Adjustments (Editable) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Adjustments & Waivers
                   </h3>
                   
@@ -5189,7 +5273,7 @@ export default function BookedVehicles({
                     )}
 
                     {calc.isScootyFuel && (
-                      <div style={{ background: 'rgba(239, 149, 0, 0.1)', border: '1px solid rgba(239, 149, 0, 0.2)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--primary)' }}>
+                      <div style={{ background: 'rgba(239, 149, 0, 0.1)', border: '1px solid rgba(239, 149, 0, 0.2)', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', color: 'var(--secondary)' }}>
                         Note: Scooty with Fuel has no KM Limit. All distance is chargeable; additional free KM waiver is disabled.
                       </div>
                     )}
@@ -5214,7 +5298,7 @@ export default function BookedVehicles({
 
                 {/* Section 6 – Usage Summary (Auto Calculated) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Trip Usage Summary
                   </h3>
                   
@@ -5229,7 +5313,7 @@ export default function BookedVehicles({
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Final Active Duration</span>
-                      <strong style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{calc.bookedDurationHours} hrs</strong>
+                      <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>{calc.bookedDurationHours} hrs</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Actual Duration</span>
@@ -5267,7 +5351,7 @@ export default function BookedVehicles({
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Final Active KM Limit</span>
-                          <strong style={{ color: 'var(--primary)', fontWeight: 'bold' }}>{calc.allowedKmLimitRounded} KM</strong>
+                          <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>{calc.allowedKmLimitRounded} KM</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Waiver KM Added</span>
@@ -5286,7 +5370,7 @@ export default function BookedVehicles({
 
                 {/* Section 7 – Charges Breakdown (Auto Calculated) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Rental Charges Breakdown
                   </h3>
                   
@@ -5380,8 +5464,8 @@ export default function BookedVehicles({
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid var(--border-light)', paddingTop: '10px', fontSize: '1rem', marginTop: '4px' }}>
-                      <span style={{ color: 'var(--primary)', fontWeight: 'bold' }}>Actual Rental Bill</span>
-                      <strong style={{ color: 'var(--primary)', fontWeight: 'bold' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
+                      <span style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Actual Rental Bill</span>
+                      <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
                     </div>
                   </div>
                 </div>
@@ -5391,7 +5475,7 @@ export default function BookedVehicles({
                   const snapshot = getBookingFinancialSnapshot(selectedBooking);
                   return (
                     <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Payment & Deposit Summary
                       </h3>
                       
@@ -5411,7 +5495,7 @@ export default function BookedVehicles({
                             </div>
                             <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border-light)' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Total Paid</span>
-                              <strong style={{ color: 'var(--primary)' }}>₹{(calc.rentalPaid || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--secondary)' }}>₹{(calc.rentalPaid || 0).toFixed(2)}</strong>
                             </div>
                           </div>
                         </div>
@@ -5444,7 +5528,7 @@ export default function BookedVehicles({
 
                 {/* Section 11 – Final Settlement Summary */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Final Settlement Ledger
                   </h3>
                   
@@ -5497,7 +5581,7 @@ export default function BookedVehicles({
 
                 {/* Unified Final Settlement Center */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Final Settlement
                   </h3>
                   
@@ -5815,7 +5899,7 @@ export default function BookedVehicles({
                         fontWeight: 'bold', 
                         border: 'none', 
                         color: '#ffffff', 
-                        background: calc.settlementStatus === 'Refund' ? 'var(--status-available)' : 'var(--primary)',
+                        background: calc.settlementStatus === 'Refund' ? 'var(--status-available)' : 'var(--secondary)',
                         borderRadius: '8px', 
                         cursor: (!dropReturnDate || !dropEndMeter) ? 'not-allowed' : 'pointer',
                         boxShadow: '0 4px 6px rgba(0,0,0,0.15)',
@@ -5912,7 +5996,7 @@ export default function BookedVehicles({
 
         return (
           <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="modal-content glass-panel" style={{ maxWidth: '550px' }}>
               <div className="modal-header">
                 <h2>Extend Rental Period - {selectedBooking.bookingId}</h2>
                 <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setActiveModal(null)}><X size={16}/></button>
@@ -6031,7 +6115,7 @@ export default function BookedVehicles({
                         type="checkbox" 
                         checked={extensionCollectNow} 
                         onChange={e => setExtensionCollectNow(e.target.checked)} 
-                        style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }} 
+                        style={{ width: '16px', height: '16px', accentColor: 'var(--secondary)' }} 
                       />
                       <span style={{ fontSize: '0.85rem' }}>Collect Rental Charges Upfront Now</span>
                     </div>
@@ -6121,7 +6205,7 @@ export default function BookedVehicles({
         const comp = getReplacePricingComparison();
         return (
           <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '550px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="modal-content glass-panel" style={{ maxWidth: '550px' }}>
               <div className="modal-header">
                 <h2>Swap / Replace Vehicle - {selectedBooking.bookingId}</h2>
                 <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setActiveModal(null)}><X size={16}/></button>
@@ -6213,7 +6297,7 @@ export default function BookedVehicles({
                       type="checkbox" 
                       checked={applyNewPricing} 
                       onChange={e => setApplyNewPricing(e.target.checked)} 
-                      style={{ width: '16px', height: '16px', accentColor: 'var(--primary)' }} 
+                      style={{ width: '16px', height: '16px', accentColor: 'var(--secondary)' }} 
                     />
                     <span style={{ fontSize: '0.85rem', fontWeight: 'bold' }}>Apply New Vehicle Pricing Plans</span>
                   </div>
@@ -6325,7 +6409,7 @@ export default function BookedVehicles({
         const comp = getEditDepositComparison();
         return (
           <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '650px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="modal-content glass-panel" style={{ maxWidth: '650px' }}>
               <div className="modal-header">
                 <h2>Edit Booking Info - {selectedBooking.bookingId}</h2>
                 <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setActiveModal(null)}><X size={16}/></button>
@@ -6335,7 +6419,7 @@ export default function BookedVehicles({
                   
                   {/* Section 1: Customer */}
                   <div>
-                    <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Customer Profiles</h4>
+                    <h4 style={{ color: 'var(--secondary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Customer Profiles</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Full Name</label>
@@ -6382,7 +6466,7 @@ export default function BookedVehicles({
 
                   {/* Section 2: Rental Specifications */}
                   <div>
-                    <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Rental Plan Dates</h4>
+                    <h4 style={{ color: 'var(--secondary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Rental Plan Dates</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Start pickup Date {selectedBooking.status !== 'Reserved' && <span style={{fontSize:'0.7rem', color:'#f43f5e'}}>(Locked - Ongoing)</span>}</label>
@@ -6413,7 +6497,7 @@ export default function BookedVehicles({
 
                   {/* Section 3: Financial Details */}
                   <div>
-                    <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Billing & Payments</h4>
+                    <h4 style={{ color: 'var(--secondary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Billing & Payments</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Rental Cost (Base Fare) (₹) * {selectedBooking.status !== 'Reserved' && <span style={{fontSize:'0.7rem', color:'#f43f5e'}}>(Locked)</span>}</label>
@@ -6453,7 +6537,7 @@ export default function BookedVehicles({
 
                   {/* Section 4: Deposit Details */}
                   <div>
-                    <h4 style={{ color: 'var(--primary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Security Deposit</h4>
+                    <h4 style={{ color: 'var(--secondary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Security Deposit</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Required Deposit (₹) *</label>
@@ -6775,6 +6859,61 @@ export default function BookedVehicles({
                 <button type="submit" className="btn btn-primary" style={{ background: 'var(--secondary)' }}>Apply Overrides</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ====================================================================
+         DELETE CONFIRMATION MODAL
+         ==================================================================== */}
+      {showDeleteConfirm && bookingToDelete && (
+        <div className="modal-overlay" style={{ zIndex: 9999 }}>
+          <div className="modal-container" style={{ maxWidth: '420px', background: '#fff', borderRadius: '12px', overflow: 'hidden' }}>
+            <div className="modal-header" style={{ background: '#ef4444', color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Trash2 size={18}/>
+              <span style={{ fontWeight: 700, fontSize: '1rem' }}>Permanently Delete Booking</span>
+            </div>
+            <div className="modal-body" style={{ padding: '24px', color: '#1e293b' }}>
+              <p style={{ marginBottom: '12px', fontSize: '0.95rem' }}>
+                Are you sure you want to <strong>permanently delete</strong> this booking?
+              </p>
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px' }}>
+                <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: '4px' }}>
+                  {bookingToDelete.bookingId}
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
+                  Customer: <strong>{bookingToDelete.customerName}</strong>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
+                  Status: <strong>{bookingToDelete.status}</strong>
+                </div>
+                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
+                  Vehicle: <strong>{bookingToDelete.vehicleDetails?.regNumber || bookingToDelete.vehicleId}</strong>
+                </div>
+              </div>
+              <p style={{ fontSize: '0.82rem', color: '#6b7280' }}>
+                ⚠️ This action cannot be undone. The booking will be removed from the database and the vehicle status will be reset to Active.
+              </p>
+            </div>
+            <div className="modal-footer" style={{ padding: '12px 20px', display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0' }}>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => { setShowDeleteConfirm(false); setBookingToDelete(null); }}
+                disabled={deleteInProgress}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={handleDeleteBooking}
+                disabled={deleteInProgress}
+                style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff' }}
+              >
+                {deleteInProgress ? 'Deleting...' : 'Yes, Delete Permanently'}
+              </button>
+            </div>
           </div>
         </div>
       )}

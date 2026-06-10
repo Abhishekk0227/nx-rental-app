@@ -6,9 +6,9 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
 
   const mainNav = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'vehicles', label: 'Vehicle management', icon: <Car size={20} />, adminOnly: true },
-    { id: 'bookings', label: 'Available vehicle', icon: <Calendar size={20} /> },
-    { id: 'available', label: 'Booked vehicle', icon: <Users size={20} /> },
+    { id: 'vehicles', label: 'Vehicle management', icon: <Car size={20} />, adminOnly: true },    
+    { id: 'available', label: 'Available vehicle', icon: <Users size={20} /> },
+    { id: 'bookings', label: ' Booked vehicle', icon: <Calendar size={20} /> },
     // { id: 'fleet', label: 'Fleet Tracking', icon: <Crosshair size={20}/>, disabled: true },
     { id: 'hisab', label: 'Daily Hisab', icon: <DollarSign size={20} /> },
     // { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20}/>, disabled: true },
@@ -39,7 +39,7 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
             <LayoutDashboard size={20} color="white" strokeWidth={2.5} />
           </div>
           <div className="fo-logo-text">
-            <span className="fo-logo-title">VeloRent</span>
+            <span className="fo-logo-title">NX Rental</span>
             <span className="fo-logo-subtitle">Enterprise Management</span>
           </div>
           {/* Close button – visible only on mobile */}

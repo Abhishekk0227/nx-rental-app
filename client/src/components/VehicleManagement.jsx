@@ -75,7 +75,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     },
     depositSettings: { requireDeposit: true, amount: 1000 },
     paymentSettings: { advanceRequired: false, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
-    bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
+    bookingConfig: { bufferTime: 30, minBookingHours: 0, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Main Branch', parkingLocation: '', gps: { lat: 22.7196, lng: 75.8577 } },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
     images: { front: '', back: '', left: '', right: '', interior: '', document: '', other: '' },
@@ -322,6 +322,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       },
       bookingConfig: {
         bufferTime: v.bookingConfig?.bufferTime ?? 30,
+        minBookingHours: v.bookingConfig?.minBookingHours ?? 0,
         status: v.bookingConfig?.status ?? 'Active',
         bookingEnabled: v.bookingConfig?.bookingEnabled ?? true,
         instantBooking: v.bookingConfig?.instantBooking ?? true
@@ -426,7 +427,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       },
       depositSettings: { requireDeposit: true, amount: 1000 },
       paymentSettings: { advanceRequired: false, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
-      bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
+      bookingConfig: { bufferTime: 30, minBookingHours: 0, status: 'Active', bookingEnabled: true, instantBooking: true },
       locationDetails: {
         currentZone: addFormData.zone,
         currentBranch: addFormData.branch,
@@ -764,7 +765,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
               </button>
             </div>
 
-            <form onSubmit={handleAddSubmit}>
+            <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden', minHeight: 0 }}>
               <div className="av-modal-body">
 
                 {/* ── SECTION 1: VEHICLE IDENTITY ── */}
@@ -1382,6 +1383,18 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                               onChange={e => handleNestedChange('bookingConfig', 'bufferTime', Number(e.target.value))} 
                             />
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Required turnaround gap between rentals.</span>
+                          </div>
+
+                          <div className="form-group">
+                            <label>Minimum Booking Duration (Hours)</label>
+                            <input 
+                              type="number"
+                              min="0"
+                              className="form-control" 
+                              value={formData.bookingConfig.minBookingHours ?? 0} 
+                              onChange={e => handleNestedChange('bookingConfig', 'minBookingHours', Number(e.target.value))} 
+                            />
+                            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Set 0 for no minimum. Booking form will enforce this limit.</span>
                           </div>
 
                           <div className="form-group">

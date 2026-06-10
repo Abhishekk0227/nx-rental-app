@@ -90,7 +90,12 @@ export default function App() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
         });
-        if (res.ok) fetchInitialData();
+        if (res.ok) {
+          fetchInitialData();
+        } else {
+          const errData = await res.json().catch(() => ({}));
+          alert(`Vehicle registration failed: ${errData.message || res.statusText || 'Unknown error'}`);
+        }
       } catch (err) {
         console.error(err);
       }

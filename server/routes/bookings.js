@@ -666,4 +666,40 @@ router.post('/:bookingId/payment', async (req, res) => {
   }
 });
 
+// ─── DELETE Booking (Hard Delete) ────────────────────────────────────────────
+// Permanently removes a booking from the database regardless of status.
+// Also resets the associated vehicle back to 'Active' status.
+router.delete('/:bookingId', async (req, res) => {
+  try {
+    if (isDbConnected()) {
+      const booking = await Booking.findOne({ bookingId: req.params.bookingId });
+      if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+      const vehicleId = booking.vehicleId;
+
+      // Hard delete the booking
+      await Booking.deleteOne({ bookingId: req.params.bookingId });
+
+      // Reset vehicle status to Active (if vehicle exists and was tied to this booking)
+      const vehicle = await Vehicle.findOne({ vehicleId });
+      if (vehicle && ['Reserved', 'Ongoing', 'Extended'].includes(vehicle.status)) {
+        vehicle.status = 'Active';
+        await vehicle.save();
+      }
+
+      return res.json({ message: 'Booking permanently deleted.', bookingId: req.params.bookingId });
+    }
+
+    // Memory fallback
+    const idx = getBookings().findIndex(b => b.bookingId === req.params.bookingId);
+    if (idx === -1) return res.status(404).json({ message: 'Booking not found' });
+    const vehicleId = getBookings()[idx].vehicleId;
+    getBookings().splice(idx, 1);
+    updateVehicle(vehicleId, { status: 'Active' });
+    res.json({ message: 'Booking permanently deleted.', bookingId: req.params.bookingId });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 export default router;

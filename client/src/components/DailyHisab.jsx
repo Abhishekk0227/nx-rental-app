@@ -4,8 +4,8 @@ import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike
 // Embedded high-fidelity styles to match your design guidelines
 const rawStyles = `
   .hisab-container {
-    padding: 24px;
-    background: #f8f9fb;
+    padding: 0;
+    background: transparent;
     color: #1e293b;
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
@@ -17,10 +17,12 @@ const rawStyles = `
     margin-bottom: 24px;
   }
   .hisab-title {
-    font-size: 1.75rem;
+    font-size: 1.65rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #1e293b;
     margin: 0;
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.03em;
   }
   .hisab-subtitle {
     font-size: 0.9rem;
@@ -79,7 +81,7 @@ const rawStyles = `
   .hisab-date-input {
     background: #f1f5f9;
     border: 1px solid #e5e7eb;
-    color: #ffffff;
+    color: #1e293b;
     padding: 8px 12px;
     border-radius: 8px;
     font-size: 0.95rem;
@@ -1636,10 +1638,10 @@ export default function DailyHisab({
       <style dangerouslySetInnerHTML={{ __html: rawStyles }} />
 
       {/* 1. MODULE TITLE & HEADER */}
-      <div className="hisab-header-row">
+      <div className="fo-page-header">
         <div>
-          <h1 className="hisab-title">Daily Hisab</h1>
-          <p className="hisab-subtitle">Financial ledger</p>
+          <h1 className="fo-page-title">Daily Hisab</h1>
+          <p className="fo-breadcrumb">FleetOps / <span style={{ color: 'var(--secondary)' }}>Daily Hisab</span></p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button className="hisab-refresh-btn" title="Refresh Data" onClick={fetchHisabData} disabled={loading}>
@@ -1808,16 +1810,21 @@ export default function DailyHisab({
           const isNewBooking = safeDateStr(b.createdAt) === dateFilter;
           const isReturnBooking = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate) === dateFilter && b.status === 'Completed';
 
-          // 1. Cumulative Security Deposit Held (using priority sequence depositHeld -> depositCollected -> securityDeposit)
-          const depAmt = b.depositHeld || b.settlement?.depositCollected || b.securityDeposit || 0;
+          // 1. Security Deposit: use the actual collected deposit from depositDetails breakdown.
+          // depAmt = sum of cash+online+card collected at booking time (original vehicle deposit).
+          // Do NOT use depositHeld as that is the post-settlement net value.
           let depCash = b.depositDetails?.cashAmount || 0;
           let depOnline = b.depositDetails?.onlineAmount || 0;
           let depCard = b.depositDetails?.cardAmount || 0;
-          if (depCash === 0 && depOnline === 0 && depCard === 0 && depAmt > 0) {
+          const depBreakdownSum = depCash + depOnline + depCard;
+          // If breakdown sums to something, use it; else fall back to securityDeposit field
+          const depAmt = depBreakdownSum > 0 ? depBreakdownSum : (b.securityDeposit || 0);
+          // If breakdown was zero but depAmt > 0, distribute by mode
+          if (depBreakdownSum === 0 && depAmt > 0) {
             const mode = b.depositDetails?.mode || 'Cash';
             if (mode === 'Card') {
               depCard = depAmt;
-            } else if (['Online', 'UPI', 'Card', 'Bank Transfer'].includes(mode)) {
+            } else if (['Online', 'UPI', 'Bank Transfer'].includes(mode)) {
               depOnline = depAmt;
             } else {
               depCash = depAmt; // default to Cash
@@ -2020,18 +2027,18 @@ export default function DailyHisab({
                   {/* Column 4: Actual Rent Bill */}
                   <div className="hisab-item-right-col">
                     <span className="hisab-item-right-label">Actual Rent Bill</span>
-                    <span className="hisab-item-right-val" style={{ color: '#ffffff' }}>
+                    <span className="hisab-item-right-val" style={{ color: '#0e0d0dff' }}>
                       ₹{(b.settlement?.actualBill || b.settlement?.totalBill || b.baseFare || 0).toLocaleString()}
                     </span>
                   </div>
 
-                  {/* Column 5: Outstanding Due */}
-                  <div className="hisab-item-right-col">
+                  {/* {Column 5: Outstanding Due */}
+                  {/* <div className="hisab-item-right-col">
                     <span className="hisab-item-right-label">Outstanding Due</span>
                     <span className="hisab-item-right-val" style={{ color: outstandingDue > 0 ? '#ef4444' : '#10b981' }}>
                       ₹{outstandingDue.toLocaleString()}
                     </span>
-                  </div>
+                  </div> */}
                   <span className={`hisab-chevron ${isExpanded ? 'open' : ''}`}>{isExpanded ? '▲' : '▼'}</span>
                 </div>
               </div>
@@ -2106,7 +2113,7 @@ export default function DailyHisab({
                       <div className="hisab-snapshot-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
                         <div className="hisab-snapshot-card">
                           <div className="hisab-snapshot-title">Current Vehicle</div>
-                          <span style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <span style={{ color: '#0f0f0fff', fontWeight: 600, fontSize: '0.85rem' }}>
                             {vehicle?.name || b.vehicleName}
                           </span>
                           <span style={{ display: 'block', fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
@@ -2115,7 +2122,7 @@ export default function DailyHisab({
                         </div>
                         <div className="hisab-snapshot-card">
                           <div className="hisab-snapshot-title">Current Plan</div>
-                          <span style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <span style={{ color: '#0b0b0bff', fontWeight: 600, fontSize: '0.85rem' }}>
                             {b.selectedPlan?.planType || '24-Hour'}
                           </span>
                           <span style={{ display: 'block', fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px' }}>
@@ -2124,13 +2131,13 @@ export default function DailyHisab({
                         </div>
                         <div className="hisab-snapshot-card">
                           <div className="hisab-snapshot-title">Current Duration</div>
-                          <span style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <span style={{ color: '#060606ff', fontWeight: 600, fontSize: '0.85rem' }}>
                             {snap.currentDuration || 0} hrs
                           </span>
                         </div>
                         <div className="hisab-snapshot-card">
                           <div className="hisab-snapshot-title">Current KM Limit</div>
-                          <span style={{ color: '#ffffff', fontWeight: 600, fontSize: '0.85rem' }}>
+                          <span style={{ color: '#060606ff', fontWeight: 600, fontSize: '0.85rem' }}>
                             {b.selectedPlan?.kmLimit || 0} KM
                           </span>
                         </div>
@@ -2414,7 +2421,7 @@ export default function DailyHisab({
       {/* 6. OUTSTANDING WORKER HANDOVER FOOTER */}
       <div className="hisab-footer-banner">
         <div className="hisab-footer-left">
-          <span className="hisab-footer-title" style={{ color: outstandingHandover >= 0 ? '#ffffff' : '#ef4444' }}>
+          <span className="hisab-footer-title" style={{ color: outstandingHandover >= 0 ? '#060606ff' : '#ef4444' }}>
             Amount to collect from worker: ₹{outstandingHandover.toLocaleString()}
           </span>
           <span className="hisab-footer-desc">

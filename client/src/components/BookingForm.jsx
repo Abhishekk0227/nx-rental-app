@@ -43,6 +43,13 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const isCar = vehicle.category?.toLowerCase() === 'car';
   const isBike = vehicle.category?.toLowerCase() === 'bike';
 
+  // Vehicle-level minimum booking hours (set in Vehicle Management → Settings tab)
+  // 0 means no minimum enforced
+  const minBookingHours = vehicle.bookingConfig?.minBookingHours || 0;
+
+  // Bike Hourly: user-entered hours (starts at minBookingHours or 1)
+  const [bikeHourlyDuration, setBikeHourlyDuration] = useState(Math.max(1, minBookingHours));
+
   // Section 4: Select Plan
   const [selectedPlanType, setSelectedPlanType] = useState('24-Hour');
   const [planRate, setPlanRate] = useState(0);
@@ -69,7 +76,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
   const getPlanDuration = (planType, fuel) => {
     if (planType === 'Hourly') {
-      return fuel ? 1 : 5;
+      if (isBike) return Math.max(1, minBookingHours); // Bike: use vehicle minimum (default 1)
+      if (fuel) return Math.max(1, minBookingHours);    // Scooty with fuel: use vehicle minimum
+      return Math.max(1, minBookingHours);               // Scooty without fuel: use vehicle minimum
     }
     if (planType === '12-Hour') {
       return 12;
@@ -83,16 +92,28 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const handlePlanChange = (planType) => {
     if (isCar && planType === 'Hourly') return;
     setSelectedPlanType(planType);
-    const duration = getPlanDuration(planType, includeFuel);
-    const newDropDate = addHoursToDateString(pickupDate, duration);
-    setExpectedDropDate(newDropDate);
+    if (isBike && planType === 'Hourly') {
+      // Use user-entered hours for bike hourly
+      const newDropDate = addHoursToDateString(pickupDate, bikeHourlyDuration);
+      setExpectedDropDate(newDropDate);
+    } else {
+      const duration = getPlanDuration(planType, includeFuel);
+      const newDropDate = addHoursToDateString(pickupDate, duration);
+      setExpectedDropDate(newDropDate);
+    }
   };
 
   const handlePickupDateChange = (val) => {
     setPickupDate(val);
-    const duration = getPlanDuration(selectedPlanType, includeFuel);
-    const newDropDate = addHoursToDateString(val, duration);
-    setExpectedDropDate(newDropDate);
+    if (isBike && selectedPlanType === 'Hourly') {
+      // Re-apply user-entered hours from the new pickup time
+      const newDropDate = addHoursToDateString(val, bikeHourlyDuration);
+      setExpectedDropDate(newDropDate);
+    } else {
+      const duration = getPlanDuration(selectedPlanType, includeFuel);
+      const newDropDate = addHoursToDateString(val, duration);
+      setExpectedDropDate(newDropDate);
+    }
   };
 
   const handleDropDateChange = (val) => {
@@ -107,9 +128,19 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       } else {
         targetPlan = '24-Hour';
       }
+    } else if (isBike) {
+      // Bike: no minimum, auto-detect plan from hours
+      if (diffHours <= 12) {
+        targetPlan = 'Hourly';
+      } else if (diffHours <= 24) {
+        targetPlan = '12-Hour';
+      } else {
+        targetPlan = '24-Hour';
+      }
     } else if (isScooty && includeFuel) {
       targetPlan = 'Hourly';
     } else {
+      // Scooty without fuel
       if (diffHours <= 5) {
         targetPlan = 'Hourly';
       } else if (diffHours <= 12) {
@@ -121,17 +152,28 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     setSelectedPlanType(targetPlan);
   };
 
+  // Handler for bike hourly duration input
+  const handleBikeHourlyDurationChange = (val) => {
+    // Enforce vehicle-level minimum booking hours
+    const hrs = Math.max(minBookingHours > 0 ? minBookingHours : 1, Number(val) || 1);
+    setBikeHourlyDuration(hrs);
+    const newDropDate = addHoursToDateString(pickupDate, hrs);
+    setExpectedDropDate(newDropDate);
+  };
+
   const handleIncludeFuelChange = (checked) => {
+    // Only applies to Scooty
+    if (!isScooty) return;
     setIncludeFuel(checked);
     if (checked) {
       // Force Hourly
       setSelectedPlanType('Hourly');
-      const newDropDate = addHoursToDateString(pickupDate, 1);
+      const newDropDate = addHoursToDateString(pickupDate, Math.max(1, minBookingHours));
       setExpectedDropDate(newDropDate);
     } else {
-      // Keep Hourly but set duration to 5 hours
+      // Scooty without fuel: use vehicle-configured minimum hours
       if (selectedPlanType === 'Hourly') {
-        const newDropDate = addHoursToDateString(pickupDate, 5);
+        const newDropDate = addHoursToDateString(pickupDate, Math.max(1, minBookingHours));
         setExpectedDropDate(newDropDate);
       }
     }
@@ -390,41 +432,41 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     let kmLimit = 0;
 
     if (!pickupDate || !expectedDropDate) {
-      return { durationText: '0 Hour(s)', cost: 0, deposit: 0, helmets: 0, grossTotal: 0, moneyReceived: 0, outstanding: 0, discountVal: 0, originalCost: 0, isMinBilling: false, kmLimit: 0 };
+      return { durationText: '0 Hour(s)', cost: 0, deposit: 0, helmets: 0, grossTotal: 0, moneyReceived: 0, outstanding: 0, discountVal: 0, isMinBilling: false, kmLimit: 0, actualHours: 0, effectiveHours: 0 };
     }
-    
+
     const start = new Date(pickupDate);
     const end = new Date(expectedDropDate);
     const diffMs = end.getTime() - start.getTime();
 
     if (isNaN(diffMs) || diffMs <= 0) {
-      return { durationText: '0 Hour(s)', cost: 0, deposit: 0, helmets: 0, grossTotal: 0, moneyReceived: 0, outstanding: 0, discountVal: 0, originalCost: 0, isMinBilling: false, kmLimit: 0 };
+      return { durationText: '0 Hour(s)', cost: 0, deposit: 0, helmets: 0, grossTotal: 0, moneyReceived: 0, outstanding: 0, discountVal: 0, isMinBilling: false, kmLimit: 0, actualHours: 0, effectiveHours: 0 };
     }
 
+    // Actual hours from date diff
     hours = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60)));
-    days = Math.ceil(hours / 24);
-    durationText = hours >= 24 ? `${days} Day(s) (${hours} hr)` : `${hours} Hour(s)`;
 
+    // Effective hours = max(actual, minimum) when Hourly plan and minimum is configured
+    // Exception: Scooty WITH fuel → no minimum (fuel-included is always per-actual-hour)
+    let effectiveHours = hours;
+    const skipMinimum = isScooty && includeFuel;
+    if (selectedPlanType === 'Hourly' && minBookingHours > 0 && hours < minBookingHours && !skipMinimum) {
+      effectiveHours = minBookingHours;
+      isMinBilling = true;
+    }
+
+    // Duration text — shows effective (charged) hours, with note when minimum applies
+    days = Math.ceil(effectiveHours / 24);
+    if (isMinBilling) {
+      durationText = `${effectiveHours} Hour(s) (Min ${minBookingHours}h Charged)`;
+    } else {
+      durationText = effectiveHours >= 24 ? `${days} Day(s) (${effectiveHours} hr)` : `${effectiveHours} Hour(s)`;
+    }
+
+    // Cost is always based on effectiveHours for Hourly plan
     let cost = 0;
-
     if (selectedPlanType === 'Hourly') {
-      if (isBike) {
-        cost = hours * planRate;
-      } else if (isScooty) {
-        // Rule: Minimum 5-hour booking charge if fuel is NOT included
-        if (!includeFuel) {
-          if (hours < 5) {
-            cost = 5 * planRate;
-            isMinBilling = true;
-          } else {
-            cost = hours * planRate;
-          }
-        } else {
-          cost = hours * planRate;
-        }
-      } else {
-        cost = hours * planRate;
-      }
+      cost = effectiveHours * planRate;
     } else if (selectedPlanType === '12-Hour') {
       cost = planRate;
       if (hours > 12) {
@@ -437,15 +479,15 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       }
     }
 
-    // Dynamic Included KM Limit based on Category and Plan
+    // KM Limit — uses effectiveHours so it matches what is charged
     if (isBike || isCar) {
-      kmLimit = hours * 10;
+      kmLimit = effectiveHours * 10;
     } else if (isScooty) {
       if (includeFuel) {
-        kmLimit = 0;
+        kmLimit = 0; // Fuel-included: no free KM (fuel surcharge applies per KM)
       } else {
         if (selectedPlanType === 'Hourly') {
-          kmLimit = hours * 10;
+          kmLimit = effectiveHours * 10;
         } else if (selectedPlanType === '12-Hour') {
           kmLimit = 120;
         } else if (selectedPlanType === '24-Hour') {
@@ -453,7 +495,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         }
       }
     } else {
-      kmLimit = hours * 10;
+      kmLimit = effectiveHours * 10;
     }
 
     // Rule: Helmet 1 unit free, extra units ₹50/each
@@ -527,10 +569,10 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       return alert("Expected Return Date & Time must be after pickup Date & Time.");
     }
 
-    // Enforce 12-Hour Car Minimum Validation
     const durationHours = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60)));
-    if (isCar && durationHours < 12) {
-      return alert("Minimum booking duration for Car is 12 hours.");
+    // Enforce vehicle-configured minimum booking duration
+    if (minBookingHours > 0 && durationHours < minBookingHours) {
+      return alert(`Minimum booking duration for this vehicle is ${minBookingHours} hour(s).`);
     }
     
     // Validate mixed deposit split matches
@@ -844,6 +886,26 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               />
             </div>
           </div>
+
+          {/* Bike + Hourly: Show duration input so user sets hours directly */}
+          {isBike && selectedPlanType === 'Hourly' && (
+            <div style={{ marginTop: '12px', padding: '10px 12px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: '0.85rem', color: '#4f46e5', fontWeight: '600', margin: 0, whiteSpace: 'nowrap' }}>
+                ⏱ Booking Duration (Hours)
+              </label>
+              <input
+                type="number"
+                min="1"
+                className="form-control"
+                style={{ width: '100px', marginBottom: 0, textAlign: 'center', fontWeight: 'bold' }}
+                value={bikeHourlyDuration}
+                onChange={e => handleBikeHourlyDurationChange(e.target.value)}
+              />
+              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+                Return by: <strong style={{ color: '#1e293b' }}>{expectedDropDate ? new Date(expectedDropDate).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '—'}</strong>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* SECTION 4: SELECT PLAN */}
@@ -981,7 +1043,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
             {/* Deposit base amount input */}
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label>Required Security Deposit (₹)</label>
+              <label>Security Deposit (₹)</label>
               <input 
                 type="number" 
                 className="form-control" 
@@ -1192,7 +1254,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                       <span style={{ color: 'var(--text-secondary)' }}>Base Rental Cost:</span>
                       <span>
                         ₹{bill.cost} 
-                        {bill.isMinBilling && <span style={{ fontSize: '0.65rem', color: 'var(--status-reserved)', marginLeft: '4px' }}>(5h Min)</span>}
+                        {bill.isMinBilling && <span style={{ fontSize: '0.65rem', color: 'var(--status-reserved)', marginLeft: '4px' }}>({minBookingHours}h Min)</span>}
                       </span>
                     </div>
                     {bill.discountVal > 0 && (

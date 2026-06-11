@@ -121,7 +121,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       const ctx = canvas.getContext('2d');
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const base64Str = canvas.toDataURL('image/jpeg');
-      
+
       setFormData(prev => ({
         ...prev,
         images: {
@@ -136,14 +136,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       canvas.width = 640;
       canvas.height = 480;
       const ctx = canvas.getContext('2d');
-      
+
       // Gradient background
       const grad = ctx.createLinearGradient(0, 0, 640, 480);
       grad.addColorStop(0, '#1e1b4b');
       grad.addColorStop(1, '#0f172a');
       ctx.fillStyle = grad;
       ctx.fillRect(0, 0, 640, 480);
-      
+
       ctx.fillStyle = '#6366f1';
       ctx.font = 'bold 24px sans-serif';
       ctx.fillText(`SNAP: ${selectedImageType.toUpperCase()}`, 50, 100);
@@ -151,7 +151,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       ctx.font = '16px sans-serif';
       ctx.fillText(`Reg: ${formData.regNumber || 'New Registration'}`, 50, 140);
       ctx.fillText(`Captured: ${new Date().toLocaleString()}`, 50, 175);
-      
+
       // Decorative motor shape
       ctx.strokeStyle = '#06b6d4';
       ctx.lineWidth = 4;
@@ -161,7 +161,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       ctx.stroke();
       ctx.fillStyle = '#3b82f6';
       ctx.fillRect(200, 240, 240, 40);
-      
+
       const base64Str = canvas.toDataURL('image/jpeg');
       setFormData(prev => ({
         ...prev,
@@ -614,7 +614,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
           <p className="fo-breadcrumb">Manage your vehicle inventory</p>
         </div>
         <button className="fo-btn-primary" onClick={openAddModal}>
-          <Plus size={16}/> Add Vehicle
+          <Plus size={16} /> Add Vehicle
         </button>
       </div>
 
@@ -623,18 +623,18 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showFilters ? '16px' : '0' }}>
           <h3 className="fo-section-title" style={{ margin: 0 }}>Filters & Search</h3>
           <button className="fo-btn-outline" onClick={() => setShowFilters(!showFilters)}>
-            <SlidersHorizontal size={16}/> {showFilters ? 'Hide Filters' : 'Show Filters'}
+            <SlidersHorizontal size={16} /> {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
         </div>
 
         {showFilters && (
           <div className="vm-filter-grid animate-fade">
             <div style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}/>
-              <input 
-                type="text" 
-                className="form-control" 
-                placeholder="Search Vehicle Name or Number..." 
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search Vehicle Name or Number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{ paddingLeft: '36px' }}
@@ -689,7 +689,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       <div className="vehicles-grid animate-fade">
         {filteredVehicles.map(v => (
           <div key={v.vehicleId} className="vehicle-grid-card">
-            
+
             {/* Status Badges Floating Top-Left */}
             <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 10 }}>
               <span className={`badge badge-${(v.status === 'Booked' ? 'ongoing' : (v.status || 'Active').toLowerCase())}`}>{v.status === 'Booked' ? 'Ongoing' : (v.status || 'Active')}</span>
@@ -701,11 +701,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
             {/* Circular Actions Floating Top-Right */}
             <div className="card-header-actions">
-              <button className="circle-action-btn view" title="Details / Config" onClick={() => openEditModal(v)}><Eye size={14}/></button>
-              <button className="circle-action-btn history" title="Rent History" onClick={() => openHistoryModal(v)}><Clock size={14}/></button>
-              <button className="circle-action-btn availability" title="Booking Permission" onClick={() => openAvailabilityModal(v)}><ToggleLeft size={14}/></button>
-              <button className="circle-action-btn location" title="Coordinate Location" onClick={() => openLocationModal(v)}><MapPin size={14}/></button>
-              <button className="circle-action-btn delete" title="Delete Fleet Item" onClick={() => openDeleteModal(v)}><Trash2 size={14}/></button>
+              <button className="circle-action-btn view" title="Details / Config" onClick={() => openEditModal(v)}><Eye size={14} /></button>
+              <button className="circle-action-btn history" title="Rent History" onClick={() => openHistoryModal(v)}><Clock size={14} /></button>
+              <button className="circle-action-btn availability" title="Booking Permission" onClick={() => openAvailabilityModal(v)}><ToggleLeft size={14} /></button>
+              <button className="circle-action-btn location" title="Coordinate Location" onClick={() => openLocationModal(v)}><MapPin size={14} /></button>
+              <button className="circle-action-btn delete" title="Delete Fleet Item" onClick={() => openDeleteModal(v)}><Trash2 size={14} /></button>
             </div>
 
             {/* Vehicle Image View */}
@@ -728,7 +728,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   ₹{v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0}/day • ₹{v.pricingPlans?.hourly?.rate || v.perHourRate || 0}/hr
                 </div>
                 <div className="vehicle-card-info-zone">
-                  <MapPin size={12} style={{marginRight: 2}}/> {v.locationDetails?.currentZone || v.location || 'Vijay Nagar'}
+                  <MapPin size={12} style={{ marginRight: 2 }} /> {v.locationDetails?.currentZone || v.location || 'Vijay Nagar'}
                 </div>
               </div>
             </div>
@@ -927,15 +927,15 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
          ========================================================================== */}
       {showEditModal && selectedVehicle && (
         <div className="modal-overlay">
-        <div className="modal-content glass-panel vm-edit-modal" style={{ width: '90%', maxWidth: '1000px' }}>
-            
+          <div className="modal-content glass-panel vm-edit-modal" style={{ width: '90%', maxWidth: '1000px' }}>
+
             <div className="modal-header" style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-light)' }}>
               <h2>Vehicle Configuration ({selectedVehicle.vehicleId})</h2>
-              <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowEditModal(false)}><X size={16}/></button>
+              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowEditModal(false)}><X size={16} /></button>
             </div>
 
             <div className="modal-body" style={{ flex: 1, display: 'flex', overflow: 'hidden', padding: 0 }}>
-              
+
               {/* Tab Selector Sidebar */}
               <div className="vm-tab-nav">
                 {[
@@ -945,7 +945,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   { id: 4, label: 'Settings' },
                   { id: 5, label: 'Vehicle Images' }
                 ].map(t => (
-                  <button 
+                  <button
                     key={t.id}
                     type="button"
                     className={activeSubTab === t.id ? 'active-tab' : ''}
@@ -960,7 +960,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
               <div className="vm-tab-content">
                 <form onSubmit={handleEditSubmit} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ flex: 1 }}>
-                    
+
                     {/* TAB 1: BASIC INFORMATION */}
                     {activeSubTab === 1 && (
                       <div className="animate-fade">
@@ -970,45 +970,45 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             <label>Basic ID</label>
                             <input type="text" className="form-control" value={selectedVehicle.vehicleId} disabled />
                           </div>
-                          
+
                           <div className="form-group">
                             <label>Vehicle Name</label>
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              value={formData.name} 
-                              onChange={e => setFormData({ ...formData, name: e.target.value })} 
-                              required 
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={formData.name}
+                              onChange={e => setFormData({ ...formData, name: e.target.value })}
+                              required
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Company / Brand</label>
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              value={formData.brand} 
-                              onChange={e => setFormData({ ...formData, brand: e.target.value })} 
-                              required 
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={formData.brand}
+                              onChange={e => setFormData({ ...formData, brand: e.target.value })}
+                              required
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Vehicle Number</label>
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              value={formData.regNumber} 
-                              onChange={e => setFormData({ ...formData, regNumber: e.target.value })} 
-                              required 
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={formData.regNumber}
+                              onChange={e => setFormData({ ...formData, regNumber: e.target.value })}
+                              required
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Category</label>
-                            <select 
-                              className="form-control" 
-                              value={formData.category} 
+                            <select
+                              className="form-control"
+                              value={formData.category}
                               onChange={e => setFormData({ ...formData, category: e.target.value })}
                             >
                               <option value="Bike">Bike</option>
@@ -1020,9 +1020,9 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                           <div className="form-group">
                             <label>Fuel Type</label>
-                            <select 
-                              className="form-control" 
-                              value={formData.fuelType} 
+                            <select
+                              className="form-control"
+                              value={formData.fuelType}
                               onChange={e => setFormData({ ...formData, fuelType: e.target.value })}
                             >
                               <option value="Petrol">Petrol</option>
@@ -1036,60 +1036,60 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                           <div className="form-group">
                             <label>Seating Capacity</label>
-                            <input 
-                              type="number" 
-                              className="form-control" 
-                              value={formData.seatingCapacity} 
-                              onChange={e => setFormData({ ...formData, seatingCapacity: Number(e.target.value) })} 
-                              min="1" 
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={formData.seatingCapacity}
+                              onChange={e => setFormData({ ...formData, seatingCapacity: Number(e.target.value) })}
+                              min="1"
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Color</label>
-                            <input 
-                              type="text" 
-                              className="form-control" 
-                              value={formData.color} 
-                              onChange={e => setFormData({ ...formData, color: e.target.value })} 
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={formData.color}
+                              onChange={e => setFormData({ ...formData, color: e.target.value })}
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Meter Reading (KM)</label>
-                            <input 
-                              type="number" 
-                              className="form-control" 
-                              value={formData.meterReading} 
-                              onChange={e => setFormData({ ...formData, meterReading: Number(e.target.value) })} 
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={formData.meterReading}
+                              onChange={e => setFormData({ ...formData, meterReading: Number(e.target.value) })}
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Fuel Capacity (Liters or %)</label>
-                            <input 
-                              type="number" 
-                              className="form-control" 
-                              value={formData.fuelCapacity} 
-                              onChange={e => setFormData({ ...formData, fuelCapacity: Number(e.target.value) })} 
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={formData.fuelCapacity}
+                              onChange={e => setFormData({ ...formData, fuelCapacity: Number(e.target.value) })}
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Mileage (KM/L or KM/Charge)</label>
-                            <input 
-                              type="number" 
-                              className="form-control" 
-                              value={formData.mileage} 
-                              onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })} 
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={formData.mileage}
+                              onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })}
                             />
                           </div>
 
                           <div className="form-group">
                             <label>Operation Zone</label>
-                            <select 
-                              className="form-control" 
-                              value={formData.locationDetails.currentZone} 
+                            <select
+                              className="form-control"
+                              value={formData.locationDetails.currentZone}
                               onChange={e => handleNestedChange('locationDetails', 'currentZone', e.target.value)}
                             >
                               <option value="Vijay Nagar">Vijay Nagar</option>
@@ -1102,11 +1102,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                         <div className="form-group" style={{ marginTop: '12px' }}>
                           <label>Description</label>
-                          <textarea 
-                            className="form-control" 
-                            rows="2" 
-                            value={formData.description} 
-                            onChange={e => setFormData({ ...formData, description: e.target.value })} 
+                          <textarea
+                            className="form-control"
+                            rows="2"
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
                           />
                         </div>
                       </div>
@@ -1116,7 +1116,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     {activeSubTab === 2 && (
                       <div className="animate-fade">
                         <h3 style={{ fontSize: '1rem', color: 'var(--secondary)', marginBottom: '16px' }}>Multi-Plan Pricing Parameters</h3>
-                        
+
                         {/* 1. Hourly Plan */}
                         <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '6px', marginBottom: '12px' }}>
                           <h4 style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: '8px' }}>Hourly Plan limits (6 fields)</h4>
@@ -1291,14 +1291,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     {activeSubTab === 3 && (
                       <div className="animate-fade">
                         <h3 style={{ fontSize: '1rem', color: 'var(--accent)', marginBottom: '16px' }}>Deposit &amp; Advance Reservation</h3>
-                        
+
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                           <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '8px' }}>
                             <h4 style={{ fontSize: '0.9rem', color: 'var(--primary)', marginBottom: '12px' }}>Deposit Configuration</h4>
-                            
+
                             <div className="form-group">
                               <label>Require Security Deposit</label>
-                              <select 
+                              <select
                                 className="form-control"
                                 value={formData.depositSettings.requireDeposit ? 'Yes' : 'No'}
                                 onChange={e => handleNestedChange('depositSettings', 'requireDeposit', e.target.value === 'Yes')}
@@ -1311,11 +1311,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             {formData.depositSettings.requireDeposit && (
                               <div className="form-group">
                                 <label>Deposit Amount (₹)</label>
-                                <input 
-                                  type="number" 
-                                  className="form-control" 
-                                  value={formData.depositSettings.amount} 
-                                  onChange={e => handleNestedChange('depositSettings', 'amount', Number(e.target.value))} 
+                                <input
+                                  type="number"
+                                  className="form-control"
+                                  value={formData.depositSettings.amount}
+                                  onChange={e => handleNestedChange('depositSettings', 'amount', Number(e.target.value))}
                                 />
                               </div>
                             )}
@@ -1323,10 +1323,10 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                           <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '8px' }}>
                             <h4 style={{ fontSize: '0.9rem', color: 'var(--primary)', marginBottom: '12px' }}>Payment Configuration</h4>
-                            
+
                             <div className="form-group">
                               <label>Advance Payment Required</label>
-                              <select 
+                              <select
                                 className="form-control"
                                 value={formData.paymentSettings.advanceRequired ? 'Yes' : 'No'}
                                 onChange={e => handleNestedChange('paymentSettings', 'advanceRequired', e.target.value === 'Yes')}
@@ -1339,11 +1339,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             {formData.paymentSettings.advanceRequired && (
                               <div className="form-group animate-fade">
                                 <label>Required Payment Percentage (%)</label>
-                                <input 
-                                  type="number" 
-                                  className="form-control" 
-                                  value={formData.paymentSettings.percentage} 
-                                  onChange={e => handleNestedChange('paymentSettings', 'percentage', Number(e.target.value))} 
+                                <input
+                                  type="number"
+                                  className="form-control"
+                                  value={formData.paymentSettings.percentage}
+                                  onChange={e => handleNestedChange('paymentSettings', 'percentage', Number(e.target.value))}
                                 />
                               </div>
                             )}
@@ -1355,8 +1355,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'flex', gap: '20px', marginTop: '6px' }}>
                             {['Cash', 'UPI', 'Card', 'Bank Transfer'].map(mode => (
                               <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
-                                <input 
-                                  type="checkbox" 
+                                <input
+                                  type="checkbox"
                                   checked={formData.paymentSettings.acceptedModes.includes(mode)}
                                   onChange={() => handlePaymentModeToggle(mode)}
                                 />
@@ -1372,34 +1372,34 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     {activeSubTab === 4 && (
                       <div className="animate-fade">
                         <h3 style={{ fontSize: '1rem', color: 'var(--secondary)', marginBottom: '16px' }}>Booking Settings</h3>
-                        
+
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                           <div className="form-group">
                             <label>Minimum Buffer Time (Minutes)</label>
-                            <input 
-                              type="number" 
-                              className="form-control" 
-                              value={formData.bookingConfig.bufferTime} 
-                              onChange={e => handleNestedChange('bookingConfig', 'bufferTime', Number(e.target.value))} 
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={formData.bookingConfig.bufferTime}
+                              onChange={e => handleNestedChange('bookingConfig', 'bufferTime', Number(e.target.value))}
                             />
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Required turnaround gap between rentals.</span>
                           </div>
 
                           <div className="form-group">
                             <label>Minimum Booking Duration (Hours)</label>
-                            <input 
+                            <input
                               type="number"
                               min="0"
-                              className="form-control" 
-                              value={formData.bookingConfig.minBookingHours ?? 0} 
-                              onChange={e => handleNestedChange('bookingConfig', 'minBookingHours', Number(e.target.value))} 
+                              className="form-control"
+                              value={formData.bookingConfig.minBookingHours ?? 0}
+                              onChange={e => handleNestedChange('bookingConfig', 'minBookingHours', Number(e.target.value))}
                             />
                             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Set 0 for no minimum. Booking form will enforce this limit.</span>
                           </div>
 
                           <div className="form-group">
                             <label>Vehicle Status</label>
-                            <select 
+                            <select
                               className="form-control"
                               value={formData.status}
                               onChange={e => {
@@ -1424,7 +1424,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                           <div className="form-group">
                             <label>Booking Enabled</label>
-                            <select 
+                            <select
                               className="form-control"
                               value={formData.bookingConfig.bookingEnabled ? 'Yes' : 'No'}
                               onChange={e => handleNestedChange('bookingConfig', 'bookingEnabled', e.target.value === 'Yes')}
@@ -1436,7 +1436,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                           <div className="form-group">
                             <label>Instant Booking</label>
-                            <select 
+                            <select
                               className="form-control"
                               value={formData.bookingConfig.instantBooking ? 'Enable' : 'Disable'}
                               onChange={e => handleNestedChange('bookingConfig', 'instantBooking', e.target.value === 'Enable')}
@@ -1453,14 +1453,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     {activeSubTab === 5 && (
                       <div className="animate-fade">
                         <h3 style={{ fontSize: '1rem', color: 'var(--accent)', marginBottom: '16px' }}>Vehicle Gallery Uploads</h3>
-                        
+
                         <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '20px' }}>
                           <div>
                             <div className="form-group">
                               <label>Select Image Type to Upload/Capture</label>
-                              <select 
-                                className="form-control" 
-                                value={selectedImageType} 
+                              <select
+                                className="form-control"
+                                value={selectedImageType}
                                 onChange={e => setSelectedImageType(e.target.value)}
                               >
                                 <option value="front">Front View</option>
@@ -1474,11 +1474,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             </div>
 
                             {/* Drag and Drop Zone */}
-                            <div 
-                              style={{ 
-                                border: '2px dashed var(--border-light)', 
-                                padding: '24px', 
-                                borderRadius: '8px', 
+                            <div
+                              style={{
+                                border: '2px dashed var(--border-light)',
+                                padding: '24px',
+                                borderRadius: '8px',
                                 textAlign: 'center',
                                 cursor: 'pointer',
                                 background: 'rgba(255, 255, 255, 0.01)',
@@ -1501,25 +1501,25 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                               }}
                               onClick={() => document.getElementById('file-picker-elem').click()}
                             >
-                              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}><Upload size={20} style={{opacity:0.5}}/></span>
+                              <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '8px' }}><Upload size={20} style={{ opacity: 0.5 }} /></span>
                               <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Drag &amp; Drop Image or Click to Browse</span>
-                              <input 
+                              <input
                                 id="file-picker-elem"
-                                type="file" 
-                                accept="image/*" 
-                                style={{ display: 'none' }} 
-                                onChange={e => handleFileChange(e, selectedImageType)} 
+                                type="file"
+                                accept="image/*"
+                                style={{ display: 'none' }}
+                                onChange={e => handleFileChange(e, selectedImageType)}
                               />
                             </div>
 
                             {/* Camera Actions */}
-                            <button 
-                              type="button" 
-                              className="btn btn-secondary" 
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
                               style={{ width: '100%', marginBottom: '8px' }}
                               onClick={cameraActive ? stopCamera : startCamera}
                             >
-                              <Camera size={13} style={{marginRight:4}}/>{cameraActive ? 'Turn Off Camera' : 'Take Picture with Camera'}
+                              <Camera size={13} style={{ marginRight: 4 }} />{cameraActive ? 'Turn Off Camera' : 'Take Picture with Camera'}
                             </button>
                           </div>
 
@@ -1532,19 +1532,19 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             {cameraActive ? (
                               <div style={{ background: '#000', borderRadius: '8px', overflow: 'hidden', position: 'relative', height: '240px' }}>
                                 {cameraStream ? (
-                                  <video 
-                                    ref={videoRef} 
-                                    autoPlay 
-                                    playsInline 
+                                  <video
+                                    ref={videoRef}
+                                    autoPlay
+                                    playsInline
                                     id="camera-feed"
-                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                   />
                                 ) : (
                                   <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', height: '100%', color: 'var(--text-muted)', padding: '20px', textAlign: 'center' }}>
                                     Offline simulation active. Click "Capture Snapshot" to generate mock canvas illustration.
                                   </div>
                                 )}
-                                
+
                                 <div style={{ position: 'absolute', bottom: '12px', left: '0', right: '0', display: 'flex', justifyContent: 'center', gap: '10px', zIndex: 20 }}>
                                   <button type="button" className="btn btn-accent" onClick={captureSnapshot}>Capture Snapshot</button>
                                   <button type="button" className="btn btn-secondary" onClick={stopCamera}>Cancel</button>
@@ -1553,10 +1553,10 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             ) : (
                               <div style={{ border: '1px solid var(--border-light)', background: 'rgba(0,0,0,0.1)', height: '240px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
                                 {formData.images[selectedImageType] ? (
-                                  <img 
-                                    src={formData.images[selectedImageType]} 
-                                    alt="Preview" 
-                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                  <img
+                                    src={formData.images[selectedImageType]}
+                                    alt="Preview"
+                                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                                   />
                                 ) : (
                                   <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>No image uploaded for this category yet.</div>
@@ -1625,8 +1625,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         const filteredHistory = matchedBookings.filter(b => {
           if (historyStatus !== 'All' && b.status !== historyStatus) return false;
           if (historySearch) {
-            const custMatch = b.customerName?.toLowerCase().includes(historySearch.toLowerCase()) || 
-                              b.customer?.name?.toLowerCase().includes(historySearch.toLowerCase());
+            const custMatch = b.customerName?.toLowerCase().includes(historySearch.toLowerCase()) ||
+              b.customer?.name?.toLowerCase().includes(historySearch.toLowerCase());
             const bIdMatch = b.bookingId?.toLowerCase().includes(historySearch.toLowerCase());
             if (!custMatch && !bIdMatch) return false;
           }
@@ -1643,7 +1643,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
             <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '900px', maxHeight: '85vh' }}>
               <div className="modal-header">
                 <h2>Vehicle Operations History</h2>
-                <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowHistoryModal(false)}><X size={16}/></button>
+                <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowHistoryModal(false)}><X size={16} /></button>
               </div>
 
               <div className="modal-body" style={{ overflowY: 'auto' }}>
@@ -1689,16 +1689,16 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                 {/* History Filter inputs */}
                 <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Search Customer or Booking ID..." 
-                    value={historySearch} 
-                    onChange={e => setHistorySearch(e.target.value)} 
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search Customer or Booking ID..."
+                    value={historySearch}
+                    onChange={e => setHistorySearch(e.target.value)}
                   />
-                  <select 
-                    className="form-control" 
-                    value={historyStatus} 
+                  <select
+                    className="form-control"
+                    value={historyStatus}
                     onChange={e => setHistoryStatus(e.target.value)}
                   >
                     <option value="All">All Status</option>
@@ -1707,11 +1707,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     <option value="Reserved">Reserved</option>
                     <option value="Cancelled">Cancelled</option>
                   </select>
-                  <input 
-                    type="date" 
-                    className="form-control" 
-                    value={historyDate} 
-                    onChange={e => setHistoryDate(e.target.value)} 
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={historyDate}
+                    onChange={e => setHistoryDate(e.target.value)}
                   />
                 </div>
 
@@ -1736,7 +1736,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                         const kmUsed = endM > startM ? (endM - startM) : 0;
                         const finalAmt = b.settlement?.totalBill || b.finalAmount || b.baseFare || 0;
                         const pickupDate = new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleDateString();
-                        const dropDate = b.dropDetails?.actualTime 
+                        const dropDate = b.dropDetails?.actualTime
                           ? new Date(b.dropDetails.actualTime).toLocaleDateString()
                           : new Date(b.expectedDropDate || b.rentalPeriod?.expectedEndDate).toLocaleDateString();
 
@@ -1783,14 +1783,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
           <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '450px' }}>
             <div className="modal-header">
               <h2>Booking Availability Status</h2>
-              <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowAvailabilityModal(false)}><X size={16}/></button>
+              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAvailabilityModal(false)}><X size={16} /></button>
             </div>
 
             <form onSubmit={handleAvailabilitySubmit}>
               <div className="modal-body">
                 <div className="form-group">
                   <label>Available For Booking</label>
-                  <select 
+                  <select
                     className="form-control"
                     value={formData.availability.availableForBooking ? 'Yes' : 'No'}
                     onChange={e => handleNestedChange('availability', 'availableForBooking', e.target.value === 'Yes')}
@@ -1803,7 +1803,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                 {!formData.availability.availableForBooking && (
                   <div className="form-group animate-fade">
                     <label>Reason If Disabled</label>
-                    <select 
+                    <select
                       className="form-control"
                       value={formData.availability.reason}
                       onChange={e => handleNestedChange('availability', 'reason', e.target.value)}
@@ -1841,14 +1841,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
           <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '500px' }}>
             <div className="modal-header">
               <h2>Vehicle Coordinate Location</h2>
-              <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowLocationModal(false)}><X size={16}/></button>
+              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowLocationModal(false)}><X size={16} /></button>
             </div>
 
             <form onSubmit={handleLocationSubmit}>
               <div className="modal-body">
                 <div className="form-group">
                   <label>Current Zone</label>
-                  <select 
+                  <select
                     className="form-control"
                     value={formData.locationDetails.currentZone}
                     onChange={e => handleNestedChange('locationDetails', 'currentZone', e.target.value)}
@@ -1862,8 +1862,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                 <div className="form-group">
                   <label>Current Branch</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className="form-control"
                     value={formData.locationDetails.currentBranch}
                     onChange={e => handleNestedChange('locationDetails', 'currentBranch', e.target.value)}
@@ -1873,8 +1873,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                 <div className="form-group">
                   <label>Parking Location</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     className="form-control"
                     placeholder="e.g. Basement A-12, Slot 34"
                     value={formData.locationDetails.parkingLocation}
@@ -1885,8 +1885,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="form-group">
                     <label>GPS Latitude (Optional)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       step="any"
                       className="form-control"
                       value={formData.locationDetails.gps.lat}
@@ -1904,8 +1904,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   </div>
                   <div className="form-group">
                     <label>GPS Longitude (Optional)</label>
-                    <input 
-                      type="number" 
+                    <input
+                      type="number"
                       step="any"
                       className="form-control"
                       value={formData.locationDetails.gps.lng}
@@ -1943,13 +1943,13 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
             <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '450px' }}>
               <div className="modal-header">
                 <h2>Delete Vehicle</h2>
-                <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowDeleteModal(false)}><X size={16}/></button>
+                <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowDeleteModal(false)}><X size={16} /></button>
               </div>
 
               <form onSubmit={handleDeleteSubmit}>
                 <div className="modal-body">
                   <div style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.2)', padding: '16px', borderRadius: '6px', marginBottom: '16px' }}>
-                    <h3 style={{ color: 'var(--status-cancelled)', fontSize: '1rem', marginBottom: '8px', display:'flex', alignItems:'center', gap:'6px' }}><AlertTriangle size={16}/> Warning: Dangerous Action</h3>
+                    <h3 style={{ color: 'var(--status-cancelled)', fontSize: '1rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}><AlertTriangle size={16} /> Warning: Dangerous Action</h3>
                     <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
                       You are about to permanently delete <strong>{selectedVehicle.name}</strong> (<code>{selectedVehicle.regNumber}</code>) from the ERP node registry.
                     </p>
@@ -1962,22 +1962,22 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
 
                   <div className="form-group">
                     <label style={{ fontWeight: 'bold' }}>To confirm delete, type <span style={{ color: 'var(--status-cancelled)' }}>DELETE</span> below:</label>
-                    <input 
-                      type="text" 
-                      className="form-control" 
-                      placeholder="Type DELETE..." 
-                      value={deleteConfirmText} 
-                      onChange={e => setDeleteConfirmText(e.target.value)} 
-                      required 
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Type DELETE..."
+                      value={deleteConfirmText}
+                      onChange={e => setDeleteConfirmText(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
 
                 <div className="modal-footer">
                   <button type="button" className="btn btn-secondary" onClick={() => setShowDeleteModal(false)}>Cancel</button>
-                  <button 
-                    type="submit" 
-                    className="btn btn-danger" 
+                  <button
+                    type="submit"
+                    className="btn btn-danger"
                     disabled={deleteConfirmText !== 'DELETE'}
                   >
                     Delete Vehicle Permanently

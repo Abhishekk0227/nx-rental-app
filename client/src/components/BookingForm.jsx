@@ -222,7 +222,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       // Scooty
       if (selectedPlanType === 'Hourly') {
         const isScootyFuel = isScooty && includeFuel;
-        const rateField = isScootyFuel 
+        const rateField = isScootyFuel
           ? (plans.hourly?.withFuel || vehicle.perHourRate || 60)
           : (plans.hourly?.rate || vehicle.perHourRate || 40);
 
@@ -260,7 +260,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   useEffect(() => {
     setSecurityDeposit(getDefaultDeposit());
   }, [vehicle]);
-  
+
   // Deposit Payment mode details (Cash, Online, Mixed)
   const [depositMethod, setDepositMethod] = useState('Cash'); // 'Cash' | 'Online' | 'Mixed'
   const [depositCash, setDepositCash] = useState(vehicle.depositSettings?.amount ?? vehicle.securityDeposit ?? 200);
@@ -376,7 +376,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       ctx.strokeStyle = '#3b82f6';
       ctx.lineWidth = 4;
       ctx.strokeRect(20, 20, 600, 360);
-      
+
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 20px sans-serif';
       ctx.fillText(`${activeDocType.toUpperCase()} DOCUMENT MOCK SCAN`, 50, 80);
@@ -384,7 +384,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       ctx.font = '14px sans-serif';
       ctx.fillText(`Customer Name: ${fullName || 'Guest'}`, 50, 130);
       ctx.fillText(`Timestamp: ${new Date().toLocaleString()}`, 50, 160);
-      
+
       // Draw signature or card details
       ctx.fillStyle = '#334155';
       ctx.fillRect(400, 200, 180, 120);
@@ -501,7 +501,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     // Rule: Helmet 1 unit free, extra units ₹50/each
     const helmets = helmetsCount > 1 ? (helmetsCount - 1) * helmetsPrice : 0;
     const deposit = Number(securityDeposit) || 0;
-    
+
     // Rule: Discount applies strictly to the rental cost (before addons or deposit)
     let discVal = 0;
     if (discountType === '₹') {
@@ -509,7 +509,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     } else {
       discVal = (cost * (Number(discountAmount) || 0)) / 100;
     }
-    
+
     // Ensure discount doesn't exceed cost itself
     discVal = Math.min(cost, discVal);
     const costAfterDiscount = cost - discVal;
@@ -574,7 +574,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     if (minBookingHours > 0 && durationHours < minBookingHours) {
       return alert(`Minimum booking duration for this vehicle is ${minBookingHours} hour(s).`);
     }
-    
+
     // Validate mixed deposit split matches
     if (depositMethod === 'Mixed') {
       const sum = Number(depositCash) + Number(depositOnline);
@@ -664,7 +664,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       revisions: [{
         revisionNumber: 1,
         actionType: 'Create',
-        description: initialStatus === 'Ongoing' 
+        description: initialStatus === 'Ongoing'
           ? `Booking created and handover completed immediately for ${fullName}. Vehicle: ${vehicle?.name} (${vehicle?.regNumber}).`
           : `Booking created and reserved for ${fullName}. Vehicle: ${vehicle?.name} (${vehicle?.regNumber}).`,
         operator: currentWorker || 'System',
@@ -720,7 +720,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           newDeposit: depositCollected
         }
       }],
-      
+
       // Legacy compatibility mappings
       customerName: fullName,
       customerPhone: phoneNumber,
@@ -747,27 +747,27 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
   return (
     <div className="booking-form-wrap animate-slide-up">
-      
+
       {/* HEADER SECTION */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e5e7eb', paddingBottom: '10px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Bike size={28} color="var(--primary)"/>
+          <Bike size={28} color="var(--primary)" />
           <div>
             <h3 style={{ fontSize: '1.1rem', margin: 0, color: '#1e293b' }}>{vehicle.name}</h3>
             <span style={{ fontSize: '0.8rem', color: '#64748b' }}><code>{vehicle.regNumber}</code></span>
           </div>
         </div>
-        <button className="fo-btn-outline" onClick={onCancel} style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16}/></button>
+        <button className="fo-btn-outline" onClick={onCancel} style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
       </div>
 
       <form onSubmit={handleCheckoutSubmit}>
-        
+
         {/* SECTION 1: CUSTOMER INFORMATION */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <User size={15}/> Customer Information
+            <User size={15} /> Customer Information
           </h4>
-          
+
           <div className="grid-2col" style={{ marginBottom: '12px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Full Name *</label>
@@ -795,8 +795,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               style={{ width: '100%', padding: '6px 12px', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               onClick={() => setShowOptionalDetails(!showOptionalDetails)}
             >
-              <MapPin size={13}/> Optional Details (Email & Address)
-              {showOptionalDetails ? <ChevronUp size={13}/> : <ChevronDown size={13}/>}
+              <MapPin size={13} /> Optional Details (Email & Address)
+              {showOptionalDetails ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
             </button>
 
             {showOptionalDetails && (
@@ -831,7 +831,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 2: VEHICLE HANDOVER */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <Key size={15}/> Vehicle Handover
+            <Key size={15} /> Vehicle Handover
           </h4>
           <div style={{ display: 'grid', gridTemplateColumns: isScooty ? '1.2fr 1fr' : '1fr', gap: '16px', alignItems: 'center' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
@@ -843,11 +843,11 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             {isScooty && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '16px' }}>
                 <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>
-                  <input 
-                    type="checkbox" 
-                    checked={includeFuel} 
-                    onChange={e => handleIncludeFuelChange(e.target.checked)} 
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }} 
+                  <input
+                    type="checkbox"
+                    checked={includeFuel}
+                    onChange={e => handleIncludeFuelChange(e.target.checked)}
+                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
                   />
                   Include Fuel in Rental
                 </label>
@@ -862,27 +862,27 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 3: RENTAL PERIOD */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <Calendar size={15}/> Rental Period
+            <Calendar size={15} /> Rental Period
           </h4>
           <div className="grid-2col">
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Start Date & Time</label>
-              <input 
-                type="datetime-local" 
-                className="form-control" 
-                value={pickupDate} 
-                onChange={e => handlePickupDateChange(e.target.value)} 
-                required 
+              <input
+                type="datetime-local"
+                className="form-control"
+                value={pickupDate}
+                onChange={e => handlePickupDateChange(e.target.value)}
+                required
               />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>End Date & Time</label>
-              <input 
-                type="datetime-local" 
-                className="form-control" 
-                value={expectedDropDate} 
-                onChange={e => handleDropDateChange(e.target.value)} 
-                required 
+              <input
+                type="datetime-local"
+                className="form-control"
+                value={expectedDropDate}
+                onChange={e => handleDropDateChange(e.target.value)}
+                required
               />
             </div>
           </div>
@@ -911,45 +911,45 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 4: SELECT PLAN */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <Tag size={15}/> Select Pricing Plan
+            <Tag size={15} /> Select Pricing Plan
           </h4>
-          
+
           {(() => {
             const availablePlans = [
-              { 
-                type: 'Hourly', 
-                label: 'Hourly', 
-                rate: (isScooty && includeFuel) 
+              {
+                type: 'Hourly',
+                label: 'Hourly',
+                rate: (isScooty && includeFuel)
                   ? (vehicle.pricingPlans?.hourly?.withFuel || vehicle.perHourRate || 60)
                   : isBike
                     ? (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 100)
-                    : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40), 
+                    : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40),
                 limit: (isScooty && includeFuel)
                   ? `Fuel Surcharge: ₹${vehicle.pricingPlans?.hourly?.fuelChargePerKm || 2}/KM`
                   : `10 KM/hr Limit`,
-                disabled: isCar 
+                disabled: isCar
               },
-              { 
-                type: '12-Hour', 
-                label: '12 Hour', 
+              {
+                type: '12-Hour',
+                label: '12 Hour',
                 rate: isCar
                   ? (vehicle.pricingPlans?.twelveHour?.baseRate || 2500)
                   : isBike
                     ? (vehicle.pricingPlans?.twelveHour?.baseRate || 1200)
-                    : (vehicle.pricingPlans?.twelveHour?.baseRate || 350), 
+                    : (vehicle.pricingPlans?.twelveHour?.baseRate || 350),
                 limit: isCar || isBike
                   ? `10 KM/hr Limit`
                   : `${vehicle.pricingPlans?.twelveHour?.kmLimit || 60} KM Limit`,
                 disabled: isScooty && includeFuel
               },
-              { 
-                type: '24-Hour', 
-                label: '24 Hour', 
+              {
+                type: '24-Hour',
+                label: '24 Hour',
                 rate: isCar
                   ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 4500)
                   : isBike
                     ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 2400)
-                    : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500), 
+                    : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500),
                 limit: isCar || isBike
                   ? `10 KM/hr Limit`
                   : `${vehicle.pricingPlans?.twentyFourHour?.kmLimit || 120} KM Limit`,
@@ -960,12 +960,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             return (
               <div style={{ display: 'grid', gridTemplateColumns: `repeat(${availablePlans.length}, 1fr)`, gap: '8px', marginBottom: '10px' }}>
                 {availablePlans.map(plan => (
-                  <label 
+                  <label
                     key={plan.type}
-                    style={{ 
+                    style={{
                       border: '1px solid ' + (selectedPlanType === plan.type ? '#4f46e5' : '#e5e7eb'),
-                      background: selectedPlanType === plan.type 
-                        ? 'rgba(99, 102, 241, 0.08)' 
+                      background: selectedPlanType === plan.type
+                        ? 'rgba(99, 102, 241, 0.08)'
                         : '#f8f9fb',
                       padding: '10px',
                       borderRadius: '6px',
@@ -977,11 +977,11 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                       margin: 0
                     }}
                   >
-                    <input 
-                      type="radio" 
+                    <input
+                      type="radio"
                       name="pricing_plan_select"
-                      checked={selectedPlanType === plan.type} 
-                      onChange={() => handlePlanChange(plan.type)} 
+                      checked={selectedPlanType === plan.type}
+                      onChange={() => handlePlanChange(plan.type)}
                       style={{ marginTop: '3px', accentColor: 'var(--primary)', cursor: 'pointer' }}
                     />
                     <div>
@@ -994,7 +994,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               </div>
             );
           })()}
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div style={{ opacity: 0.4, border: '1px solid #e5e7eb', background: '#f8f9fb', padding: '8px', borderRadius: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
               Weekly Plan (Future coming soon)
@@ -1008,9 +1008,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 5: ADD-ONS (HELMET & DEPOSIT SECTOR SPLIT) */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <Shield size={15}/> Add-ons & Deposit Details
+            <Shield size={15} /> Add-ons & Deposit Details
           </h4>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '16px', marginBottom: '14px' }}>
             {/* Helmets (1 unit is Free!) */}
             <div>
@@ -1018,18 +1018,18 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                 Helmet Quantity (1 Free!)
               </label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   style={{ width: '32px', height: '32px', padding: 0, borderRadius: '4px' }}
                   onClick={() => setHelmetsCount(Math.max(0, helmetsCount - 1))}
                 >
                   -
                 </button>
                 <strong style={{ fontSize: '1.1rem', width: '20px', textAlign: 'center' }}>{helmetsCount}</strong>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
+                <button
+                  type="button"
+                  className="btn btn-secondary"
                   style={{ width: '32px', height: '32px', padding: 0, borderRadius: '4px' }}
                   onClick={() => setHelmetsCount(helmetsCount + 1)}
                 >
@@ -1044,12 +1044,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             {/* Deposit base amount input */}
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Security Deposit (₹)</label>
-              <input 
-                type="number" 
-                className="form-control" 
-                value={securityDeposit} 
-                onChange={e => setSecurityDeposit(Number(e.target.value))} 
-                style={{ borderColor: 'var(--status-reserved)' }} 
+              <input
+                type="number"
+                className="form-control"
+                value={securityDeposit}
+                onChange={e => setSecurityDeposit(Number(e.target.value))}
+                style={{ borderColor: 'var(--status-reserved)' }}
               />
             </div>
           </div>
@@ -1109,17 +1109,17 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 6: RENTAL COST PAYMENT */}
         <div className="bform-section-box">
           <h4 className="bform-section-title">
-            <Banknote size={15}/> Rental Cost Payment
+            <Banknote size={15} /> Rental Cost Payment
           </h4>
-          
+
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
             {['Cash', 'UPI', 'Card', 'Mixed'].map(mode => (
               <button
                 key={mode}
                 type="button"
                 className={`btn ${paymentMethod === mode ? 'btn-success' : 'btn-secondary'}`}
-                style={{ 
-                  padding: '8px 12px', 
+                style={{
+                  padding: '8px 12px',
                   fontSize: '0.8rem',
                   border: paymentMethod === mode ? '1px solid var(--status-available)' : '1px solid var(--border-light)',
                   background: paymentMethod === mode ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
@@ -1185,12 +1185,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             <div className="grid-2col" style={{ marginTop: '10px', borderTop: '1px solid #e5e7eb', paddingTop: '10px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Discount Value (Optional)</label>
-                <input 
-                  type="number" 
-                  className="form-control" 
-                  value={discountAmount} 
-                  onChange={e => setDiscountAmount(Math.max(0, Number(e.target.value)))} 
-                  placeholder="e.g. 50" 
+                <input
+                  type="number"
+                  className="form-control"
+                  value={discountAmount}
+                  onChange={e => setDiscountAmount(Math.max(0, Number(e.target.value)))}
+                  placeholder="e.g. 50"
                 />
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
@@ -1201,7 +1201,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                 </select>
               </div>
               <div style={{ gridColumn: 'span 2', fontSize: '0.75rem', color: 'var(--status-available)', marginTop: '4px' }}>
-                <Info size={13} style={{marginRight: 4}}/> Note: Discount applies strictly to the Rental Cost (₹{bill.cost}) before deposit and helmet fees.
+                <Info size={13} style={{ marginRight: 4 }} /> Note: Discount applies strictly to the Rental Cost (₹{bill.cost}) before deposit and helmet fees.
               </div>
             </div>
           </div>
@@ -1215,7 +1215,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             onClick={() => setShowBillingSummary(!showBillingSummary)}
           >
             <h4 className="bform-section-title" style={{ margin: 0 }}>
-              <BarChart2 size={15}/> Billing Summary
+              <BarChart2 size={15} /> Billing Summary
             </h4>
             <span style={{ fontSize: '1rem', color: '#4f46e5', fontWeight: 'bold' }}>
               ₹{totalBookingValue} {showBillingSummary ? '▲' : '▼'}
@@ -1224,12 +1224,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
           {showBillingSummary && (
             <div className="animate-fade" style={{ marginTop: '12px', background: '#f8f9fb', borderRadius: '6px', padding: '12px', border: '1px solid #e5e7eb', fontSize: '0.82rem' }}>
-              
+
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                
+
                 {/* COLUMN 1: RENTAL COSTS */}
                 <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  
+
                   {/* Card 1: Rental Summary */}
                   <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
                     <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -1253,7 +1253,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                     <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Base Rental Cost:</span>
                       <span>
-                        ₹{bill.cost} 
+                        ₹{bill.cost}
                         {bill.isMinBilling && <span style={{ fontSize: '0.65rem', color: 'var(--status-reserved)', marginLeft: '4px' }}>({minBookingHours}h Min)</span>}
                       </span>
                     </div>
@@ -1281,7 +1281,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
                 {/* COLUMN 2: PAYMENTS & VALUES */}
                 <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  
+
                   {/* Card 3: Collection Details */}
                   <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
                     <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
@@ -1348,7 +1348,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
               {depositCollected < bill.deposit && (
                 <div style={{ marginTop: '8px', padding: '6px 10px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', fontSize: '0.75rem', border: '1px solid rgba(239,68,68,0.2)' }}>
-                  <AlertTriangle size={13} style={{marginRight: 4}}/> Warning: Deposit collected now (₹{depositCollected}) is less than the required Security Deposit (₹{bill.deposit}).
+                  <AlertTriangle size={13} style={{ marginRight: 4 }} /> Warning: Deposit collected now (₹{depositCollected}) is less than the required Security Deposit (₹{bill.deposit}).
                 </div>
               )}
             </div>
@@ -1363,9 +1363,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             onClick={() => setShowDocuments(!showDocuments)}
           >
             <h4 className="bform-section-title" style={{ margin: 0 }}>
-              <FileText size={15}/> Upload Customer Documents (Optional)
+              <FileText size={15} /> Upload Customer Documents (Optional)
             </h4>
-            {showDocuments ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+            {showDocuments ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
           </button>
 
           {showDocuments && (
@@ -1384,16 +1384,16 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                 ].map(doc => (
                   <div key={doc.id} style={{ border: '1px solid #e5e7eb', padding: '10px', borderRadius: '6px', background: '#f8f9fb' }}>
                     <div style={{ fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '6px', color: '#1e293b' }}>{doc.label}</div>
-                    
+
                     {doc.stateVal ? (
                       <div style={{ position: 'relative', height: '90px', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px', background: '#000' }}>
                         <img src={doc.stateVal} alt={doc.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(239, 68, 68, 0.8)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}
                           onClick={() => saveDocImage('')}
                         >
-                          <X size={10}/>
+                          <X size={10} />
                         </button>
                       </div>
                     ) : (
@@ -1403,29 +1403,29 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                     )}
 
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button 
-                        type="button" 
-                        className="btn btn-secondary" 
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
                         style={{ flex: 1, padding: '4px 8px', fontSize: '0.7rem', height: '28px' }}
                         onClick={() => document.getElementById(`doc-pick-${doc.id}`).click()}
                       >
                         Choose File
                       </button>
-                      <input 
+                      <input
                         id={`doc-pick-${doc.id}`}
-                        type="file" 
-                        accept="image/*" 
-                        style={{ display: 'none' }} 
-                        onChange={e => handleDocFileChange(e, doc.id)} 
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={e => handleDocFileChange(e, doc.id)}
                       />
 
-                      <button 
-                        type="button" 
-                        className="btn btn-success" 
+                      <button
+                        type="button"
+                        className="btn btn-success"
                         style={{ flex: 1, padding: '4px 8px', fontSize: '0.7rem', height: '28px', background: 'rgba(16,185,129,0.1)', borderColor: 'var(--status-available-border)', color: 'var(--status-available)' }}
                         onClick={() => startCamera(doc.id)}
                       >
-                        <Camera size={13} style={{marginRight: 4}}/> Camera
+                        <Camera size={13} style={{ marginRight: 4 }} /> Camera
                       </button>
                     </div>
                   </div>
@@ -1438,7 +1438,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                   <div className="glass-panel" style={{ width: '90%', maxWidth: '500px', padding: '16px', background: 'var(--bg-glass)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                       <h4 style={{ margin: 0 }}>Document Scan: {activeDocType.toUpperCase()}</h4>
-                      <button type="button" className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={stopCamera}><X size={16}/></button>
+                      <button type="button" className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={stopCamera}><X size={16} /></button>
                     </div>
 
                     <div style={{ background: '#000', borderRadius: '8px', overflow: 'hidden', height: '300px', position: 'relative' }}>
@@ -1465,26 +1465,26 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         {/* SECTION 9: ADDITIONAL NOTES */}
         <div className="bform-section-box" style={{ marginBottom: '20px' }}>
           <h4 className="bform-section-title">
-            <StickyNote size={15}/> Additional Notes (Optional)
+            <StickyNote size={15} /> Additional Notes (Optional)
           </h4>
           <div className="form-group">
             <label>Booking Notes / Handover Comments</label>
-            <textarea 
-              className="form-control" 
-              rows="2" 
-              placeholder="Any special instructions, damages, or notes..." 
-              value={bookingNotes} 
-              onChange={e => setBookingNotes(e.target.value)} 
+            <textarea
+              className="form-control"
+              rows="2"
+              placeholder="Any special instructions, damages, or notes..."
+              value={bookingNotes}
+              onChange={e => setBookingNotes(e.target.value)}
             />
           </div>
           <div className="form-group" style={{ marginBottom: 0 }}>
             <label>Special Instructions</label>
-            <textarea 
-              className="form-control" 
-              rows="2" 
-              placeholder="e.g. Needs extra cleaning, return instructions" 
-              value={specialInstructions} 
-              onChange={e => setSpecialInstructions(e.target.value)} 
+            <textarea
+              className="form-control"
+              rows="2"
+              placeholder="e.g. Needs extra cleaning, return instructions"
+              value={specialInstructions}
+              onChange={e => setSpecialInstructions(e.target.value)}
             />
           </div>
         </div>

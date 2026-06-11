@@ -1,0 +1,6197 @@
+[{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023d7"
+  },
+  "name": "Hf deluxe",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AW2703",
+  "companyName": "Hero",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8973,
+      22.7532
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562480/Hf_deluxe_bv0g3v.png"
+  ],
+  "meterReading": 12431,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 50,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 50,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T11:52:45.360Z"
+  },
+  "seatingCapacity": 2,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "currentBookingId": {
+    "$oid": "6a12e68db3309cff413c201e"
+  },
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e5"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UV4520",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 10259,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783f00e90bb6d555c9d02ef",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-11T13:24:55.969Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023da"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AV4352",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 1460,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "692a7001e7c08e0230da7be2",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:38:12.080Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e3"
+  },
+  "name": "SP 125",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "HR85UX0991",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562482/SP_125_eqy7lq.png"
+  ],
+  "meterReading": 85845,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 50,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 50,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783f3d97950d79869e575a8",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T14:08:56.313Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f8"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UV4923",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 18641,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67826e07f2b6611d58ad8187",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T06:04:34.931Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a13e6723f723e44c6fa2589"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e0"
+  },
+  "name": "Activa125",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09SZ9770",
+  "companyName": "Honda",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562457/Activa125_ptgjjq.png"
+  ],
+  "meterReading": 69200,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 3,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67d991b5983c14cc0d1ffded",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-10T16:32:35.965Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023ed"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UY5983",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 48922,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67827d8350a876e64a5006fa",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T11:21:23.298Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023dc"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AQ1359",
+  "companyName": "Honda",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 20715,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "68ac90f0094528cf10cb8885",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:33:05.471Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e1"
+  },
+  "name": "HF deluxe",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AK3624",
+  "companyName": "Hero",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562480/Hf_deluxe_bv0g3v.png"
+  ],
+  "meterReading": 25848,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 50,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 3,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67d7d4a590d6df6ea49497d5",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-08T10:49:27.167Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e8"
+  },
+  "name": "Xtreme 160",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09ZQ7028",
+  "companyName": "Hero",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562454/Xtreme_160_lepasq.png"
+  ],
+  "meterReading": 46946,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 700,
+    "ratePerHour": 70,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 70,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "rateHourly": {
+    "ratePerHour": 70,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "rate24hr": {
+    "baseRate": 1000,
+    "ratePerHour": 3,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782a6bb41dabd9e5cbbc85e",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:34:27.118Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023ea"
+  },
+  "name": "Raider 125",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09ZP7167",
+  "companyName": "TVS",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766564940/Vehicals_mbhses.png"
+  ],
+  "meterReading": 73612,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 600,
+    "ratePerHour": 60,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 60,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rateHourly": {
+    "ratePerHour": 60,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rate24hr": {
+    "baseRate": 800,
+    "ratePerHour": 3,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67829f5f8ba36b57a1ce1297",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T16:56:48.839Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023ef"
+  },
+  "name": "Activa 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09DR8683",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 41004,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783ee5958fafdba6ec233ef",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T12:05:41.114Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "depositType": "offline",
+  "requiresDeposit": false
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f1"
+  },
+  "name": "Freedom",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP11ZJ5333",
+  "companyName": "Bajaj",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562469/Freedom_rajsnp.png"
+  ],
+  "meterReading": 29222,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 600,
+    "ratePerHour": 60,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 60,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rateHourly": {
+    "ratePerHour": 60,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rate24hr": {
+    "baseRate": 800,
+    "ratePerHour": 3,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782ae87784610ead013c555",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-23T16:44:24.332Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f9"
+  },
+  "name": "Activa 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UY5982",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png",
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771144101/Tastyaana/vehicles/yhfnflzuwcjs9ruzs8eb.jpg"
+  ],
+  "meterReading": 2145,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67826afa2bd0ecbd1f8cd657",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-22T07:54:27.120Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a100bb34f59697281dc5035"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023fa"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09ZF5279",
+  "companyName": "Honda",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 52148,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67826a2277ffa5681257ed47",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:32:17.705Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023fe"
+  },
+  "name": "Jupiter zx",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UX1224",
+  "companyName": "Tvs",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562405/Jupiter_zx_blue_cuhbcc.png"
+  ],
+  "meterReading": 28918,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "678262a4f6950b8fbe8c4c3e",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T05:35:46.052Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023df"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09WH4190",
+  "companyName": "Honda",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 18552,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67fbe70f962d1145c6de452b",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:33:55.941Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023dd"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AQ1348",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8648,
+      22.7532
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 16020,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "68ac8fd5863c43c4ceb1adc2",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:32:27.020Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023fd"
+  },
+  "name": "ACTIVA 5G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UM0906",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562407/ACTIVA_5G_m6dkcc.png"
+  ],
+  "meterReading": 50856,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "678265ef86cc6caab006265f",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-11T13:37:26.092Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "69fb620048c988811f0c92a3"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023de"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AQ1337",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 13660,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "68ac8f4717dcdc8f06e8e519",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T05:50:21.850Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a13e31d3f723e44c6fa250c"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e4"
+  },
+  "name": "Activa 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UX0232",
+  "companyName": "Honda",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 50457,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783f1467461033bb82189da",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:35:01.492Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f6"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UX7631",
+  "companyName": "Honda",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png",
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771144014/Tastyaana/vehicles/rjkscluaq2jjwkqzd5li.jpg"
+  ],
+  "meterReading": 53425,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782705b73cc222a7dc7addd",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T08:51:25.325Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a12bc0db3309cff413c1511"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca202400"
+  },
+  "name": "ACTIVA",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UA7556",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562400/ACTIVA_veslw4.png"
+  ],
+  "meterReading": 47644,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 0,
+    "kmLimit": 100,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 3,
+    "kmLimit": 120,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67825c4396d2661a07c56c92",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-08T03:47:40.736Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023d8"
+  },
+  "name": "Destiny prime",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AW2761",
+  "companyName": "Hero",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562471/Destiny_prime_iithll.png"
+  ],
+  "meterReading": 3700,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "692a7971e7c08e0230da7c61",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T05:37:36.878Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023db"
+  },
+  "name": "Jawa 42 bobber",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09BF9092",
+  "companyName": "Jawa",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562473/Jawa_42_bobber_gfw9wq.png"
+  ],
+  "meterReading": 4639,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 1500,
+    "ratePerHour": 150,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 150,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 150,
+    "withoutFuelPerHour": 150
+  },
+  "rateHourly": {
+    "ratePerHour": 150,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 150,
+    "withoutFuelPerHour": 150
+  },
+  "rate24hr": {
+    "baseRate": 2000,
+    "ratePerHour": 150,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 150,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 150,
+    "withoutFuelPerHour": 150
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "692a6d4de7c08e0230da7bdc",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T15:57:13.201Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a131fd9b3309cff413c78e8"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023ee"
+  },
+  "name": "Activa 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09DR8624",
+  "companyName": "Honda",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 40370,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783eec11a43efbbb82c8789",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:35:09.942Z"
+  },
+  "seatingCapacity": 2,
+  "zoneId": "69f75ced05211a84445fa459",
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f5"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP47MM3121",
+  "companyName": "Honda",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 16419,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67827189955b8895c5c6e8c7",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T12:32:26.728Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a12efdab3309cff413c231e"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023fc"
+  },
+  "name": "Jupiter silver",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UM9122",
+  "companyName": "Tvs",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562392/Jupiter_silver_ltclcu.png"
+  ],
+  "meterReading": 25,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67826723b83aabb337e570c2",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-10T16:32:13.068Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "69fd4f546b51e94565d68e1b"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023e6"
+  },
+  "name": "Activa 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UV4310",
+  "companyName": "Honda",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 22531,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6783efa8abab348cee9ce0ac",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T05:05:37.153Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a13d8a13f723e44c6fa1ef1"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023ff"
+  },
+  "name": "ACTIVA 6G",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP41NF9532",
+  "companyName": "HONDA",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 13802,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 100,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 4,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "67825dd92c524497da9e9019",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T16:42:58.486Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023d9"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AV4391",
+  "companyName": "Honda",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8648,
+      22.7532
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562474/Activa_6g_ishypj.png"
+  ],
+  "meterReading": 17205,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "692a786ce7c08e0230da7c5b",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-23T15:17:37.962Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a11c5114f59697281dc98f9"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f0"
+  },
+  "name": "Ola electric",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "EV",
+  "vehicleNo": "MP06ZF8144",
+  "companyName": "Ola",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562471/Ola_electric_nggwfx.png"
+  ],
+  "meterReading": 15602,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 0,
+    "kmLimit": 150,
+    "fuelChargesperkm": 3,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 0,
+    "fuelChargesperkm": 3,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 700,
+    "ratePerHour": 3,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782b014784610ead013c55b",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-08T03:47:40.736Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023fb"
+  },
+  "name": "Activa special edition",
+  "category": "scooty",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09UX3884",
+  "companyName": "Honda",
+  "zoneCenterName": "Indrapuri main office",
+  "zoneCenterAddress": "bhawar kua square",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/ v1766562412/Activa_special_edition_h7hhg6.png",
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1769418148/Tastyaana/vehicles/otxiwmq1w2zdfwulmqcm.jpg",
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771144206/Tastyaana/vehicles/grwymo21t27zytjtsyky.jpg"
+  ],
+  "meterReading": 82450,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "678268cd0ae1b125894f6a56",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T05:24:13.598Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a128b7d863f4009c3e35905"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "ind003"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f3"
+  },
+  "name": "Splendor",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AF4320",
+  "companyName": "Hero",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562435/Splendor_sj4nsq.png"
+  ],
+  "meterReading": 24241,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 50,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 50,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 50
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782abdaed718df0ba6b77de",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-25T04:34:47.868Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f75ced05211a84445fa459"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023eb"
+  },
+  "name": "CLASSIC 350",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09DK5640",
+  "companyName": "Royal Enfield",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562430/CLASSIC_350_mk2wa5.png"
+  ],
+  "meterReading": 59690,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 1000,
+    "ratePerHour": 100,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 100,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rateHourly": {
+    "ratePerHour": 100,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rate24hr": {
+    "baseRate": 1500,
+    "ratePerHour": 100,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 100,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "678285372e8707340cfa1cb0",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T16:02:37.037Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "694d35fccc14a0c2ca2023f2"
+  },
+  "name": "Meteor 350",
+  "category": "bike",
+  "requireConfirmation": true,
+  "type": "Petrol",
+  "vehicleNo": "MP09AH9616",
+  "companyName": "Royal Enfield",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": false,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1766562435/Meteor_350_hhbhoh.png"
+  ],
+  "meterReading": 15859,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 1000,
+    "ratePerHour": 100,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 100,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rateHourly": {
+    "ratePerHour": 100,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rate24hr": {
+    "baseRate": 1500,
+    "ratePerHour": 3,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 100,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "lastBookingDate": null,
+    "popularTimeslots": null
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": "6782ad7bec1eba729ebd7650",
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-23T04:34:07.824Z"
+  },
+  "seatingCapacity": 2,
+  "currentBookingId": {
+    "$oid": "6a112e3f4f59697281dc8625"
+  },
+  "depositType": "offline",
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "6956bf06afdd213de413f9e6"
+  },
+  "name": "ERTIGA",
+  "category": "car",
+  "requireConfirmation": true,
+  "type": "PETROL+CNG",
+  "vehicleNo": "MP09WH5488",
+  "companyName": "Suzuki",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": true,
+  "status": "active",
+  "availability": "available",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1767193959/Ertiga_jygqxz.png"
+  ],
+  "meterReading": 10000,
+  "color": null,
+  "fuelCapacity": null,
+  "mileage": null,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 2200,
+    "ratePerHour": 300,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 300,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rate24hr": {
+    "baseRate": 3500,
+    "ratePerHour": 0,
+    "kmLimit": 250,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 300,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": {
+    "$oid": "67825c4396d2661a07c56c92"
+  },
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-08T03:47:40.736Z"
+  },
+  "seatingCapacity": 5,
+  "currentBookingId": null,
+  "depositType": "offline",
+  "rateHourly": {
+    "ratePerHour": 300,
+    "kmFreePerHour": 20,
+    "fuelChargesperkm": null,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 300,
+    "withoutFuelPerHour": 300
+  },
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "6956bf06afdd213de413f9e8"
+  },
+  "name": "THAR",
+  "category": "car",
+  "requireConfirmation": true,
+  "type": "DIESEL",
+  "vehicleNo": "MP09DT8514",
+  "companyName": "Mahindra",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": true,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1767193685/Thar_j5zcwz.png"
+  ],
+  "meterReading": 10000,
+  "color": null,
+  "fuelCapacity": null,
+  "mileage": null,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 2500,
+    "ratePerHour": 0,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 300,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rate24hr": {
+    "baseRate": 4500,
+    "ratePerHour": 0,
+    "kmLimit": 250,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 300,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": {
+    "$oid": "67825c4396d2661a07c56c92"
+  },
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T19:09:50.514Z"
+  },
+  "seatingCapacity": 5,
+  "currentBookingId": {
+    "$oid": "6a134cfe0783ec6376022c89"
+  },
+  "depositType": "offline",
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "6956bf06afdd213de413f9e7"
+  },
+  "name": "FRONX",
+  "category": "car",
+  "requireConfirmation": true,
+  "type": "Petrol + CNG",
+  "vehicleNo": "MP09AY4743",
+  "companyName": "Suzuki",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requiresApproval": true,
+  "status": "active",
+  "availability": "reserved",
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1767193687/3_p54zi3.png"
+  ],
+  "meterReading": 10048,
+  "color": null,
+  "fuelCapacity": null,
+  "mileage": null,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 1800,
+    "ratePerHour": 0,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 250,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rate24hr": {
+    "baseRate": 2800,
+    "ratePerHour": 0,
+    "kmLimit": 250,
+    "extraChargePerKm": 6,
+    "extraChargePerHour": 250,
+    "gracePeriodMinutes": 0,
+    "withFuelPerHour": 0,
+    "withoutFuelPerHour": 0
+  },
+  "rateDaily": [],
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 50,
+  "maintenance": [],
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "damageReports": [],
+  "analytics": null,
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "originalId": {
+    "$oid": "67825c4396d2661a07c56c92"
+  },
+  "isDeleted": 0,
+  "createdAt": "2025-12-23T00:00:00.000Z",
+  "updatedAt": {
+    "$date": "2026-05-24T20:17:12.391Z"
+  },
+  "seatingCapacity": 5,
+  "currentBookingId": {
+    "$oid": "6a135cc83f723e44c6f9f72d"
+  },
+  "depositType": "offline",
+  "rateHourly": {
+    "ratePerHour": 200,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 200,
+    "withoutFuelPerHour": 200
+  },
+  "requiresDeposit": false,
+  "zoneId": "69f7655f97e4104ef2f0535c"
+},
+{
+  "_id": {
+    "$oid": "6977a6f955ae5a6cc3351abb"
+  },
+  "name": "Thar",
+  "category": "scooty",
+  "type": "Petrol + CNG",
+  "vehicleNo": "NX02NX0001",
+  "companyName": "Mahindra ",
+  "zoneId": "69735741a01ce0494ef8c922",
+  "zoneCenterName": "Vijay nagar square",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      75.8577,
+      22.7196
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": true,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a12fc60b3309cff413c28df"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777701344/Tastyaana/vehicles/zydqdn4vq7nprtm3kje1.jpg"
+  ],
+  "seatingCapacity": 5,
+  "meterReading": 4880,
+  "color": "Black",
+  "fuelCapacity": 15,
+  "mileage": 20,
+  "vehicleFeatures": [
+    "ABS",
+    "AC",
+    "Disk Brake",
+    "Gearless",
+    "Music System",
+    "GPS",
+    "Bluetooth",
+    "Airbags",
+    "Central Lock",
+    "Power Steering"
+  ],
+  "rate12hr": {
+    "baseRate": 2000,
+    "ratePerHour": 200,
+    "kmLimit": 120,
+    "fuelChargesperkm": 110,
+    "extraChargePerKm": 10,
+    "extraChargePerHour": 200,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 250,
+    "withoutFuelPerHour": 200
+  },
+  "rateHourly": {
+    "ratePerHour": 250,
+    "kmFreePerHour": 25,
+    "fuelChargesperkm": 60,
+    "extraChargePerKm": 12,
+    "withFuelPerHour": 250,
+    "withoutFuelPerHour": 250
+  },
+  "rate24hr": {
+    "baseRate": 3491,
+    "ratePerHour": 155,
+    "kmLimit": 250,
+    "extraChargePerKm": 10,
+    "extraChargePerHour": 150,
+    "gracePeriodMinutes": 60,
+    "withFuelPerHour": 200,
+    "withoutFuelPerHour": 150
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-01-26T17:40:09.648Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T13:25:52.736Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "697b28f855ae5a6cc33ddea0"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09BH5646",
+  "companyName": "Honda",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a13c2d43f723e44c6f9fa8a"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771143940/Tastyaana/vehicles/o5xvfk9sha0mpxbm4gkt.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 8672,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 40,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-01-29T09:31:36.805Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T03:32:36.668Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "697b297455ae5a6cc33de136"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09BH5627",
+  "companyName": "Honda",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a12998ab3309cff413c0af6"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771143924/Tastyaana/vehicles/aeaffrcuyfkzhpmyli82.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 10518,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-01-29T09:33:40.256Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T06:24:10.729Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6986d2fc71d19a790176410a"
+  },
+  "name": "ninja",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "RS05SS5505",
+  "companyName": "suzuki",
+  "zoneId": "02",
+  "zoneCenterName": "indore ",
+  "zoneCenterAddress": "indore ",
+  "zoneCode": "RS01",
+  "locationGeo": null,
+  "minBufferTime": 100,
+  "requireConfirmation": true,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 10,
+  "color": "Black",
+  "fuelCapacity": 15,
+  "mileage": 4,
+  "vehicleFeatures": [
+    "ABS",
+    "GPS"
+  ],
+  "rate12hr": {
+    "baseRate": 5000,
+    "ratePerHour": 200,
+    "kmLimit": 200,
+    "fuelChargesperkm": 100,
+    "extraChargePerKm": 50,
+    "extraChargePerHour": 20,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 300,
+    "withoutFuelPerHour": 400
+  },
+  "rateHourly": {
+    "ratePerHour": 500,
+    "kmFreePerHour": 0,
+    "fuelChargesperkm": 70,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 30,
+    "extraChargePerHour": 20,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 400,
+    "withoutFuelPerHour": 600
+  },
+  "depositAmount": 20000,
+  "requiredPaymentPercentage": 34,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69859c23b56ca70c6835d2d7"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-07T05:51:56.348Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-07T11:25:05.966Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6986d77e71d19a79017680e1"
+  },
+  "name": "Sweta Rajput",
+  "category": "truck",
+  "type": "Petrol",
+  "vehicleNo": "SR59DS8909",
+  "companyName": "royal enfield",
+  "zoneId": "003",
+  "zoneCenterName": "gouri nagar",
+  "zoneCenterAddress": "vijaynagar",
+  "zoneCode": "001",
+  "locationGeo": null,
+  "minBufferTime": 40,
+  "requireConfirmation": true,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69859c70b56ca70c6835d2db"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-07T06:11:10.953Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-07T06:35:52.919Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6986d8d571d19a7901768cec"
+  },
+  "name": "activa",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP32HY1569",
+  "companyName": "hero",
+  "zoneId": "ZONE0124",
+  "zoneCenterName": "sayaji",
+  "zoneCenterAddress": "78, Vijay Nagar Main Road, Scheme 54 PU4",
+  "zoneCode": "MUM-001",
+  "locationGeo": null,
+  "minBufferTime": 28,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69859c23b56ca70c6835d2d7"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-07T06:16:53.589Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-07T07:12:10.235Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6986e64771d19a790176b867"
+  },
+  "name": "thar",
+  "category": "car",
+  "type": "Diesel",
+  "vehicleNo": "RS05SS5555",
+  "companyName": "mahindra",
+  "zoneId": "ind003",
+  "zoneCenterName": "indore ",
+  "zoneCenterAddress": "MW88+C48",
+  "zoneCode": "ind-003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": true,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "inactive",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [],
+  "seatingCapacity": 6,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [
+    "ABS",
+    "Airbags",
+    "Music System",
+    "Bluetooth",
+    "GPS",
+    "Power Steering",
+    "Gearless"
+  ],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 1000,
+  "requiredPaymentPercentage": 70,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69859c23b56ca70c6835d2d7"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-07T07:14:15.146Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-07T11:20:45.974Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6987229d71d19a790177192c"
+  },
+  "name": "honda",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "RS05SS5556",
+  "companyName": "honda",
+  "zoneId": "ind003",
+  "zoneCenterName": "indore ",
+  "zoneCenterAddress": "MW88+C48",
+  "zoneCode": "ind-003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": true,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "inactive",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69859c23b56ca70c6835d2d7"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-07T11:31:41.856Z"
+  },
+  "updatedAt": {
+    "$date": "2026-02-08T06:27:11.167Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "699180f2902db329d2869a2a"
+  },
+  "name": "Pulsar n160",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09ZH9404",
+  "companyName": "Bajaj",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "online",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a1352160783ec637602325e"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771143565/Tastyaana/vehicles/bllawqj2hrbnvcckyu7v.png"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 59462,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 700,
+    "ratePerHour": 70,
+    "kmLimit": 150,
+    "fuelChargesperkm": 3,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 70,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "rateHourly": {
+    "ratePerHour": 70,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "rate24hr": {
+    "baseRate": 1000,
+    "ratePerHour": 70,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 70,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 70,
+    "withoutFuelPerHour": 70
+  },
+  "depositAmount": 500,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-15T08:16:50.340Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T19:31:34.571Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69918804902db329d286ab5a"
+  },
+  "name": "Xtreme 125",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09DV2458",
+  "companyName": "Hero",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a1358273f723e44c6f9eeb7"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771146163/Tastyaana/vehicles/nk9jnccb6ohbqpxmymyd.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 48106,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 600,
+    "ratePerHour": 60,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 60,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rateHourly": {
+    "ratePerHour": 60,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "rate24hr": {
+    "baseRate": 800,
+    "ratePerHour": 60,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 60,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 60,
+    "withoutFuelPerHour": 60
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-15T08:47:00.195Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T19:57:27.272Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69918845902db329d286ac8a"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09BK1259",
+  "companyName": "Honda",
+  "zoneId": "69f75ced05211a84445fa459",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a130edbb3309cff413c5052"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771145945/Tastyaana/vehicles/vkgtouxfbzpe7trgnvql.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-15T08:48:05.345Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T04:33:36.289Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69918871902db329d286ad75"
+  },
+  "name": "Activa6g",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09BK1254",
+  "companyName": "Honda",
+  "zoneId": "69f75ced05211a84445fa459",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a153d493f723e44c6fa38f0"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771145785/Tastyaana/vehicles/fuhxredfsque6hspatfl.jpg",
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777819964/Tastyaana/vehicles/wskvygztzqrlvw26ovob.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-15T08:48:49.299Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-26T06:27:21.048Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6991890e902db329d286adbe"
+  },
+  "name": "Activa 6g",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09AQ1340",
+  "companyName": "Honda",
+  "zoneId": "69f75ced05211a84445fa459",
+  "zoneCenterName": "Vijay nagar square ",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1771145601/Tastyaana/vehicles/ug5alrbc1q9cn3vtlcsm.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 2086,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-02-15T08:51:26.117Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T04:32:38.891Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69ecba3cd8a32a410fc83086"
+  },
+  "name": "fronx",
+  "category": "car",
+  "type": "Petrol + CNG",
+  "vehicleNo": "MH12BC0001",
+  "companyName": "Maruti Suzuki ",
+  "zoneId": "69735741a01ce0494ef8c922",
+  "zoneCenterName": "Vijay nagar square",
+  "zoneCenterAddress": "Vijay nagar square, Indore, Madhya Pradesh",
+  "zoneCode": "ind004",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "online",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "69ff21fa850bc251e05da369"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777701247/Tastyaana/vehicles/fpeiv9r6dgyhsyxbbjc4.jpg"
+  ],
+  "seatingCapacity": 7,
+  "meterReading": 500,
+  "color": "gray",
+  "fuelCapacity": 15,
+  "mileage": 10,
+  "vehicleFeatures": [
+    "ABS",
+    "Disk Brake",
+    "AC",
+    "Airbags",
+    "GPS",
+    "Bluetooth",
+    "Music System",
+    "Central Lock",
+    "Power Steering",
+    "Gearless"
+  ],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 500,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [
+    {
+      "lastServicingDate": {
+        "$date": "2026-04-25T00:00:00.000Z"
+      },
+      "nextDueDate": {
+        "$date": "2026-07-24T14:06:20.590Z"
+      },
+      "serviceType": "oil-change",
+      "serviceCost": 1200,
+      "serviceCenter": "Toyota Service Centre",
+      "notes": "Oil changed ",
+      "isCompleted": true,
+      "createdAt": {
+        "$date": "2026-04-25T14:06:20.590Z"
+      },
+      "_id": {
+        "$oid": "69ecca5c6eaa248650cbfb8b"
+      }
+    }
+  ],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-04-25T12:57:32.767Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-09T12:00:58.506Z"
+  },
+  "__v": 1
+},
+{
+  "_id": {
+    "$oid": "69ecd998218be43291bbc4c6"
+  },
+  "name": "Activa 5G",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MH12BC3232",
+  "companyName": "Honda",
+  "zoneId": "69f7f2d62dcb03c652095ca4",
+  "zoneCenterName": "Bhawarkua",
+  "zoneCenterAddress": "Bhawarkua, Bholaram Square, Indore, Madhya Pradesh ",
+  "zoneCode": "ind007",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": null,
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777129892/Tastyaana/vehicles/fkcmy3ml2rozndtvvuwd.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 3000,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 48,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [
+    {
+      "lastServicingDate": {
+        "$date": "2026-05-15T00:00:00.000Z"
+      },
+      "nextDueDate": {
+        "$date": "2026-08-13T07:53:51.064Z"
+      },
+      "serviceType": "oil-change",
+      "serviceCost": 600,
+      "serviceCenter": "Local Service Center",
+      "notes": "",
+      "isCompleted": true,
+      "createdAt": {
+        "$date": "2026-05-15T07:53:51.062Z"
+      },
+      "_id": {
+        "$oid": "6a06d10f4f59697281dbf7bb"
+      }
+    }
+  ],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-04-25T15:11:20.259Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-23T21:51:51.181Z"
+  },
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "69eceaac2b9873a95c318eda"
+  },
+  "name": "Ertiga",
+  "category": "car",
+  "type": "Petrol + CNG",
+  "vehicleNo": "MH12AS2321",
+  "companyName": "Maruti Suzuki",
+  "zoneId": "6a009be50f8671c577239785",
+  "zoneCenterName": "Rajendra Nagar ",
+  "zoneCenterAddress": "Rajendra nagar square, indore MP",
+  "zoneCode": "Ind006",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "not-available",
+  "currentBookingId": {
+    "$oid": "6a0166e44f59697281cbd65c"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777134252/Tastyaana/vehicles/qzqgid38gltjwhi7d2ba.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 340,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 51,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [
+    {
+      "lastServicingDate": {
+        "$date": "2026-04-30T00:00:00.000Z"
+      },
+      "nextDueDate": {
+        "$date": "2026-07-29T16:03:39.686Z"
+      },
+      "serviceType": "tyre-check",
+      "serviceCost": 250,
+      "serviceCenter": "Authorized service center",
+      "notes": "tyre checking done ",
+      "isCompleted": true,
+      "createdAt": {
+        "$date": "2026-04-30T16:03:39.681Z"
+      },
+      "_id": {
+        "$oid": "69f37d5bfc643d8b6c76750b"
+      }
+    }
+  ],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-04-25T16:24:12.152Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-14T09:47:24.389Z"
+  },
+  "__v": 5
+},
+{
+  "_id": {
+    "$oid": "69f4b6081c48742f449d5cd8"
+  },
+  "name": "Bullet Classic - 350",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MH12AC9092",
+  "companyName": "Royal Enfield",
+  "zoneId": "69735741a01ce0494ef8c922",
+  "zoneCenterName": "Bhawarkua",
+  "zoneCenterAddress": "Bhawarkua, Bholaram Square, Indore, Madhya Pradesh ",
+  "zoneCode": "ind007",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "69fed223850bc251e05d806a"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777645614/Tastyaana/vehicles/hifdyoeqaxqzb4duf2hp.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 0,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 560,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-01T14:17:44.837Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-23T21:54:07.022Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69f592f45ec235ec5653da1b"
+  },
+  "name": "GT 650",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09XL2345",
+  "companyName": "Royal Enfield Continental",
+  "zoneId": "69735741a01ce0494ef8c922",
+  "zoneCenterName": "Bhawarkua",
+  "zoneCenterAddress": "Bhawarkua, Bholaram Square, Indore, Madhya Pradesh ",
+  "zoneCode": "ind007",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a134f0f0783ec6376023058"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777701672/Tastyaana/vehicles/enwmf75zfxpnobyn91yv.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 100,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 899,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [
+    {
+      "lastServicingDate": {
+        "$date": "2026-05-02T00:00:00.000Z"
+      },
+      "nextDueDate": {
+        "$date": "2026-07-31T06:12:09.221Z"
+      },
+      "serviceType": "general-service",
+      "serviceCost": 15000,
+      "serviceCenter": "company service center",
+      "notes": "",
+      "isCompleted": true,
+      "createdAt": {
+        "$date": "2026-05-02T06:12:09.221Z"
+      },
+      "_id": {
+        "$oid": "69f595b95ec235ec5653df88"
+      }
+    }
+  ],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-02T06:00:20.281Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T19:18:39.347Z"
+  },
+  "__v": 3
+},
+{
+  "_id": {
+    "$oid": "69f7aa0197e4104ef2f0a139"
+  },
+  "name": "Pulser RS200",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09XL8055",
+  "companyName": "Bajaj",
+  "zoneId": "69f7a75897e4104ef2f09f62",
+  "zoneCenterName": "Bhawarkua",
+  "zoneCenterAddress": "Bhawarkua, Bholaram Square, Indore Madhya Pradesh ",
+  "zoneCode": "ind007",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777838646/Tastyaana/vehicles/jvg4y1jqp8snf3zl6yxl.jpg"
+  ],
+  "seatingCapacity": 1,
+  "meterReading": 1010,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 550,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 49,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 5,
+    "withFuelPerHour": 69,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 799,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-03T20:03:13.898Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-23T22:16:21.148Z"
+  },
+  "__v": 4
+},
+{
+  "_id": {
+    "$oid": "69f826f02dcb03c652096363"
+  },
+  "name": "Raider 125",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09NX1000",
+  "companyName": "TVS",
+  "zoneId": "6a009be50f8671c577239785",
+  "zoneCenterName": "Rajendra Nagar ",
+  "zoneCenterAddress": "Rajendra nagar square, indore MP",
+  "zoneCode": "Ind006",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": true,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777870623/Tastyaana/vehicles/rvswsufqazmpnvdxfhnt.png"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 6666,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 200,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 200,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-04T04:56:16.403Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-15T07:12:20.442Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69f87c392dcb03c65209b48b"
+  },
+  "name": "Pulsar RS 200",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP11ZF2979",
+  "companyName": "Bajaj",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a135b233f723e44c6f9f1b9"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777892568/Tastyaana/vehicles/ziivqb38o3jndohoxyff.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 31796,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 100,
+    "ratePerHour": 100,
+    "kmLimit": 150,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 100,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rateHourly": {
+    "ratePerHour": 100,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "rate24hr": {
+    "baseRate": 1500,
+    "ratePerHour": 100,
+    "kmLimit": 200,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 100,
+    "withoutFuelPerHour": 100
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-04T11:00:09.827Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T20:10:12.022Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69f87d332dcb03c65209b5cb"
+  },
+  "name": "Continental GT 650",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP13AH7014",
+  "companyName": "Royal Enfield",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a11ec044f59697281dca338"
+  },
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777892818/Tastyaana/vehicles/wjxs9jqyqxwz2ghjarb2.jpg"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 7014,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 1500,
+    "ratePerHour": 200,
+    "kmLimit": 200,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 200,
+    "withoutFuelPerHour": 200
+  },
+  "rateHourly": {
+    "ratePerHour": 200,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 10,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 200,
+    "withoutFuelPerHour": 200
+  },
+  "rate24hr": {
+    "baseRate": 2500,
+    "ratePerHour": 200,
+    "kmLimit": 300,
+    "extraChargePerKm": 10,
+    "extraChargePerHour": 200,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 200,
+    "withoutFuelPerHour": 200
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-04T11:04:19.983Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-23T18:03:48.046Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "69f883922dcb03c65209e768"
+  },
+  "name": "Jupiter 125",
+  "category": "scooty",
+  "type": "Petrol",
+  "vehicleNo": "MP09ZV5963",
+  "companyName": "TVS",
+  "zoneId": "69f7655f97e4104ef2f0535c",
+  "zoneCenterName": "Bhawarkua ",
+  "zoneCenterAddress": "Bhawarkua bholaram, Indore, Madhya Pradesh",
+  "zoneCode": "ind003",
+  "locationGeo": null,
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": null,
+  "vehicleImages": [
+    "https://res.cloudinary.com/dcha7gy9o/image/upload/v1777894432/Tastyaana/vehicles/si3f00wbougnisxlfnij.png"
+  ],
+  "seatingCapacity": 2,
+  "meterReading": 16140,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 400,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 40,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 40,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 5,
+    "extraChargePerKm": 3,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 600,
+    "ratePerHour": 40,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 40
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "69496896189c0ec965f72d9b"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-04T11:31:30.535Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-25T11:07:00.415Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a009c990f8671c5772398e9"
+  },
+  "name": "Thar rocks",
+  "category": "car",
+  "type": "Petrol + CNG",
+  "vehicleNo": "MP09RN0002",
+  "companyName": "Mahendra ",
+  "zoneId": "6a009be50f8671c577239785",
+  "zoneCenterName": "Rajendra Nagar ",
+  "zoneCenterAddress": "Rajendra nagar square, indore MP",
+  "zoneCode": "Ind006",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      73.8567,
+      18.5204
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "reserved",
+  "currentBookingId": {
+    "$oid": "6a135a813f723e44c6f9f11b"
+  },
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 12342,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-05-10T14:56:25.247Z"
+  },
+  "updatedAt": {
+    "$date": "2026-05-24T20:07:29.337Z"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "6a20095d3f723e44c6fa77da"
+  },
+  "name": "suv 700",
+  "category": "bike",
+  "type": "Petrol",
+  "vehicleNo": "MP09KL2204",
+  "companyName": "honda",
+  "zoneId": "69f7f2d62dcb03c652095ca4",
+  "zoneCenterName": "Bhawarkua",
+  "zoneCenterAddress": "Bhawarkua, Bholaram Square, Indore, Madhya Pradesh ",
+  "zoneCode": "ind007",
+  "locationGeo": {
+    "type": "Point",
+    "coordinates": [
+      0,
+      0
+    ]
+  },
+  "minBufferTime": 30,
+  "requireConfirmation": false,
+  "requiresDeposit": false,
+  "depositType": "offline",
+  "status": "active",
+  "availability": "available",
+  "currentBookingId": {
+    "$oid": "6a200fff3f723e44c6fa7ddd"
+  },
+  "vehicleImages": [],
+  "seatingCapacity": 2,
+  "meterReading": 2652,
+  "color": "Black",
+  "fuelCapacity": 5,
+  "mileage": 40,
+  "vehicleFeatures": [],
+  "rate12hr": {
+    "baseRate": 500,
+    "ratePerHour": 40,
+    "kmLimit": 120,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 50,
+    "gracePeriodMinutes": 15,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rateHourly": {
+    "ratePerHour": 50,
+    "kmFreePerHour": 10,
+    "fuelChargesperkm": 6,
+    "extraChargePerKm": 6,
+    "withFuelPerHour": 50,
+    "withoutFuelPerHour": 40
+  },
+  "rate24hr": {
+    "baseRate": 750,
+    "ratePerHour": 30,
+    "kmLimit": 150,
+    "extraChargePerKm": 3,
+    "extraChargePerHour": 3,
+    "gracePeriodMinutes": 30,
+    "withFuelPerHour": 40,
+    "withoutFuelPerHour": 30
+  },
+  "depositAmount": 2000,
+  "requiredPaymentPercentage": 50,
+  "documents": {
+    "rcBook": "pending",
+    "insurance": "pending",
+    "pollutionCert": "pending",
+    "puc": "pending"
+  },
+  "analytics": {
+    "totalBookings": 0,
+    "totalRevenue": 0,
+    "totalKmDriven": 0,
+    "totalHoursRented": 0,
+    "averageRating": 0,
+    "ratingCount": 0,
+    "popularTimeslots": []
+  },
+  "sellerId": {
+    "$oid": "6977a48aef8105e537f53c36"
+  },
+  "isDeleted": 0,
+  "rateDaily": [],
+  "maintenance": [],
+  "damageReports": [],
+  "createdAt": {
+    "$date": "2026-06-03T11:00:45.907Z"
+  },
+  "updatedAt": {
+    "$date": "2026-06-03T11:32:02.753Z"
+  },
+  "__v": 0
+}]

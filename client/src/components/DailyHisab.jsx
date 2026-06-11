@@ -771,6 +771,39 @@ export default function DailyHisab({
     }
   };
 
+  /**
+   * Returns true if this booking was operationally active on the given dateStr (YYYY-MM-DD).
+   * Covers Reserved / Ongoing / Extended / Overdue bookings whose active window overlaps the date.
+   * Used to show multi-day bookings on every date they occupy, not just the booking/payment date.
+   */
+  const isActiveOnDate = (b, dateStr) => {
+    const activeStatuses = ['Reserved', 'Ongoing', 'Extended', 'Overdue'];
+    if (!activeStatuses.includes(b.status)) return false;
+
+    // Determine the booking's active window start (prefer actual pickup, fall back to planned start)
+    const startRaw =
+      b.actualPickupDate ||
+      b.rentalPeriod?.actualPickupDate ||
+      b.rentalPeriod?.startDate ||
+      b.createdAt;
+
+    // Determine the booking's active window end (prefer actual return, fall back to expected end)
+    const endRaw =
+      b.actualReturnDate ||
+      b.rentalPeriod?.actualReturnDate ||
+      b.rentalPeriod?.expectedEndDate ||
+      b.expectedReturnDate;
+
+    const startDate = safeDateStr(startRaw);
+    const endDate   = safeDateStr(endRaw);
+
+    if (!startDate) return false;
+
+    // Overlap: booking started on or before selected date AND
+    // (no end date recorded yet, OR booking ends on or after selected date)
+    return startDate <= dateStr && (!endDate || endDate >= dateStr);
+  };
+
   // Safe time helper
   const formatTimeDisplay = (dateStr) => {
     if (!dateStr) return '';
@@ -1510,8 +1543,21 @@ export default function DailyHisab({
     const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
     const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
 
-    // If no activity today, exclude it
-    if (todayPayments.length === 0 && todayRevisions.length === 0 && createdDateStr !== dateFilter && pickupDateStr !== dateFilter && returnDateStr !== dateFilter && !isRefundToday) {
+    // Check if any timestamp-anchored activity happened on this date
+    const hasDateActivity = (
+      todayPayments.length > 0 ||
+      todayRevisions.length > 0 ||
+      createdDateStr === dateFilter ||
+      pickupDateStr  === dateFilter ||
+      returnDateStr  === dateFilter ||
+      isRefundToday
+    );
+
+    // Check if the booking is operationally active on this date (vehicle is still out)
+    const isOperationallyActive = isActiveOnDate(b, dateFilter);
+
+    // Exclude only if NEITHER a timestamp-anchored event NOR an active-window overlap exists
+    if (!hasDateActivity && !isOperationallyActive) {
       return false;
     }
 
@@ -1810,6 +1856,17 @@ export default function DailyHisab({
           const isNewBooking = safeDateStr(b.createdAt) === dateFilter;
           const isReturnBooking = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate) === dateFilter && b.status === 'Completed';
 
+          // Carryover flag: this booking appears because the vehicle is still active on this date,
+          // NOT because a payment/revision/creation event happened on this specific date.
+          const hasDateActivityOnCard = (
+            (b.paymentCollection?.some(p => safeDateStr(p.timestamp) === dateFilter)) ||
+            (b.revisions?.some(r => safeDateStr(r.timestamp) === dateFilter)) ||
+            safeDateStr(b.createdAt) === dateFilter ||
+            safeDateStr(b.actualPickupDate || b.rentalPeriod?.actualPickupDate) === dateFilter ||
+            safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate) === dateFilter
+          );
+          const isOperationalCarryover = !hasDateActivityOnCard && isActiveOnDate(b, dateFilter);
+
           // 1. Security Deposit: use the actual collected deposit from depositDetails breakdown.
           // depAmt = sum of cash+online+card collected at booking time (original vehicle deposit).
           // Do NOT use depositHeld as that is the post-settlement net value.
@@ -1962,6 +2019,16 @@ export default function DailyHisab({
                       <span className={`hisab-pill status-${b.status.toLowerCase()}`}>{b.status}</span>
                       {isNewBooking && <span className="hisab-pill new-badge">NEW</span>}
                       {isReturnBooking && <span className="hisab-pill returned-badge">RETURNED</span>}
+                      {isOperationalCarryover && (
+                        <span className="hisab-pill" style={{
+                          background: 'rgba(139, 92, 246, 0.18)',
+                          color: '#a78bfa',
+                          border: '1px solid rgba(139, 92, 246, 0.35)',
+                          animation: 'pulse 2s infinite'
+                        }}>
+                          ⚡ ACTIVE
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -2055,7 +2122,133 @@ export default function DailyHisab({
 
                 return (
                   <div className="hisab-details-panel">
-                    
+
+                    {/* ─── CARRYOVER: VEHICLE ACTIVE ON THIS DATE PANEL ─── */}
+                    {isOperationalCarryover && (() => {
+                      const startRawCarry = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.rentalPeriod?.startDate;
+                      const endRawCarry   = b.actualReturnDate || b.rentalPeriod?.actualReturnDate || b.rentalPeriod?.expectedEndDate || b.expectedReturnDate;
+                      const daysActive = startRawCarry
+                        ? Math.max(1, Math.ceil((new Date(dateFilter) - new Date(safeDateStr(startRawCarry))) / 86400000) + 1)
+                        : '—';
+                      const currentBill   = b.rentalCost || b.baseFare || 0;
+                      const rentalPaidAmt = b.rentalPaid || 0;
+                      const outstanding   = b.outstandingRent || 0;
+
+                      return (
+                        <div style={{
+                          background: 'linear-gradient(135deg, rgba(139,92,246,0.1) 0%, rgba(99,102,241,0.06) 100%)',
+                          border: '1px solid rgba(139,92,246,0.35)',
+                          borderRadius: '10px',
+                          padding: '18px 20px',
+                          marginBottom: '20px'
+                        }}>
+                          {/* Header */}
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: '10px',
+                            marginBottom: '14px', paddingBottom: '10px',
+                            borderBottom: '1px solid rgba(139,92,246,0.2)'
+                          }}>
+                            <span style={{ fontSize: '1.1rem' }}>⚡</span>
+                            <span style={{ color: '#a78bfa', fontWeight: 700, fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                              Vehicle Active on {formatDateDisplay(dateFilter)}
+                            </span>
+                            <span style={{
+                              marginLeft: 'auto',
+                              background: 'rgba(139,92,246,0.2)',
+                              color: '#c4b5fd',
+                              fontSize: '0.7rem',
+                              fontWeight: 700,
+                              padding: '2px 10px',
+                              borderRadius: '9999px',
+                              border: '1px solid rgba(139,92,246,0.3)'
+                            }}>
+                              NO TRANSACTION TODAY
+                            </span>
+                          </div>
+
+                          {/* Info Grid */}
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px', marginBottom: '14px' }}>
+
+                            {/* Expected Drop-Off */}
+                            <div style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Expected Drop-Off
+                              </div>
+                              <div style={{ fontWeight: 700, color: '#f59e0b', fontSize: '0.82rem', lineHeight: 1.3 }}>
+                                {endRawCarry ? formatDateTime(endRawCarry) : 'Not set'}
+                              </div>
+                            </div>
+
+                            {/* Outstanding Amount */}
+                            <div style={{
+                              background: outstanding > 0 ? 'rgba(239,68,68,0.07)' : 'rgba(16,185,129,0.07)',
+                              border: `1px solid ${outstanding > 0 ? 'rgba(239,68,68,0.2)' : 'rgba(16,185,129,0.2)'}`,
+                              borderRadius: '8px', padding: '10px 12px'
+                            }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Outstanding Due
+                              </div>
+                              <div style={{ fontWeight: 700, color: outstanding > 0 ? '#ef4444' : '#10b981', fontSize: '0.82rem' }}>
+                                ₹{outstanding.toLocaleString()}
+                              </div>
+                            </div>
+
+                            {/* Current Rental Bill */}
+                            <div style={{ background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Current Rental Bill
+                              </div>
+                              <div style={{ fontWeight: 700, color: '#818cf8', fontSize: '0.82rem' }}>
+                                ₹{currentBill.toLocaleString()}
+                              </div>
+                            </div>
+
+                            {/* Rental Paid So Far */}
+                            <div style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Paid So Far
+                              </div>
+                              <div style={{ fontWeight: 700, color: '#10b981', fontSize: '0.82rem' }}>
+                                ₹{rentalPaidAmt.toLocaleString()}
+                              </div>
+                            </div>
+
+                            {/* Days Active */}
+                            <div style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.2)', borderRadius: '8px', padding: '10px 12px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Days Active
+                              </div>
+                              <div style={{ fontWeight: 700, color: '#a78bfa', fontSize: '0.82rem' }}>
+                                {daysActive} day(s)
+                              </div>
+                            </div>
+
+                            {/* Booked By Worker */}
+                            <div style={{ background: 'rgba(51,65,85,0.4)', border: '1px solid rgba(71,85,105,0.3)', borderRadius: '8px', padding: '10px 12px' }}>
+                              <div style={{ fontSize: '0.68rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '5px' }}>
+                                Assigned Worker
+                              </div>
+                              <div style={{ fontWeight: 700, color: '#cbd5e1', fontSize: '0.82rem' }}>
+                                {b.workerId || 'System'}
+                              </div>
+                            </div>
+
+                          </div>
+
+                          {/* Footer note */}
+                          <div style={{
+                            fontSize: '0.73rem', color: '#64748b', lineHeight: 1.5,
+                            paddingTop: '10px', borderTop: '1px solid rgba(139,92,246,0.12)'
+                          }}>
+                            💡 <strong style={{ color: '#94a3b8' }}>Revenue Note (Option C):</strong>&nbsp;
+                            No financial transaction was recorded for this booking on {formatDateDisplay(dateFilter)}.
+                            Revenue will be counted on the date of actual payment or final settlement — not distributed across active days.
+                            This card appears here because the vehicle is operationally occupied.
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     {/* SECTION 1: BOOKING SNAPSHOT SUMMARY */}
                     <div style={{ marginBottom: '20px' }}>
                       <div className="hisab-subsec-title">Booking Snapshot Summary</div>

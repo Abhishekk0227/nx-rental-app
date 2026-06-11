@@ -166,12 +166,13 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     if (!isScooty) return;
     setIncludeFuel(checked);
     if (checked) {
-      // Force Hourly
+      // Force Hourly plan and ALWAYS set drop to pickup + 1 hour
+      // (minBookingHours is ignored when fuel is included — billing is per actual hour)
       setSelectedPlanType('Hourly');
-      const newDropDate = addHoursToDateString(pickupDate, Math.max(1, minBookingHours));
+      const newDropDate = addHoursToDateString(pickupDate, 1);
       setExpectedDropDate(newDropDate);
     } else {
-      // Scooty without fuel: use vehicle-configured minimum hours
+      // Scooty without fuel: restore vehicle-configured minimum hours
       if (selectedPlanType === 'Hourly') {
         const newDropDate = addHoursToDateString(pickupDate, Math.max(1, minBookingHours));
         setExpectedDropDate(newDropDate);

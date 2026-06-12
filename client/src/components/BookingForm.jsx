@@ -572,7 +572,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
     const durationHours = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60)));
     // Enforce vehicle-configured minimum booking duration
-    if (minBookingHours > 0 && durationHours < minBookingHours) {
+    // Exception: Scooty with fuel included is always per-actual-hour (min 1h), skip minimum check
+    const skipMinCheck = isScooty && includeFuel;
+    if (!skipMinCheck && minBookingHours > 0 && durationHours < minBookingHours) {
       return alert(`Minimum booking duration for this vehicle is ${minBookingHours} hour(s).`);
     }
 

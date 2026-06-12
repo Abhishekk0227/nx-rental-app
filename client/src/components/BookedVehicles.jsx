@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { RefreshCw, AlertTriangle, Clock, Calendar, CheckCircle, Search, SlidersHorizontal, Car, Bike, User, Phone, MapPin, ArrowRight, Banknote, CreditCard, Wallet, Monitor, Eye, Pencil, RotateCw, Truck, Printer, FileText, X, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 
 export default function BookedVehicles({ 
@@ -2346,9 +2346,12 @@ export default function BookedVehicles({
     let actualRentalBill = 0;
     let baseHourlyCost = 0;
     if (isScootyFuel) {
-      // Scooty with Fuel: actual hours * hourly rate + actual KM * fuel rate + damages + accessories + other - discount
+      // Scooty with Fuel: charged hourly with a MINIMUM of 1 hour.
+      // Any fraction of an hour is rounded UP (Math.ceil), and the minimum billable unit is 1 hour.
+      // e.g. 30 min → 1 hr charge, 1 hr 10 min → 2 hr charge
       const baseHourlyRate = selectedBooking.selectedPlan?.rate || 40;
-      baseHourlyCost = actualHoursDecimal * baseHourlyRate;
+      const chargeableHoursForFuel = Math.max(1, Math.ceil(actualHoursDecimal));
+      baseHourlyCost = chargeableHoursForFuel * baseHourlyRate;
       
       actualRentalBill = baseHourlyCost + distanceCharge + manualChargesTotal + accessoryChargeTotal - waiverDiscount;
     } else {

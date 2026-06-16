@@ -469,15 +469,35 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     if (selectedPlanType === 'Hourly') {
       cost = effectiveHours * planRate;
     } else if (selectedPlanType === '12-Hour') {
-      cost = planRate;
-      if (hours > 12) {
-        cost += (hours - 12) * planExtraHour;
+      // Count number of 12-hour slots; extra hours after last full slot billed at planExtraHour
+      const fullSlots = Math.floor(hours / 12);
+      const remainingHours = hours % 12;
+      cost = fullSlots * planRate;
+      if (remainingHours > 0) {
+        // Grace period: if vehicle config has grace, apply it
+        const graceMins = vehicle.pricingPlans?.twelveHour?.gracePeriod || 0;
+        const graceHours = graceMins / 60;
+        if (remainingHours > graceHours) {
+          cost += remainingHours * planExtraHour;
+        }
       }
+      // Minimum 1 slot
+      if (cost === 0) cost = planRate;
     } else if (selectedPlanType === '24-Hour') {
-      cost = planRate;
-      if (hours > 24) {
-        cost += (hours - 24) * planExtraHour;
+      // Count number of 24-hour day slots; extra hours after last full day billed at planExtraHour
+      const fullDays = Math.floor(hours / 24);
+      const remainingHours = hours % 24;
+      cost = fullDays * planRate;
+      if (remainingHours > 0) {
+        // Grace period: if vehicle config has grace, apply it
+        const graceMins = vehicle.pricingPlans?.twentyFourHour?.gracePeriod || 0;
+        const graceHours = graceMins / 60;
+        if (remainingHours > graceHours) {
+          cost += remainingHours * planExtraHour;
+        }
       }
+      // Minimum 1 day
+      if (cost === 0) cost = planRate;
     }
 
     // KM Limit — uses effectiveHours so it matches what is charged
@@ -918,15 +938,39 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           </h4>
 
           {(() => {
+            // Build plan cards using live planRate state (synced from vehicle config via useEffect)
+            // so any vehicle pricing change reflects immediately in the UI
+            const getCardRate = (type) => {
+              if (type === selectedPlanType) return planRate; // use live state for selected plan
+              // for non-selected plans, read directly from vehicle config
+              if (type === 'Hourly') {
+                return (isScooty && includeFuel)
+                  ? (vehicle.pricingPlans?.hourly?.withFuel || vehicle.perHourRate || 60)
+                  : isBike
+                    ? (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 100)
+                    : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40);
+              }
+              if (type === '12-Hour') {
+                return isCar
+                  ? (vehicle.pricingPlans?.twelveHour?.baseRate || 2500)
+                  : isBike
+                    ? (vehicle.pricingPlans?.twelveHour?.baseRate || 1200)
+                    : (vehicle.pricingPlans?.twelveHour?.baseRate || 350);
+              }
+              if (type === '24-Hour') {
+                return isCar
+                  ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 4500)
+                  : isBike
+                    ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 2400)
+                    : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500);
+              }
+              return 0;
+            };
             const availablePlans = [
               {
                 type: 'Hourly',
                 label: 'Hourly',
-                rate: (isScooty && includeFuel)
-                  ? (vehicle.pricingPlans?.hourly?.withFuel || vehicle.perHourRate || 60)
-                  : isBike
-                    ? (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 100)
-                    : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40),
+                rate: getCardRate('Hourly'),
                 limit: (isScooty && includeFuel)
                   ? `Fuel Surcharge: ₹${vehicle.pricingPlans?.hourly?.fuelChargePerKm || 2}/KM`
                   : `10 KM/hr Limit`,
@@ -935,11 +979,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               {
                 type: '12-Hour',
                 label: '12 Hour',
-                rate: isCar
-                  ? (vehicle.pricingPlans?.twelveHour?.baseRate || 2500)
-                  : isBike
-                    ? (vehicle.pricingPlans?.twelveHour?.baseRate || 1200)
-                    : (vehicle.pricingPlans?.twelveHour?.baseRate || 350),
+                rate: getCardRate('12-Hour'),
                 limit: isCar || isBike
                   ? `10 KM/hr Limit`
                   : `${vehicle.pricingPlans?.twelveHour?.kmLimit || 60} KM Limit`,
@@ -948,11 +988,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               {
                 type: '24-Hour',
                 label: '24 Hour',
-                rate: isCar
-                  ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 4500)
-                  : isBike
-                    ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 2400)
-                    : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500),
+                rate: getCardRate('24-Hour'),
                 limit: isCar || isBike
                   ? `10 KM/hr Limit`
                   : `${vehicle.pricingPlans?.twentyFourHour?.kmLimit || 120} KM Limit`,

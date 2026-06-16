@@ -510,10 +510,10 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
         )}
       </div>
 
-      {/* 📋 VEHICLES DATA TABLE */}
+      {/* 📋 VEHICLES DATA TABLE — Horizontal scroll on all small screens, full row always visible */}
       <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="table-responsive">
-          <table className="custom-table">
+        <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <table className="custom-table av-vehicle-table">
             <thead>
               <tr>
                 <th>VEHICLE</th>

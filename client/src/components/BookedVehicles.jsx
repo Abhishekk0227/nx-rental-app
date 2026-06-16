@@ -2990,8 +2990,10 @@ export default function BookedVehicles({
             </div>
           )}
 
-          {/* Cards Grid List matching Mockup 3 */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          {/* Cards Grid List — responsive scroll on all device sizes */}
+          <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', minWidth: '320px' }}>
+
             {sortedBookings.map(b => {
               const flow = getCardFlow(b);
               const totalExt = b.extensions?.reduce((sum, ext) => sum + ext.extraCharges, 0) || 0;
@@ -3214,6 +3216,7 @@ export default function BookedVehicles({
               </div>
             )}
           </div>
+          </div>{/* end scroll wrapper */}
         </>
       )}
 

@@ -4,7 +4,6 @@ import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike
 // Embedded high-fidelity styles to match your design guidelines
 const rawStyles = `
   .hisab-container {
-    padding: 0;
     background: transparent;
     color: #1e293b;
     min-height: 100vh;
@@ -667,7 +666,6 @@ const rawStyles = `
     .hisab-snapshot-grid { grid-template-columns: repeat(2, 1fr); }
   }
   @media (max-width: 720px) {
-    .hisab-container { padding: 16px 12px; }
     .hisab-filters-row { grid-template-columns: repeat(2, 1fr); }
     .hisab-activity-summary-row { flex-direction: column; align-items: flex-start; gap: 10px; }
     .hisab-activity-summary-stats { gap: 10px; }
@@ -689,7 +687,6 @@ const rawStyles = `
     .hisab-date-input-wrapper { gap: 6px; }
   }
   @media (max-width: 400px) {
-    .hisab-container { padding: 12px 8px; }
     .hisab-kpi-grid { gap: 8px; }
     .hisab-kpi-value { font-size: 1.2rem; }
     .hisab-filters-row { grid-template-columns: 1fr; }

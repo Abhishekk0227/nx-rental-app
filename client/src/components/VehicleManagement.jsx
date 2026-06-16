@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, SlidersHorizontal, Plus, Car, Bike, Eye, Clock, ToggleLeft, MapPin, Trash2, X, Pencil, Camera, Upload, AlertTriangle } from 'lucide-react';
+import { Search, SlidersHorizontal, Plus, Car, Bike, Eye, Clock, ToggleLeft, ToggleRight, MapPin, Trash2, X, Pencil, Camera, Upload, AlertTriangle } from 'lucide-react';
 
 export default function VehicleManagement({ vehicles, bookings = [], onAddVehicle, onUpdateVehicle, onToggleStatus, autoOpenAdd, onAutoOpenConsumed }) {
   // Search & Filter state variables
@@ -703,7 +703,26 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
             <div className="card-header-actions">
               <button className="circle-action-btn view" title="Details / Config" onClick={() => openEditModal(v)}><Eye size={14} /></button>
               <button className="circle-action-btn history" title="Rent History" onClick={() => openHistoryModal(v)}><Clock size={14} /></button>
-              <button className="circle-action-btn availability" title="Booking Permission" onClick={() => openAvailabilityModal(v)}><ToggleLeft size={14} /></button>
+
+              {/* Availability toggle: green+left when available, red+right when not */}
+              {(() => {
+                const isAvail = v.status === 'Active' || v.status === 'Available';
+                return (
+                  <button
+                    className={`avail-toggle-btn ${isAvail ? 'is-available' : 'is-unavailable'}`}
+                    title="Booking Availability"
+                    onClick={() => openAvailabilityModal(v)}
+                  >
+                    <span className="avail-icon">
+                      {isAvail ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}
+                    </span>
+                    <span style={{ fontSize: '0.65rem', fontWeight: 700 }}>
+                      {isAvail ? 'Open' : v.status || 'Blocked'}
+                    </span>
+                  </button>
+                );
+              })()}
+
               <button className="circle-action-btn location" title="Coordinate Location" onClick={() => openLocationModal(v)}><MapPin size={14} /></button>
               <button className="circle-action-btn delete" title="Delete Fleet Item" onClick={() => openDeleteModal(v)}><Trash2 size={14} /></button>
             </div>

@@ -641,7 +641,7 @@ export default function App() {
         />
 
         {/* Dynamic Route Screen */}
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, minHeight: 0 }}>
           {renderTabContent()}
         </div>
       </main>

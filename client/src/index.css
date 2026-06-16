@@ -517,6 +517,56 @@ h6 {
   animation: modalAppear 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* ── Universal: Every direct child of modal-overlay is constrained to viewport ── */
+.modal-overlay > * {
+  max-height: calc(100vh - 32px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box;
+}
+
+/* av-add-modal (Vehicle Add form) */
+.av-add-modal {
+  max-height: calc(100vh - 32px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* av-modal-body must scroll internally */
+.av-modal-body {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+/* vm-edit-modal (Vehicle Config tabbed modal) */
+.vm-edit-modal {
+  max-height: calc(100vh - 32px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* vm-tab-content must scroll internally */
+.vm-tab-content {
+  flex: 1 !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+}
+
+/* vm-edit-modal body area */
+.vm-edit-modal .modal-body {
+  flex: 1 !important;
+  overflow: hidden !important;
+  display: flex !important;
+  padding: 0 !important;
+}
+
+
 /* Form inside modal must stretch as a flex child so modal-body can scroll */
 .modal-content > form,
 .modal-content form {
@@ -790,8 +840,14 @@ h6 {
 /* --- Vehicles Display Grid (Cards) --- */
 .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+}
+@media (max-width: 1100px) {
+  .vehicles-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .vehicles-grid { grid-template-columns: 1fr; }
 }
 
 .vehicle-grid-card {
@@ -2043,21 +2099,80 @@ select.form-control {
   margin-top: 14px;
 }
 
-/* ── Page content inner padding ── */
-.fo-page-inner {
+/* ── Page content inner padding (same as fo-dashboard) ── */
+.fo-page-inner,
+.animate-slide-up {
   padding: 24px 28px;
 }
 
-/* ── Global table: always allow horizontal scroll ── */
+/* ── Global table: always allow horizontal scroll — NEVER hide columns ── */
 .table-responsive,
 .fo-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* Ensure table is wide enough so full row always visible */
+.table-responsive .custom-table,
+.av-vehicle-table {
+  min-width: 860px;
+  width: 100%;
 }
 
 /* ── Consistent page section spacing ── */
 .fo-section {
   margin-bottom: 24px;
+}
+
+/* ── Availability Toggle Button — animated state change ── */
+.avail-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 20px;
+  border: 1.5px solid transparent;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+}
+
+/* Available state: green, icon on left */
+.avail-toggle-btn.is-available {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #059669;
+  flex-direction: row;
+}
+.avail-toggle-btn.is-available:hover {
+  background: rgba(16, 185, 129, 0.18);
+  transform: scale(1.04);
+}
+
+/* Unavailable state: red/orange, icon on RIGHT */
+.avail-toggle-btn.is-unavailable {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #dc2626;
+  flex-direction: row-reverse;
+}
+.avail-toggle-btn.is-unavailable:hover {
+  background: rgba(239, 68, 68, 0.18);
+  transform: scale(1.04);
+}
+
+/* Icon pulse animation for unavailable */
+@keyframes pulse-icon {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.avail-toggle-btn.is-unavailable .avail-icon {
+  animation: pulse-icon 2s ease-in-out infinite;
 }
 
 /* ── Consistent card padding ── */
@@ -2196,12 +2311,7 @@ select.form-control {
     min-width: 140px;
   }
 
-  /* Table columns hide gracefully */
-  .custom-table th:nth-child(n+5),
-  .custom-table td:nth-child(n+5) {
-    display: none;
-  }
-
+  /* Table columns NEVER hidden — horizontal scroll handles it */
   .fo-bookings-card,
   .fo-chart-card,
   .fo-util-card {
@@ -2212,10 +2322,15 @@ select.form-control {
     margin: 12px;
     max-height: calc(100vh - 24px);
   }
+
+  /* Page padding smaller on mobile */
+  .animate-slide-up {
+    padding: 16px !important;
+  }
 }
 
 /* ==========================================================================
-   BREAKPOINT: 540px – Mobile portrait
+   BREAKPOINT: 540px – Mobile portrait / fold phone
    ========================================================================== */
 @media (max-width: 540px) {
   .fo-stat-grid {
@@ -2244,10 +2359,13 @@ select.form-control {
     font-size: 1.35rem !important;
   }
 
-  /* Table: show only first 3 columns on small mobile */
-  .custom-table th:nth-child(n+4),
-  .custom-table td:nth-child(n+4) {
-    display: none;
+  .animate-slide-up {
+    padding: 14px !important;
+  }
+
+  /* Vehicle grid: 1 column on phones */
+  .vehicles-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 
@@ -2285,8 +2403,8 @@ select.form-control {
    HISAB PAGE (DailyHisab) – light theme container fix
    ========================================================================== */
 .hisab-container {
-  background: #f8f9fb !important;
   color: #1e293b !important;
+  background: transparent !important;
 }
 
 /* ==========================================================================

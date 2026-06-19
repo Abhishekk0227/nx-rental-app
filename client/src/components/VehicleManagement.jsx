@@ -605,7 +605,18 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     );
   };
 
+  // Determines whether any form/panel is open — hides the vehicle list and shows the form full-page
+  const anyFormOpen = showAddModal ||
+    (showEditModal && !!selectedVehicle) ||
+    (showHistoryModal && !!selectedVehicle) ||
+    (showAvailabilityModal && !!selectedVehicle) ||
+    (showLocationModal && !!selectedVehicle) ||
+    (showDeleteModal && !!selectedVehicle);
+
   return (
+    <>
+    {/* ── Vehicle list — hidden when any form is open ── */}
+    {!anyFormOpen && (
     <div className="animate-slide-up">
       {/* 1. MODULE HEADER */}
       <div className="fo-page-header">
@@ -763,11 +774,14 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         )}
       </div>
 
+    </div>
+    )}
+
       {/* ==========================================================================
-         4. ADD VEHICLE MODAL (Dedicated Popup)
+         4. ADD VEHICLE MODAL (Full-Page Section)
          ========================================================================== */}
       {showAddModal && (
-        <div className="modal-overlay" style={{ alignItems: 'center', padding: '16px' }}>
+        <div className="fullpage-form-wrap">
           <div className="av-add-modal animate-slide-up">
 
             {/* ── GRADIENT HEADER ── */}
@@ -945,8 +959,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
          5. EDIT / CONFIG MODAL (Tabbed popup - 👁️)
          ========================================================================== */}
       {showEditModal && selectedVehicle && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel vm-edit-modal" style={{ width: '90%', maxWidth: '1000px' }}>
+        <div className="fullpage-form-wrap animate-slide-up">
+          <div className="modal-content glass-panel vm-edit-modal" style={{ width: '100%', maxWidth: '1100px' }}>
 
             <div className="modal-header" style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-light)' }}>
               <h2>Vehicle Configuration ({selectedVehicle.vehicleId})</h2>
@@ -1658,8 +1672,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         });
 
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '900px', maxHeight: '85vh' }}>
+          <div className="fullpage-form-wrap animate-slide-up">
+            <div className="modal-content glass-panel" style={{ width: '100%', maxWidth: '960px' }}>
               <div className="modal-header">
                 <h2>Vehicle Operations History</h2>
                 <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowHistoryModal(false)}><X size={16} /></button>
@@ -1798,8 +1812,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
          7. AVAILABILITY MODAL (Dedicated Popup - 🟢)
          ========================================================================== */}
       {showAvailabilityModal && selectedVehicle && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '450px' }}>
+        <div className="fullpage-form-wrap animate-slide-up">
+          <div className="modal-content glass-panel" style={{ width: '100%', maxWidth: '600px' }}>
             <div className="modal-header">
               <h2>Booking Availability Status</h2>
               <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowAvailabilityModal(false)}><X size={16} /></button>
@@ -1856,8 +1870,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
          8. LOCATION MODAL (Dedicated Popup - 📍)
          ========================================================================== */}
       {showLocationModal && selectedVehicle && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '500px' }}>
+        <div className="fullpage-form-wrap animate-slide-up">
+          <div className="modal-content glass-panel" style={{ width: '100%', maxWidth: '700px' }}>
             <div className="modal-header">
               <h2>Vehicle Coordinate Location</h2>
               <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowLocationModal(false)}><X size={16} /></button>
@@ -1958,8 +1972,8 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       {showDeleteModal && selectedVehicle && (() => {
         const bookingsCount = bookings.filter(b => b.vehicleId === selectedVehicle.vehicleId).length;
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '450px' }}>
+          <div className="fullpage-form-wrap animate-slide-up">
+            <div className="modal-content glass-panel" style={{ width: '100%', maxWidth: '600px' }}>
               <div className="modal-header">
                 <h2>Delete Vehicle</h2>
                 <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowDeleteModal(false)}><X size={16} /></button>
@@ -2008,6 +2022,6 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         );
       })()}
 
-    </div>
+    </>
   );
 }

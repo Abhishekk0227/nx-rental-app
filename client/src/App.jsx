@@ -640,8 +640,8 @@ export default function App() {
           onAddVehicle={handleHeaderAddVehicle}
         />
 
-        {/* Dynamic Route Screen */}
-        <div style={{ flex: 1, minHeight: 0 }}>
+        {/* Dynamic Route Screen — scrollable area */}
+        <div className="page-scroll-area">
           {renderTabContent()}
         </div>
       </main>

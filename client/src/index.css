@@ -138,12 +138,20 @@ h6 {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 32px 40px;
-  /* Increased padding for breathing room */
+  padding: 0;
   margin-left: 240px;
-  /* Slightly narrower sidebar */
   transition: margin-left var(--transition-normal);
   min-width: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* The scrollable inner area sits below the sticky header */
+.main-content > .page-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 28px 36px;
+  min-height: 0;
 }
 
 @media (max-width: 992px) {
@@ -155,9 +163,12 @@ h6 {
 @media (max-width: 768px) {
   .main-content {
     margin-left: 0;
-    padding: 20px;
+  }
+  .main-content > .page-scroll-area {
+    padding: 16px;
   }
 }
+
 
 /* --- Animations --- */
 @keyframes fadeIn {
@@ -518,7 +529,7 @@ h6 {
 }
 
 /* ── Universal: Every direct child of modal-overlay is constrained to viewport ── */
-.modal-overlay > * {
+.modal-overlay>* {
   max-height: calc(100vh - 32px) !important;
   display: flex !important;
   flex-direction: column !important;
@@ -568,7 +579,7 @@ h6 {
 
 
 /* Form inside modal must stretch as a flex child so modal-body can scroll */
-.modal-content > form,
+.modal-content>form,
 .modal-content form {
   display: flex;
   flex-direction: column;
@@ -578,8 +589,15 @@ h6 {
 }
 
 @keyframes modalAppear {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* Glass-panel override — ensure white in modal context */
@@ -608,13 +626,13 @@ h6 {
 
 /* Close button inside gradient header */
 .modal-header .fo-btn-outline {
-  background: rgba(255,255,255,0.15) !important;
-  border-color: rgba(255,255,255,0.3) !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
   color: #ffffff !important;
 }
 
 .modal-header .fo-btn-outline:hover {
-  background: rgba(255,255,255,0.25) !important;
+  background: rgba(255, 255, 255, 0.25) !important;
 }
 
 .modal-body {
@@ -749,7 +767,7 @@ h6 {
   border-radius: 10px !important;
   padding: 9px 20px !important;
   font-weight: 700 !important;
-  box-shadow: 0 4px 12px rgba(239,68,68,0.3) !important;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3) !important;
 }
 
 .modal-footer .btn-danger:disabled {
@@ -843,11 +861,17 @@ h6 {
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
+
 @media (max-width: 1100px) {
-  .vehicles-grid { grid-template-columns: repeat(2, 1fr); }
+  .vehicles-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
+
 @media (max-width: 640px) {
-  .vehicles-grid { grid-template-columns: 1fr; }
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .vehicle-grid-card {
@@ -858,14 +882,14 @@ h6 {
   display: flex;
   flex-direction: column;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   position: relative;
 }
 
 .vehicle-grid-card:hover {
   border-color: #cbd5e1;
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.10);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10);
 }
 
 .vehicle-card-image-wrapper {
@@ -904,7 +928,7 @@ h6 {
   justify-content: center;
   border: none;
   background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   color: #94a3b8;
@@ -912,24 +936,54 @@ h6 {
 
 .circle-action-btn:hover {
   transform: scale(1.12);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
 }
 
 /* Colored icon variants */
-.circle-action-btn.view { color: #7c3aed; }
-.circle-action-btn.view:hover { color: #6d28d9; background: #f5f3ff; }
+.circle-action-btn.view {
+  color: #7c3aed;
+}
 
-.circle-action-btn.history { color: #8b5cf6; }
-.circle-action-btn.history:hover { color: #7c3aed; background: #f5f3ff; }
+.circle-action-btn.view:hover {
+  color: #6d28d9;
+  background: #f5f3ff;
+}
 
-.circle-action-btn.availability { color: #059669; }
-.circle-action-btn.availability:hover { color: #047857; background: #ecfdf5; }
+.circle-action-btn.history {
+  color: #8b5cf6;
+}
 
-.circle-action-btn.location { color: #16a34a; }
-.circle-action-btn.location:hover { color: #15803d; background: #f0fdf4; }
+.circle-action-btn.history:hover {
+  color: #7c3aed;
+  background: #f5f3ff;
+}
 
-.circle-action-btn.delete { color: #dc2626; }
-.circle-action-btn.delete:hover { color: #b91c1c; background: #fef2f2; }
+.circle-action-btn.availability {
+  color: #059669;
+}
+
+.circle-action-btn.availability:hover {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.circle-action-btn.location {
+  color: #16a34a;
+}
+
+.circle-action-btn.location:hover {
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.circle-action-btn.delete {
+  color: #dc2626;
+}
+
+.circle-action-btn.delete:hover {
+  color: #b91c1c;
+  background: #fef2f2;
+}
 
 .vehicle-card-info-wrapper {
   padding: 16px 16px 14px;
@@ -1909,12 +1963,12 @@ select.form-control {
 .vehicle-grid-card {
   background: #ffffff !important;
   border: 1px solid #e8edf2 !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
 }
 
 .vehicle-grid-card:hover {
   border-color: #cbd5e1 !important;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.10) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.10) !important;
 }
 
 .vehicle-card-image-wrapper {
@@ -2148,6 +2202,7 @@ select.form-control {
   color: #059669;
   flex-direction: row;
 }
+
 .avail-toggle-btn.is-available:hover {
   background: rgba(16, 185, 129, 0.18);
   transform: scale(1.04);
@@ -2160,6 +2215,7 @@ select.form-control {
   color: #dc2626;
   flex-direction: row-reverse;
 }
+
 .avail-toggle-btn.is-unavailable:hover {
   background: rgba(239, 68, 68, 0.18);
   transform: scale(1.04);
@@ -2167,10 +2223,19 @@ select.form-control {
 
 /* Icon pulse animation for unavailable */
 @keyframes pulse-icon {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.25); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.25);
+  }
+
+  100% {
+    transform: scale(1);
+  }
 }
+
 .avail-toggle-btn.is-unavailable .avail-icon {
   animation: pulse-icon 2s ease-in-out infinite;
 }
@@ -2425,24 +2490,56 @@ select.form-control {
   -webkit-text-fill-color: unset !important;
 }
 
-.fo-section-title { color: var(--text-primary) !important; }
-.fo-stat-label { color: var(--text-secondary) !important; }
-.fo-breadcrumb { color: var(--text-secondary) !important; }
-.fo-last-updated { color: var(--text-secondary) !important; }
-.fo-cell-bold { color: var(--text-primary) !important; }
-.fo-table td { color: var(--text-secondary) !important; }
-.fo-table th { color: var(--text-muted) !important; }
+.fo-section-title {
+  color: var(--text-primary) !important;
+}
+
+.fo-stat-label {
+  color: var(--text-secondary) !important;
+}
+
+.fo-breadcrumb {
+  color: var(--text-secondary) !important;
+}
+
+.fo-last-updated {
+  color: var(--text-secondary) !important;
+}
+
+.fo-cell-bold {
+  color: var(--text-primary) !important;
+}
+
+.fo-table td {
+  color: var(--text-secondary) !important;
+}
+
+.fo-table th {
+  color: var(--text-muted) !important;
+}
 
 /* Sidebar & Header elements — these are on dark sidebar background */
-.fo-logo-title { color: var(--text-primary) !important; }
-.fo-user-name { color: var(--text-primary) !important; }
-.fo-user-role { color: var(--text-secondary) !important; }
+.fo-logo-title {
+  color: var(--text-primary) !important;
+}
+
+.fo-user-name {
+  color: var(--text-primary) !important;
+}
+
+.fo-user-role {
+  color: var(--text-secondary) !important;
+}
 
 /* Vehicle card info — these cards are on dark bg-secondary */
-.vehicle-card-info-title { color: var(--text-primary) !important; }
+.vehicle-card-info-title {
+  color: var(--text-primary) !important;
+}
 
 /* Utility class for explicitly dark text (inside light modal/form contexts) */
-.fo-util-name { color: #334155 !important; }
+.fo-util-name {
+  color: #334155 !important;
+}
 
 /* Booking form section headers — inside light-bg forms */
 .bform-section-title {
@@ -2538,8 +2635,15 @@ select.form-control {
   font-family: var(--font-body);
 }
 
-.modal-sidebar-nav button:hover { background: #eef2ff; color: #4f46e5; }
-.modal-sidebar-nav button.active { background: #4f46e5; color: #fff; }
+.modal-sidebar-nav button:hover {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.modal-sidebar-nav button.active {
+  background: #4f46e5;
+  color: #fff;
+}
 
 .modal-sidebar-content {
   flex: 1;
@@ -2589,7 +2693,10 @@ select.form-control {
   transition: all 0.15s;
 }
 
-.modal-close-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.modal-close-btn:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
 
 /* ==========================================================================
    BOOKINGS PAGE — RESPONSIVE CARDS & TABLE
@@ -2606,7 +2713,7 @@ select.form-control {
 }
 
 .bv-booking-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
   border-color: #cbd5e1;
 }
 
@@ -2655,9 +2762,20 @@ select.form-control {
   font-weight: 500;
 }
 
-.bv-flow-item.cash { background: #f0fdf4; color: #16a34a; }
-.bv-flow-item.online { background: #eff6ff; color: #2563eb; }
-.bv-flow-item.out { background: #fef2f2; color: #dc2626; }
+.bv-flow-item.cash {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.bv-flow-item.online {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.bv-flow-item.out {
+  background: #fef2f2;
+  color: #dc2626;
+}
 
 /* Booking detail header */
 .bv-detail-header {
@@ -2722,15 +2840,26 @@ select.form-control {
   .vm-filter-grid {
     grid-template-columns: 1fr 1fr 1fr;
   }
-  .modal-sidebar-nav { width: 160px; }
+
+  .modal-sidebar-nav {
+    width: 160px;
+  }
 }
 
 /* ==========================================================================
    BREAKPOINT: 900px — Sidebar collapses (already handled above)
    ========================================================================== */
 @media (max-width: 900px) {
-  .fo-page-inner, .fo-page-wrap { padding: 16px 20px; }
-  .booking-form-wrap { padding: 16px; border-radius: 8px; }
+
+  .fo-page-inner,
+  .fo-page-wrap {
+    padding: 16px 20px;
+  }
+
+  .booking-form-wrap {
+    padding: 16px;
+    border-radius: 8px;
+  }
 }
 
 /* ==========================================================================
@@ -2803,7 +2932,8 @@ select.form-control {
   }
 
   /* fo-page-inner / wrap */
-  .fo-page-inner, .fo-page-wrap {
+  .fo-page-inner,
+  .fo-page-wrap {
     padding: 12px 14px !important;
   }
 
@@ -2821,10 +2951,14 @@ select.form-control {
   }
 
   /* Booking card actions wrap nicely */
-  .bv-card-actions { gap: 4px; }
+  .bv-card-actions {
+    gap: 4px;
+  }
 
   .fo-btn-primary .fo-btn-label,
-  .fo-btn-outline .fo-btn-label { display: none; }
+  .fo-btn-outline .fo-btn-label {
+    display: none;
+  }
 
   /* Vehicle cards: 2 col on tablet */
   .vehicles-grid {
@@ -2846,7 +2980,9 @@ select.form-control {
   }
 
   /* Header: hide search bar */
-  .fo-header-search { display: none !important; }
+  .fo-header-search {
+    display: none !important;
+  }
 
   /* Modal full width */
   .modal-content {
@@ -2854,11 +2990,18 @@ select.form-control {
   }
 
   /* Modal header */
-  .modal-header { padding: 12px 16px !important; }
-  .modal-header h2 { font-size: 1rem !important; }
+  .modal-header {
+    padding: 12px 16px !important;
+  }
+
+  .modal-header h2 {
+    font-size: 1rem !important;
+  }
 
   /* Form controls text size */
-  .form-control { font-size: 0.9rem !important; }
+  .form-control {
+    font-size: 0.9rem !important;
+  }
 
   /* Table: 3 cols max on small mobile */
   .fo-table th:nth-child(n+4),
@@ -2869,14 +3012,23 @@ select.form-control {
   }
 
   /* Stat grid: 2 cols */
-  .fo-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .fo-stat-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 
   /* Page title */
-  .fo-page-title { font-size: 1.25rem !important; }
+  .fo-page-title {
+    font-size: 1.25rem !important;
+  }
 
   /* Booking form */
-  .booking-form-wrap { padding: 12px !important; }
-  .bform-section-box { padding: 12px !important; }
+  .booking-form-wrap {
+    padding: 12px !important;
+  }
+
+  .bform-section-box {
+    padding: 12px !important;
+  }
 }
 
 /* ==========================================================================
@@ -2885,6 +3037,7 @@ select.form-control {
 
 /* Hide non-critical columns on tablet */
 @media (max-width: 900px) {
+
   .custom-table .av-col-specs,
   .custom-table .av-col-location {
     display: none;
@@ -2977,6 +3130,89 @@ select.form-control {
   min-height: 60px;
 }
 
+/* ── Full-Page Form Wrapper ── */
+/* Parent (.page-scroll-area) handles scrolling — this just centers the form */
+.fullpage-form-wrap {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding-bottom: 48px;
+  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Inner content box — centered, white card */
+.fullpage-form-wrap .modal-content {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 0 auto !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
+
+/* Modal body must NOT be height-capped — let it expand naturally */
+.fullpage-form-wrap .modal-body {
+  max-height: none !important;
+  overflow-y: visible !important;
+  height: auto !important;
+}
+
+/* Add-vehicle card overrides */
+.fullpage-form-wrap .av-add-modal {
+  width: 100% !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+  flex-shrink: 0;
+}
+.fullpage-form-wrap .av-modal-body {
+  flex: none !important;
+  overflow-y: visible !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+/* Vehicle config (tabbed) overrides */
+.fullpage-form-wrap .vm-edit-modal {
+  width: 100% !important;
+  max-width: 1100px !important;
+  margin: 0 auto !important;
+  max-height: none !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+.fullpage-form-wrap .vm-edit-modal .modal-body {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+  min-height: 600px;
+}
+.fullpage-form-wrap .vm-tab-content {
+  overflow-y: visible !important;
+  height: auto !important;
+  flex: none !important;
+  min-height: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .fullpage-form-wrap {
+    padding: 16px 14px 56px;
+  }
+}
+
+/* ── Remove number input spinners globally ── */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
 .fo-header-actions {
   display: flex !important;
   align-items: center !important;
@@ -2985,9 +3221,19 @@ select.form-control {
 }
 
 @media (max-width: 480px) {
-  .fo-header { padding: 10px 14px !important; gap: 8px !important; }
-  .fo-header-actions { gap: 4px !important; }
-  .fo-header-icon-btn { width: 34px !important; height: 34px !important; }
+  .fo-header {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+
+  .fo-header-actions {
+    gap: 4px !important;
+  }
+
+  .fo-header-icon-btn {
+    width: 34px !important;
+    height: 34px !important;
+  }
 }
 
 /* ==========================================================================
@@ -3004,6 +3250,7 @@ select.form-control {
     transform: translateX(0) !important;
     box-shadow: none !important;
   }
+
   .main-content {
     margin-left: 220px !important;
   }
@@ -3014,16 +3261,25 @@ select.form-control {
    ========================================================================== */
 
 @media print {
+
   .fo-sidebar,
   .fo-header,
   .fo-hamburger,
   .fo-sidebar-backdrop,
   .fo-btn-primary,
   .fo-btn-outline,
-  .bv-card-actions { display: none !important; }
+  .bv-card-actions {
+    display: none !important;
+  }
 
-  .main-content { margin-left: 0 !important; padding: 0 !important; }
-  body { background: #fff !important; }
+  .main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+  }
+
+  body {
+    background: #fff !important;
+  }
 }
 
 /* ==========================================================================
@@ -3067,12 +3323,12 @@ select.form-control {
 }
 
 /* Fix deposit mode label and doc type labels in light panels */
-.bform-section-box > div > label {
+.bform-section-box>div>label {
   color: #1e293b !important;
 }
 
 /* Ensure doc card labels are visible */
-.bform-section-box .grid-2col > div > div:first-child {
+.bform-section-box .grid-2col>div>div:first-child {
   color: #1e293b !important;
 }
 
@@ -3119,8 +3375,15 @@ select.form-control {
   gap: 8px;
 }
 
-.vm-tab-nav button:hover { background: #eef2ff; color: #4f46e5; }
-.vm-tab-nav button.active-tab { background: #4f46e5; color: #fff !important; }
+.vm-tab-nav button:hover {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.vm-tab-nav button.active-tab {
+  background: #4f46e5;
+  color: #fff !important;
+}
 
 .vm-tab-content {
   flex: 1;
@@ -3142,7 +3405,7 @@ select.form-control {
 }
 
 /* Tab content scrollable area */
-.vm-tab-content form > div:first-child {
+.vm-tab-content form>div:first-child {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
@@ -3260,8 +3523,15 @@ select.form-control {
 }
 
 @keyframes slideUpModal {
-  from { opacity: 0; transform: translateY(32px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 /* ── GRADIENT HEADER ── */
@@ -3483,7 +3753,9 @@ textarea.av-input {
   transform: translateY(-2px);
 }
 
-.av-cat-btn.active::before { opacity: 1; }
+.av-cat-btn.active::before {
+  opacity: 1;
+}
 
 .av-cat-icon {
   font-size: 1.5rem;
@@ -3493,7 +3765,9 @@ textarea.av-input {
   transition: transform 0.2s;
 }
 
-.av-cat-btn.active .av-cat-icon { transform: scale(1.15); }
+.av-cat-btn.active .av-cat-icon {
+  transform: scale(1.15);
+}
 
 .av-cat-name {
   font-size: 0.78rem;
@@ -3503,7 +3777,9 @@ textarea.av-input {
   z-index: 1;
 }
 
-.av-cat-btn.active .av-cat-name { color: #4f46e5; }
+.av-cat-btn.active .av-cat-name {
+  color: #4f46e5;
+}
 
 .av-cat-desc {
   font-size: 0.65rem;
@@ -3512,7 +3788,9 @@ textarea.av-input {
   z-index: 1;
 }
 
-.av-cat-btn.active .av-cat-desc { color: #6366f1; }
+.av-cat-btn.active .av-cat-desc {
+  color: #6366f1;
+}
 
 /* ── ID PREVIEW PILL ── */
 .av-id-preview {
@@ -3629,8 +3907,13 @@ textarea.av-input {
     height: 44px;
   }
 
-  .av-modal-title { font-size: 1.05rem; }
-  .av-modal-subtitle { font-size: 0.73rem; }
+  .av-modal-title {
+    font-size: 1.05rem;
+  }
+
+  .av-modal-subtitle {
+    font-size: 0.73rem;
+  }
 
   .av-form-section {
     padding: 16px 18px;
@@ -3650,9 +3933,17 @@ textarea.av-input {
     padding: 12px 6px;
   }
 
-  .av-cat-icon { font-size: 1.3rem; }
-  .av-cat-name { font-size: 0.72rem; }
-  .av-cat-desc { display: none; }
+  .av-cat-icon {
+    font-size: 1.3rem;
+  }
+
+  .av-cat-name {
+    font-size: 0.72rem;
+  }
+
+  .av-cat-desc {
+    display: none;
+  }
 
   .av-modal-footer {
     padding: 14px 18px;
@@ -3677,13 +3968,104 @@ textarea.av-input {
     gap: 10px !important;
   }
 
-  .av-cat-icon { font-size: 1.4rem !important; }
-  .av-cat-desc { display: block !important; font-size: 0.68rem; }
+  .av-cat-icon {
+    font-size: 1.4rem !important;
+  }
 
-  .av-modal-header { gap: 12px; }
-  .av-modal-title { font-size: 0.98rem; }
+  .av-cat-desc {
+    display: block !important;
+    font-size: 0.68rem;
+  }
+
+  .av-modal-header {
+    gap: 12px;
+  }
+
+  .av-modal-title {
+    font-size: 0.98rem;
+  }
 
   .av-btn-cancel,
-  .av-btn-submit { flex: 1; justify-content: center; }
+  .av-btn-submit {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
+/* ============================================================
+   BOOKING FORM — COMPACT LAYOUT
+   ============================================================ */
+.booking-form-wrap {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 16px 20px;
+}
+
+.bform-section-box {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+
+.bform-section-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 6px;
+  margin-top: 0;
+}
+
+.booking-form-wrap .form-group {
+  margin-bottom: 8px;
+  gap: 3px;
+}
+
+.booking-form-wrap .form-group label,
+.booking-form-wrap label {
+  font-size: 0.73rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.booking-form-wrap .form-control,
+.booking-form-wrap input,
+.booking-form-wrap select,
+.booking-form-wrap textarea {
+  padding: 6px 10px !important;
+  font-size: 0.82rem !important;
+  border-radius: 7px !important;
+  background: #fafafa !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #1e293b !important;
+}
+
+.booking-form-wrap .form-control:focus,
+.booking-form-wrap input:focus,
+.booking-form-wrap select:focus,
+.booking-form-wrap textarea:focus {
+  border-color: #6366f1 !important;
+  background: #fff !important;
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.1) !important;
+  outline: none !important;
+}
+
+.booking-form-wrap .grid-2col {
+  gap: 8px;
+}
+
+/* ── Number inputs: hide spin arrows globally ── */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

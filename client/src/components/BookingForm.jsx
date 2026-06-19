@@ -310,6 +310,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const [discountAmount, setDiscountAmount] = useState(0);
   const [discountType, setDiscountType] = useState('₹'); // '₹' | '%'
 
+  // Payment section collapsible
+  const [showPaymentSection, setShowPaymentSection] = useState(true);
+
   // Section 7: Billing Summary Collapsible accordion
   const [showBillingSummary, setShowBillingSummary] = useState(true);
 
@@ -771,27 +774,24 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   return (
     <div className="booking-form-wrap animate-slide-up">
 
-      {/* HEADER SECTION */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', borderBottom: '1px solid #e5e7eb', paddingBottom: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Bike size={28} color="var(--primary)" />
+      {/* COMPACT HEADER */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid #e5e7eb', paddingBottom: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Bike size={22} color="#6366f1" />
           <div>
-            <h3 style={{ fontSize: '1.1rem', margin: 0, color: '#1e293b' }}>{vehicle.name}</h3>
-            <span style={{ fontSize: '0.8rem', color: '#64748b' }}><code>{vehicle.regNumber}</code></span>
+            <h3 style={{ fontSize: '0.98rem', margin: 0, color: '#1e293b', fontWeight: 700 }}>{vehicle.name}</h3>
+            <span style={{ fontSize: '0.72rem', color: '#64748b' }}><code>{vehicle.regNumber}</code></span>
           </div>
         </div>
-        <button className="fo-btn-outline" onClick={onCancel} style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={16} /></button>
+        <button className="fo-btn-outline" onClick={onCancel} style={{ borderRadius: '50%', width: '28px', height: '28px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
       </div>
 
       <form onSubmit={handleCheckoutSubmit}>
 
         {/* SECTION 1: CUSTOMER INFORMATION */}
         <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <User size={15} /> Customer Information
-          </h4>
-
-          <div className="grid-2col" style={{ marginBottom: '12px' }}>
+          <h4 className="bform-section-title"><User size={13} /> Customer Information</h4>
+          <div className="grid-2col" style={{ gap: '8px', marginBottom: '8px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Full Name *</label>
               <input type="text" className="form-control" placeholder="Full Name" value={fullName} onChange={e => setFullName(e.target.value)} required />
@@ -810,29 +810,27 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             </div>
           </div>
 
-          {/* Collapsible Optional Details */}
-          <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '10px' }}>
+          <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '7px' }}>
             <button
               type="button"
               className="btn btn-secondary"
-              style={{ width: '100%', padding: '6px 12px', fontSize: '0.8rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+              style={{ width: '100%', padding: '5px 10px', fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               onClick={() => setShowOptionalDetails(!showOptionalDetails)}
             >
-              <MapPin size={13} /> Optional Details (Email & Address)
-              {showOptionalDetails ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><MapPin size={12} /> Optional Details (Email & Address)</span>
+              {showOptionalDetails ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
             </button>
-
             {showOptionalDetails && (
-              <div className="animate-fade" style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div className="animate-fade" style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Email Address</label>
                   <input type="email" className="form-control" placeholder="name@domain.com" value={email} onChange={e => setEmail(e.target.value)} />
                 </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Street Address</label>
-                  <input type="text" className="form-control" placeholder="Street Address" value={streetAddress} onChange={e => setStreetAddress(e.target.value)} />
-                </div>
-                <div className="grid-3col">
+                <div className="grid-2col" style={{ gap: '8px' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label>Street Address</label>
+                    <input type="text" className="form-control" placeholder="Street Address" value={streetAddress} onChange={e => setStreetAddress(e.target.value)} />
+                  </div>
                   <div className="form-group" style={{ marginBottom: 0 }}>
                     <label>City</label>
                     <input type="text" className="form-control" value={city} onChange={e => setCity(e.target.value)} />
@@ -851,80 +849,60 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           </div>
         </div>
 
-        {/* SECTION 2: VEHICLE HANDOVER */}
+        {/* SECTION 2: VEHICLE HANDOVER (compact inline) */}
         <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <Key size={15} /> Vehicle Handover
-          </h4>
-          <div style={{ display: 'grid', gridTemplateColumns: isScooty ? '1.2fr 1fr' : '1fr', gap: '16px', alignItems: 'center' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isScooty ? '1fr 1fr' : '1fr', gap: '10px', alignItems: 'end' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
-              <label>Start Meter Reading (KM) *</label>
-              <input type="number" className="form-control" value={startMeter} onChange={e => setStartMeter(Number(e.target.value))} required />
+              <label><Key size={11} style={{ marginRight: 3 }} />Start Meter Reading (KM) *</label>
+              <input
+                type="number"
+                className="form-control"
+                value={startMeter === '' ? '' : startMeter}
+                onChange={e => setStartMeter(e.target.value === '' ? '' : Number(e.target.value))}
+                required
+              />
             </div>
-
-            {/* Rule: Fuel option is visible ONLY for Scooties */}
             {isScooty && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '16px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0, fontSize: '0.9rem', fontWeight: 'bold' }}>
-                  <input
-                    type="checkbox"
-                    checked={includeFuel}
-                    onChange={e => handleIncludeFuelChange(e.target.checked)}
-                    style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
-                  />
-                  Include Fuel in Rental
-                </label>
-                <span style={{ fontSize: '0.7rem', color: 'var(--accent)' }}>
-                  Locks plan to Hourly + Fuel surcharge.
-                </span>
-              </div>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '7px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 600, color: '#1e293b', paddingBottom: '6px' }}>
+                <input
+                  type="checkbox"
+                  checked={includeFuel}
+                  onChange={e => handleIncludeFuelChange(e.target.checked)}
+                  style={{ width: '15px', height: '15px', accentColor: '#6366f1' }}
+                />
+                Include Fuel in Rental
+                <span style={{ fontSize: '0.65rem', color: '#6366f1', fontWeight: 'normal' }}>Locks to Hourly+Surcharge</span>
+              </label>
             )}
           </div>
         </div>
 
         {/* SECTION 3: RENTAL PERIOD */}
         <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <Calendar size={15} /> Rental Period
-          </h4>
-          <div className="grid-2col">
+          <h4 className="bform-section-title"><Calendar size={13} /> Rental Period</h4>
+          <div className="grid-2col" style={{ gap: '8px' }}>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Start Date & Time</label>
-              <input
-                type="datetime-local"
-                className="form-control"
-                value={pickupDate}
-                onChange={e => handlePickupDateChange(e.target.value)}
-                required
-              />
+              <input type="datetime-local" className="form-control" value={pickupDate} onChange={e => handlePickupDateChange(e.target.value)} required />
             </div>
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>End Date & Time</label>
-              <input
-                type="datetime-local"
-                className="form-control"
-                value={expectedDropDate}
-                onChange={e => handleDropDateChange(e.target.value)}
-                required
-              />
+              <input type="datetime-local" className="form-control" value={expectedDropDate} onChange={e => handleDropDateChange(e.target.value)} required />
             </div>
           </div>
 
-          {/* Bike + Hourly: Show duration input so user sets hours directly */}
           {isBike && selectedPlanType === 'Hourly' && (
-            <div style={{ marginTop: '12px', padding: '10px 12px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <label style={{ fontSize: '0.85rem', color: '#4f46e5', fontWeight: '600', margin: 0, whiteSpace: 'nowrap' }}>
-                ⏱ Booking Duration (Hours)
-              </label>
+            <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '7px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <label style={{ fontSize: '0.78rem', color: '#4f46e5', fontWeight: 600, margin: 0, whiteSpace: 'nowrap' }}>⏱ Duration (hrs)</label>
               <input
                 type="number"
                 min="1"
                 className="form-control"
-                style={{ width: '100px', marginBottom: 0, textAlign: 'center', fontWeight: 'bold' }}
+                style={{ width: '75px', marginBottom: 0, textAlign: 'center', fontWeight: 'bold' }}
                 value={bikeHourlyDuration}
                 onChange={e => handleBikeHourlyDurationChange(e.target.value)}
               />
-              <span style={{ fontSize: '0.8rem', color: '#64748b' }}>
+              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
                 Return by: <strong style={{ color: '#1e293b' }}>{expectedDropDate ? new Date(expectedDropDate).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit', hour12: true }) : '—'}</strong>
               </span>
             </div>
@@ -933,86 +911,35 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
         {/* SECTION 4: SELECT PLAN */}
         <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <Tag size={15} /> Select Pricing Plan
-          </h4>
-
+          <h4 className="bform-section-title"><Tag size={13} /> Select Plan</h4>
           {(() => {
-            // Build plan cards using live planRate state (synced from vehicle config via useEffect)
-            // so any vehicle pricing change reflects immediately in the UI
             const getCardRate = (type) => {
-              if (type === selectedPlanType) return planRate; // use live state for selected plan
-              // for non-selected plans, read directly from vehicle config
-              if (type === 'Hourly') {
-                return (isScooty && includeFuel)
-                  ? (vehicle.pricingPlans?.hourly?.withFuel || vehicle.perHourRate || 60)
-                  : isBike
-                    ? (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 100)
-                    : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40);
-              }
-              if (type === '12-Hour') {
-                return isCar
-                  ? (vehicle.pricingPlans?.twelveHour?.baseRate || 2500)
-                  : isBike
-                    ? (vehicle.pricingPlans?.twelveHour?.baseRate || 1200)
-                    : (vehicle.pricingPlans?.twelveHour?.baseRate || 350);
-              }
-              if (type === '24-Hour') {
-                return isCar
-                  ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 4500)
-                  : isBike
-                    ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 2400)
-                    : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500);
-              }
+              if (type === selectedPlanType) return planRate;
+              if (type === 'Hourly') return (isScooty && includeFuel) ? (vehicle.pricingPlans?.hourly?.withFuel || vehicle.perHourRate || 60) : isBike ? (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 100) : (vehicle.pricingPlans?.hourly?.rate || vehicle.perHourRate || 40);
+              if (type === '12-Hour') return isCar ? (vehicle.pricingPlans?.twelveHour?.baseRate || 2500) : isBike ? (vehicle.pricingPlans?.twelveHour?.baseRate || 1200) : (vehicle.pricingPlans?.twelveHour?.baseRate || 350);
+              if (type === '24-Hour') return isCar ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 4500) : isBike ? (vehicle.pricingPlans?.twentyFourHour?.baseRate || 2400) : (vehicle.pricingPlans?.twentyFourHour?.baseRate || 500);
               return 0;
             };
             const availablePlans = [
-              {
-                type: 'Hourly',
-                label: 'Hourly',
-                rate: getCardRate('Hourly'),
-                limit: (isScooty && includeFuel)
-                  ? `Fuel Surcharge: ₹${vehicle.pricingPlans?.hourly?.fuelChargePerKm || 2}/KM`
-                  : `10 KM/hr Limit`,
-                disabled: isCar
-              },
-              {
-                type: '12-Hour',
-                label: '12 Hour',
-                rate: getCardRate('12-Hour'),
-                limit: isCar || isBike
-                  ? `10 KM/hr Limit`
-                  : `${vehicle.pricingPlans?.twelveHour?.kmLimit || 60} KM Limit`,
-                disabled: isScooty && includeFuel
-              },
-              {
-                type: '24-Hour',
-                label: '24 Hour',
-                rate: getCardRate('24-Hour'),
-                limit: isCar || isBike
-                  ? `10 KM/hr Limit`
-                  : `${vehicle.pricingPlans?.twentyFourHour?.kmLimit || 120} KM Limit`,
-                disabled: isScooty && includeFuel
-              }
+              { type: 'Hourly', label: 'Hourly', rate: getCardRate('Hourly'), limit: (isScooty && includeFuel) ? `₹${vehicle.pricingPlans?.hourly?.fuelChargePerKm || 2}/KM surcharge` : `10 KM/hr Limit`, disabled: isCar },
+              { type: '12-Hour', label: '12 Hour', rate: getCardRate('12-Hour'), limit: isCar || isBike ? `10 KM/hr Limit` : `${vehicle.pricingPlans?.twelveHour?.kmLimit || 60} KM Limit`, disabled: isScooty && includeFuel },
+              { type: '24-Hour', label: '24 Hour', rate: getCardRate('24-Hour'), limit: isCar || isBike ? `10 KM/hr Limit` : `${vehicle.pricingPlans?.twentyFourHour?.kmLimit || 120} KM Limit`, disabled: isScooty && includeFuel }
             ].filter(plan => !plan.disabled);
 
             return (
-              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${availablePlans.length}, 1fr)`, gap: '8px', marginBottom: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: `repeat(${availablePlans.length}, 1fr)`, gap: '6px' }}>
                 {availablePlans.map(plan => (
                   <label
                     key={plan.type}
                     style={{
-                      border: '1px solid ' + (selectedPlanType === plan.type ? '#4f46e5' : '#e5e7eb'),
-                      background: selectedPlanType === plan.type
-                        ? 'rgba(99, 102, 241, 0.08)'
-                        : '#f8f9fb',
-                      padding: '10px',
-                      borderRadius: '6px',
-                      textAlign: 'left',
+                      border: '1.5px solid ' + (selectedPlanType === plan.type ? '#4f46e5' : '#e5e7eb'),
+                      background: selectedPlanType === plan.type ? 'rgba(99,102,241,0.08)' : '#f8f9fb',
+                      padding: '7px 8px',
+                      borderRadius: '7px',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'flex-start',
-                      gap: '8px',
+                      gap: '6px',
                       margin: 0
                     }}
                   >
@@ -1021,478 +948,283 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                       name="pricing_plan_select"
                       checked={selectedPlanType === plan.type}
                       onChange={() => handlePlanChange(plan.type)}
-                      style={{ marginTop: '3px', accentColor: 'var(--primary)', cursor: 'pointer' }}
+                      style={{ marginTop: '2px', accentColor: '#6366f1', cursor: 'pointer' }}
                     />
                     <div>
-                      <strong style={{ display: 'block', fontSize: '0.85rem', color: '#1e293b' }}>{plan.label}</strong>
-                      <span style={{ fontSize: '0.75rem', color: '#4f46e5', fontWeight: 'bold' }}>₹{plan.rate}</span>
-                      <span style={{ display: 'block', fontSize: '0.65rem', color: '#64748b' }}>{plan.limit}</span>
+                      <strong style={{ display: 'block', fontSize: '0.8rem', color: '#1e293b' }}>{plan.label}</strong>
+                      <span style={{ fontSize: '0.72rem', color: '#4f46e5', fontWeight: 'bold' }}>₹{plan.rate}</span>
+                      <span style={{ display: 'block', fontSize: '0.62rem', color: '#64748b' }}>{plan.limit}</span>
                     </div>
                   </label>
                 ))}
               </div>
             );
           })()}
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-            <div style={{ opacity: 0.4, border: '1px solid #e5e7eb', background: '#f8f9fb', padding: '8px', borderRadius: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
-              Weekly Plan (Future coming soon)
-            </div>
-            <div style={{ opacity: 0.4, border: '1px solid #e5e7eb', background: '#f8f9fb', padding: '8px', borderRadius: '6px', fontSize: '0.75rem', color: '#94a3b8' }}>
-              Monthly Plan (Future coming soon)
-            </div>
-          </div>
         </div>
 
-        {/* SECTION 5: ADD-ONS (HELMET & DEPOSIT SECTOR SPLIT) */}
+        {/* SECTION 5: ADD-ONS & DEPOSIT */}
         <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <Shield size={15} /> Add-ons & Deposit Details
-          </h4>
+          <h4 className="bform-section-title"><Shield size={13} /> Add-ons &amp; Deposit Details</h4>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 2fr', gap: '16px', marginBottom: '14px' }}>
-            {/* Helmets (1 unit is Free!) */}
+          {/* Row 1: Helmet | Security Deposit */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: '12px', marginBottom: '10px' }}>
+
+            {/* Helmet */}
             <div>
-              <label style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '6px' }}>
-                Helmet Quantity (1 Free!)
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ width: '32px', height: '32px', padding: 0, borderRadius: '4px' }}
-                  onClick={() => setHelmetsCount(Math.max(0, helmetsCount - 1))}
-                >
-                  -
-                </button>
-                <strong style={{ fontSize: '1.1rem', width: '20px', textAlign: 'center' }}>{helmetsCount}</strong>
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  style={{ width: '32px', height: '32px', padding: 0, borderRadius: '4px' }}
-                  onClick={() => setHelmetsCount(helmetsCount + 1)}
-                >
-                  +
-                </button>
+              <label style={{ fontSize: '0.75rem', color: '#64748b', display: 'block', marginBottom: '5px' }}>Helmet Quantity (1 Free!)</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <button type="button" className="btn btn-secondary"
+                  style={{ width: '30px', height: '30px', padding: 0, borderRadius: '6px', fontSize: '1rem', fontWeight: 700 }}
+                  onClick={() => setHelmetsCount(Math.max(0, helmetsCount - 1))}>−</button>
+                <strong style={{ fontSize: '1rem', minWidth: '20px', textAlign: 'center', color: '#1e293b' }}>{helmetsCount}</strong>
+                <button type="button" className="btn btn-secondary"
+                  style={{ width: '30px', height: '30px', padding: 0, borderRadius: '6px', fontSize: '1rem', fontWeight: 700 }}
+                  onClick={() => setHelmetsCount(helmetsCount + 1)}>+</button>
               </div>
-              <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', marginTop: '4px', display: 'block' }}>
-                Additional units ₹50/each
-              </span>
+              <span style={{ fontSize: '0.68rem', color: '#94a3b8', display: 'block', marginTop: '3px' }}>Additional units ₹50/each</span>
             </div>
 
-            {/* Deposit base amount input */}
+            {/* Security Deposit */}
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Security Deposit (₹)</label>
               <input
                 type="number"
                 className="form-control"
-                value={securityDeposit}
-                onChange={e => setSecurityDeposit(Number(e.target.value))}
-                style={{ borderColor: 'var(--status-reserved)' }}
+                value={securityDeposit === '' ? '' : securityDeposit}
+                onChange={e => setSecurityDeposit(e.target.value === '' ? '' : Number(e.target.value))}
               />
             </div>
           </div>
 
-          {/* Deposit Payment splitting (Cash, Online, Mixed) */}
-          <div style={{ background: '#f8f9fb', padding: '12px', borderRadius: '6px', border: '1px solid #e5e7eb' }}>
-            <label style={{ fontSize: '0.8rem', fontWeight: 'bold', display: 'block', marginBottom: '8px', color: '#1e293b' }}>
-              Deposit Collection Mode
-            </label>
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+          {/* Row 2: Deposit Collection Mode */}
+          <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: '7px', padding: '8px 10px' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1e293b', display: 'block', marginBottom: '6px' }}>Deposit Collection Mode</label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '8px' }}>
               {['Cash', 'Online', 'Mixed'].map(mode => (
-                <button
-                  key={mode}
-                  type="button"
-                  className={`btn ${depositMethod === mode ? 'btn-primary' : 'btn-secondary'}`}
-                  style={{ padding: '6px 12px', fontSize: '0.75rem', flex: 1 }}
-                  onClick={() => setDepositMethod(mode)}
-                >
-                  {mode}
+                <button key={mode} type="button"
+                  style={{
+                    padding: '6px 0',
+                    fontSize: '0.8rem',
+                    borderRadius: '6px',
+                    border: depositMethod === mode ? '1.5px solid #6366f1' : '1px solid #e2e8f0',
+                    background: depositMethod === mode ? '#6366f1' : '#fff',
+                    color: depositMethod === mode ? '#fff' : '#64748b',
+                    fontWeight: depositMethod === mode ? 700 : 500,
+                    cursor: 'pointer',
+                    transition: 'all 0.15s'
+                  }}
+                  onClick={() => setDepositMethod(mode)}>{mode}
                 </button>
               ))}
             </div>
 
-            <div className="animate-fade">
-              {depositMethod === 'Cash' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label>Cash Amount Received for Deposit (₹)</label>
-                    <input type="number" className="form-control" value={depositCash} disabled />
-                  </div>
+            {/* Amount input based on mode */}
+            {depositMethod === 'Cash' && (
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Cash Amount Received for Deposit (₹)</label>
+                <input type="number" className="form-control" value={depositCash} disabled />
+              </div>
+            )}
+            {depositMethod === 'Online' && (
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Online Amount Received for Deposit (₹)</label>
+                <input type="number" className="form-control" value={depositOnline} disabled />
+              </div>
+            )}
+            {depositMethod === 'Mixed' && (
+              <div className="grid-2col" style={{ gap: '8px' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label>Cash ₹</label>
+                  <input type="number" className="form-control" value={depositCash} onChange={e => handleDepositCashChange(e.target.value === '' ? 0 : Number(e.target.value))} />
                 </div>
-              )}
-              {depositMethod === 'Online' && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label>Online Amount Received for Deposit (₹)</label>
-                    <input type="number" className="form-control" value={depositOnline} disabled />
-                  </div>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label>Online ₹</label>
+                  <input type="number" className="form-control" value={depositOnline} onChange={e => handleDepositOnlineChange(e.target.value === '' ? 0 : Number(e.target.value))} />
                 </div>
-              )}
-              {depositMethod === 'Mixed' && (
-                <div className="grid-2col">
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label>Cash portion (₹)</label>
-                    <input type="number" className="form-control" value={depositCash} onChange={e => handleDepositCashChange(Number(e.target.value))} />
-                  </div>
-                  <div className="form-group" style={{ marginBottom: 0 }}>
-                    <label>Online portion (₹)</label>
-                    <input type="number" className="form-control" value={depositOnline} onChange={e => handleDepositOnlineChange(Number(e.target.value))} />
-                  </div>
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* SECTION 6: RENTAL COST PAYMENT */}
-        <div className="bform-section-box">
-          <h4 className="bform-section-title">
-            <Banknote size={15} /> Rental Cost Payment
-          </h4>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px', marginBottom: '12px' }}>
-            {['Cash', 'UPI', 'Card', 'Mixed'].map(mode => (
-              <button
-                key={mode}
-                type="button"
-                className={`btn ${paymentMethod === mode ? 'btn-success' : 'btn-secondary'}`}
-                style={{
-                  padding: '8px 12px',
-                  fontSize: '0.8rem',
-                  border: paymentMethod === mode ? '1px solid var(--status-available)' : '1px solid var(--border-light)',
-                  background: paymentMethod === mode ? 'rgba(16, 185, 129, 0.15)' : 'transparent',
-                  color: paymentMethod === mode ? 'var(--status-available)' : 'var(--text-secondary)'
-                }}
-                onClick={() => setPaymentMethod(mode)}
-              >
-                {mode === 'UPI' ? 'UPI / QR' : mode}
+
+
+        {/* SECTION 6: PAYMENT COLLECTION (collapsible) */}
+        <div className="bform-section-box">
+          {/* Collapsible header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }} onClick={() => setShowPaymentSection(v => !v)}>
+            <h4 className="bform-section-title" style={{ margin: 0 }}><Banknote size={13} /> Payment Collection</h4>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {!showPaymentSection && (
+                <span style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 600 }}>{paymentMethod} · ₹{bill.moneyReceived}</span>
+              )}
+              <button type="button" style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', padding: '2px', color: '#64748b' }}>
+                {showPaymentSection ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
-            ))}
+            </div>
           </div>
 
-          <div className="animate-fade" style={{ background: '#f8f9fb', border: '1px solid #e5e7eb', padding: '12px', borderRadius: '6px' }}>
-            {paymentMethod === 'Cash' && (
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '10px' }}>
+          {showPaymentSection && (
+            <div className="animate-fade">
+              {/* Mode tabs */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '5px', margin: '6px 0' }}>
+                {['Cash', 'UPI', 'Card', 'Mixed'].map(mode => (
+                  <button key={mode} type="button"
+                    style={{ padding: '5px 6px', fontSize: '0.73rem', borderRadius: '6px', border: paymentMethod === mode ? '1.5px solid #10b981' : '1px solid #e5e7eb', background: paymentMethod === mode ? 'rgba(16,185,129,0.1)' : '#f8f9fb', color: paymentMethod === mode ? '#059669' : '#64748b', fontWeight: paymentMethod === mode ? 600 : 400, cursor: 'pointer' }}
+                    onClick={() => setPaymentMethod(mode)}>
+                    {mode === 'UPI' ? 'UPI/QR' : mode}
+                  </button>
+                ))}
+              </div>
+
+              {/* Payment fields */}
+              {paymentMethod === 'Cash' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Cash Amount Received (₹)</label>
-                  <input type="number" className="form-control" value={cashReceived} onChange={e => setCashReceived(Number(e.target.value))} />
+                  <input type="number" className="form-control" value={cashReceived === '' ? '' : cashReceived} onChange={e => setCashReceived(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
-              </div>
-            )}
+              )}
+              {paymentMethod === 'UPI' && (
+                <div className="grid-2col" style={{ gap: '6px' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="number" className="form-control" value={upiAmount === '' ? '' : upiAmount} onChange={e => setUpiAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>UPI Txn ID</label><input type="text" className="form-control" placeholder="TXN100028" value={upiTxnId} onChange={e => setUpiTxnId(e.target.value)} /></div>
+                </div>
+              )}
+              {paymentMethod === 'Card' && (
+                <div className="grid-2col" style={{ gap: '6px' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="number" className="form-control" value={cardAmount === '' ? '' : cardAmount} onChange={e => setCardAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Card Ref</label><input type="text" className="form-control" placeholder="Reference code" value={cardRef} onChange={e => setCardRef(e.target.value)} /></div>
+                </div>
+              )}
+              {paymentMethod === 'Mixed' && (
+                <div className="grid-2col" style={{ gap: '6px' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Cash (₹)</label><input type="number" className="form-control" value={mixedCash === '' ? '' : mixedCash} onChange={e => setMixedCash(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Online (₹)</label><input type="number" className="form-control" value={mixedOnline === '' ? '' : mixedOnline} onChange={e => setMixedOnline(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                </div>
+              )}
 
-            {paymentMethod === 'UPI' && (
-              <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Amount (₹)</label>
-                  <input type="number" className="form-control" value={upiAmount} onChange={e => setUpiAmount(Number(e.target.value))} />
+              {/* Discount inline */}
+              <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '6px', alignItems: 'flex-end' }}>
+                <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
+                  <label>Discount (optional)</label>
+                  <input type="number" className="form-control" value={discountAmount === '' ? '' : discountAmount} onChange={e => setDiscountAmount(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))} placeholder="0" />
                 </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>UPI Transaction ID</label>
-                  <input type="text" className="form-control" placeholder="e.g. TXN100028" value={upiTxnId} onChange={e => setUpiTxnId(e.target.value)} />
+                <div className="form-group" style={{ marginBottom: 0, width: '80px', flexShrink: 0 }}>
+                  <label>Type</label>
+                  <select className="form-control" value={discountType} onChange={e => setDiscountType(e.target.value)}>
+                    <option value="₹">₹ Flat</option>
+                    <option value="%">% Off</option>
+                  </select>
                 </div>
-              </div>
-            )}
-
-            {paymentMethod === 'Card' && (
-              <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Amount (₹)</label>
-                  <input type="number" className="form-control" value={cardAmount} onChange={e => setCardAmount(Number(e.target.value))} />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Card Transaction Ref</label>
-                  <input type="text" className="form-control" placeholder="Reference code" value={cardRef} onChange={e => setCardRef(e.target.value)} />
-                </div>
-              </div>
-            )}
-
-            {paymentMethod === 'Mixed' && (
-              <div className="grid-2col">
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Cash Amount (₹)</label>
-                  <input type="number" className="form-control" value={mixedCash} onChange={e => setMixedCash(Number(e.target.value))} />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label>Online Amount (₹)</label>
-                  <input type="number" className="form-control" value={mixedOnline} onChange={e => setMixedOnline(Number(e.target.value))} />
-                </div>
-              </div>
-            )}
-
-            {/* Discount Section inside Payment */}
-            <div className="grid-2col" style={{ marginTop: '10px', borderTop: '1px solid #e5e7eb', paddingTop: '10px' }}>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Discount Value (Optional)</label>
-                <input
-                  type="number"
-                  className="form-control"
-                  value={discountAmount}
-                  onChange={e => setDiscountAmount(Math.max(0, Number(e.target.value)))}
-                  placeholder="e.g. 50"
-                />
-              </div>
-              <div className="form-group" style={{ marginBottom: 0 }}>
-                <label>Discount Type</label>
-                <select className="form-control" value={discountType} onChange={e => setDiscountType(e.target.value)}>
-                  <option value="₹">Rupees (₹)</option>
-                  <option value="%">Percent (%)</option>
-                </select>
-              </div>
-              <div style={{ gridColumn: 'span 2', fontSize: '0.75rem', color: 'var(--status-available)', marginTop: '4px' }}>
-                <Info size={13} style={{ marginRight: 4 }} /> Note: Discount applies strictly to the Rental Cost (₹{bill.cost}) before deposit and helmet fees.
               </div>
             </div>
-          </div>
+          )}
         </div>
 
-        {/* SECTION 7: BILLING SUMMARY */}
+        {/* SECTION 7: BILLING SUMMARY (collapsible) */}
         <div className="bform-section-box">
           <button
             type="button"
-            style={{ width: '100%', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: '#1e293b', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '2px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: '#1e293b', cursor: 'pointer' }}
             onClick={() => setShowBillingSummary(!showBillingSummary)}
           >
-            <h4 className="bform-section-title" style={{ margin: 0 }}>
-              <BarChart2 size={15} /> Billing Summary
-            </h4>
-            <span style={{ fontSize: '1rem', color: '#4f46e5', fontWeight: 'bold' }}>
-              ₹{totalBookingValue} {showBillingSummary ? '▲' : '▼'}
-            </span>
+            <h4 className="bform-section-title" style={{ margin: 0 }}><BarChart2 size={13} /> Billing Summary</h4>
+            <span style={{ fontSize: '0.88rem', color: '#4f46e5', fontWeight: 700 }}>₹{totalBookingValue} {showBillingSummary ? '▲' : '▼'}</span>
           </button>
 
           {showBillingSummary && (
-            <div className="animate-fade" style={{ marginTop: '12px', background: '#f8f9fb', borderRadius: '6px', padding: '12px', border: '1px solid #e5e7eb', fontSize: '0.82rem' }}>
+            <div className="animate-fade" style={{ marginTop: '10px', background: '#f8f9fb', borderRadius: '7px', padding: '10px', border: '1px solid #e5e7eb', fontSize: '0.78rem' }}>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
 
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-
-                {/* COLUMN 1: RENTAL COSTS */}
-                <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-
-                  {/* Card 1: Rental Summary */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Rental Summary
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: '#64748b' }}>Duration:</span>
-                      <strong style={{ color: '#1e293b' }}>{bill.durationText || 'N/A'}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: '#64748b' }}>Included KM:</span>
-                      <strong style={{ color: '#1e293b' }}>{bill.kmLimit} KM</strong>
-                    </div>
-                  </div>
-
-                  {/* Card 2: Cost Breakdown */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Cost Breakdown
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Base Rental Cost:</span>
-                      <span>
-                        ₹{bill.cost}
-                        {bill.isMinBilling && <span style={{ fontSize: '0.65rem', color: 'var(--status-reserved)', marginLeft: '4px' }}>({minBookingHours}h Min)</span>}
-                      </span>
-                    </div>
-                    {bill.discountVal > 0 && (
-                      <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', color: 'var(--status-available)' }}>
-                        <span>Discount:</span>
-                        <span>-₹{bill.discountVal}</span>
-                      </div>
-                    )}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Net Rental Fare:</span>
-                      <strong>₹{Math.max(0, bill.cost - bill.discountVal)}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Helmets:</span>
-                      <span>₹{bill.helmets}</span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 0 0', borderTop: '1px solid #e5e7eb', paddingTop: '6px', fontWeight: 'bold', color: '#1e293b' }}>
-                      <span>Rental Cost Total:</span>
-                      <strong>₹{rentalCostTotal}</strong>
-                    </div>
-                  </div>
-
+                <div style={{ flex: '1 1 200px' }}>
+                  <div style={{ fontWeight: 600, color: '#4f46e5', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Rental</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Duration:</span><strong style={{ color: '#1e293b' }}>{bill.durationText || 'N/A'}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Incl. KM:</span><strong>{bill.kmLimit} KM</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Base Fare:</span><span>₹{bill.cost}{bill.isMinBilling && <span style={{ fontSize: '0.62rem', color: '#f59e0b', marginLeft: 3 }}>({minBookingHours}h min)</span>}</span></div>
+                  {bill.discountVal > 0 && <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0', color: '#10b981' }}><span>Discount:</span><span>-₹{bill.discountVal}</span></div>}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Helmets:</span><span>₹{bill.helmets}</span></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0 0 0', borderTop: '1px solid #e5e7eb', paddingTop: '4px', fontWeight: 700, color: '#1e293b' }}><span>Rental Total:</span><strong>₹{rentalCostTotal}</strong></div>
                 </div>
 
-                {/* COLUMN 2: PAYMENTS & VALUES */}
-                <div style={{ flex: '1 1 250px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div style={{ width: '1px', background: '#e5e7eb', flexShrink: 0 }} />
 
-                  {/* Card 3: Collection Details */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Upfront Collection
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Rental Paid:</span>
-                      <strong style={{ color: 'var(--status-available)' }}>₹{bill.moneyReceived}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      <span>Pay Mode:</span>
-                      <span style={{ color: '#1e293b' }}>
-                        {paymentMethod}
-                        {paymentMethod === 'Mixed' && ` (Cash: ₹${mixedCash} + Online: ₹${mixedOnline})`}
-                        {paymentMethod === 'UPI' && upiAmount > 0 && ` (₹${upiAmount})`}
-                        {paymentMethod === 'Card' && cardAmount > 0 && ` (₹${cardAmount})`}
-                        {paymentMethod === 'Cash' && cashReceived > 0 && ` (₹${cashReceived})`}
-                      </span>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 4px 0', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '6px' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Security Deposit:</span>
-                      <strong style={{ color: '#60a5fa' }}>₹{bill.deposit}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                      <span>Deposit Mode:</span>
-                      <span style={{ color: '#1e293b' }}>
-                        {depositMethod}
-                        {depositMethod === 'Mixed' && ` (Cash: ₹${depositCash} + Online: ₹${depositOnline})`}
-                        {depositMethod === 'Cash' && depositCash > 0 && ` (₹${depositCash})`}
-                        {depositMethod === 'Online' && depositOnline > 0 && ` (₹${depositOnline})`}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card 4: Overall Totals */}
-                  <div style={{ background: 'rgba(255, 255, 255, 0.015)', border: '1px solid rgba(255, 255, 255, 0.04)', borderRadius: '6px', padding: '10px' }}>
-                    <div style={{ fontWeight: 'bold', color: '#4f46e5', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px', marginBottom: '6px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                      Booking Value & Status
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Booking Value Total:</span>
-                      <strong style={{ color: 'var(--accent)' }}>₹{totalBookingValue}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Total Collected:</span>
-                      <strong style={{ color: 'var(--status-available)' }}>₹{totalCollected}</strong>
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '6px 0 0 0', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '6px', fontWeight: 'bold', color: pendingCollection > 0 ? 'var(--status-reserved)' : 'var(--status-available)' }}>
-                      <span>Pending Collection:</span>
-                      <span>₹{pendingCollection}</span>
-                    </div>
-                  </div>
-
+                <div style={{ flex: '1 1 200px' }}>
+                  <div style={{ fontWeight: 600, color: '#4f46e5', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Collection</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Rental Paid:</span><strong style={{ color: '#10b981' }}>₹{bill.moneyReceived}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Deposit:</span><strong style={{ color: '#60a5fa' }}>₹{bill.deposit}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Total Collected:</span><strong style={{ color: '#10b981' }}>₹{totalCollected}</strong></div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', margin: '5px 0 0 0', borderTop: '1px solid #e5e7eb', paddingTop: '4px', fontWeight: 700, color: pendingCollection > 0 ? '#f59e0b' : '#10b981' }}><span>Pending:</span><span>₹{pendingCollection}</span></div>
                 </div>
 
               </div>
 
               {isScooty && includeFuel && (
-                <div style={{ marginTop: '8px', display: 'flex', justifyContent: 'space-between', padding: '6px 10px', borderRadius: '4px', background: 'rgba(59, 130, 246, 0.08)', border: '1px solid rgba(59, 130, 246, 0.15)', color: '#93c5fd' }}>
-                  <span>Per KM Fuel Surcharge (Billed at return):</span>
+                <div style={{ marginTop: '7px', display: 'flex', justifyContent: 'space-between', padding: '5px 8px', borderRadius: '5px', background: 'rgba(59,130,246,0.06)', border: '1px solid rgba(59,130,246,0.15)', color: '#3b82f6', fontSize: '0.73rem' }}>
+                  <span>Per KM Fuel Surcharge (at return):</span>
                   <strong>₹{vehicle.pricingPlans?.hourly?.fuelChargePerKm || 2}/KM</strong>
                 </div>
               )}
-
               {depositCollected < bill.deposit && (
-                <div style={{ marginTop: '8px', padding: '6px 10px', borderRadius: '4px', background: 'rgba(239, 68, 68, 0.1)', color: '#f87171', fontSize: '0.75rem', border: '1px solid rgba(239,68,68,0.2)' }}>
-                  <AlertTriangle size={13} style={{ marginRight: 4 }} /> Warning: Deposit collected now (₹{depositCollected}) is less than the required Security Deposit (₹{bill.deposit}).
+                <div style={{ marginTop: '6px', padding: '5px 8px', borderRadius: '5px', background: 'rgba(239,68,68,0.08)', color: '#ef4444', fontSize: '0.72rem', border: '1px solid rgba(239,68,68,0.15)' }}>
+                  <AlertTriangle size={12} style={{ marginRight: 4 }} />Warning: Deposit collected (₹{depositCollected}) is less than required (₹{bill.deposit}).
                 </div>
               )}
             </div>
           )}
         </div>
 
-        {/* SECTION 8: UPLOAD CUSTOMER DOCUMENTS */}
+        {/* SECTION 8: DOCUMENTS (collapsible) */}
         <div className="bform-section-box">
           <button
             type="button"
-            style={{ width: '100%', padding: '4px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: '#1e293b', cursor: 'pointer' }}
+            style={{ width: '100%', padding: '2px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'transparent', border: 'none', color: '#1e293b', cursor: 'pointer' }}
             onClick={() => setShowDocuments(!showDocuments)}
           >
-            <h4 className="bform-section-title" style={{ margin: 0 }}>
-              <FileText size={15} /> Upload Customer Documents (Optional)
-            </h4>
-            {showDocuments ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            <h4 className="bform-section-title" style={{ margin: 0 }}><FileText size={13} /> Upload Customer Documents (Optional)</h4>
+            {showDocuments ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
           </button>
 
           {showDocuments && (
-            <div className="animate-fade" style={{ marginTop: '12px' }}>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                Upload customer's Aadhar card (front & back), driving license, and registration form if available.
-              </p>
-
-              {/* 4 Document Grid Cards */}
-              <div className="grid-2col">
+            <div className="animate-fade" style={{ marginTop: '10px' }}>
+              <div className="grid-2col" style={{ gap: '8px' }}>
                 {[
-                  { id: 'aadhaarFront', label: 'Aadhaar Card (Front)', stateVal: docAadhaarFront },
-                  { id: 'aadhaarBack', label: 'Aadhaar Card (Back)', stateVal: docAadhaarBack },
+                  { id: 'aadhaarFront', label: 'Aadhaar Front', stateVal: docAadhaarFront },
+                  { id: 'aadhaarBack', label: 'Aadhaar Back', stateVal: docAadhaarBack },
                   { id: 'dl', label: 'Driving License', stateVal: docLicense },
-                  { id: 'registration', label: 'Registration Form', stateVal: docRegistration }
+                  { id: 'registration', label: 'Registration', stateVal: docRegistration }
                 ].map(doc => (
-                  <div key={doc.id} style={{ border: '1px solid #e5e7eb', padding: '10px', borderRadius: '6px', background: '#f8f9fb' }}>
-                    <div style={{ fontSize: '0.8rem', fontWeight: 'bold', marginBottom: '6px', color: '#1e293b' }}>{doc.label}</div>
-
+                  <div key={doc.id} style={{ border: '1px solid #e5e7eb', padding: '8px', borderRadius: '7px', background: '#f8f9fb' }}>
+                    <div style={{ fontSize: '0.73rem', fontWeight: 600, marginBottom: '5px', color: '#1e293b' }}>{doc.label}</div>
                     {doc.stateVal ? (
-                      <div style={{ position: 'relative', height: '90px', borderRadius: '4px', overflow: 'hidden', marginBottom: '8px', background: '#000' }}>
+                      <div style={{ position: 'relative', height: '70px', borderRadius: '4px', overflow: 'hidden', marginBottom: '6px', background: '#000' }}>
                         <img src={doc.stateVal} alt={doc.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        <button
-                          type="button"
-                          style={{ position: 'absolute', top: '4px', right: '4px', background: 'rgba(239, 68, 68, 0.8)', border: 'none', borderRadius: '50%', width: '20px', height: '20px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem' }}
-                          onClick={() => saveDocImage('')}
-                        >
-                          <X size={10} />
-                        </button>
+                        <button type="button" style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: '50%', width: '18px', height: '18px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => saveDocImage('')}><X size={9} /></button>
                       </div>
                     ) : (
-                      <div style={{ height: '90px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #e5e7eb', borderRadius: '4px', color: '#94a3b8', fontSize: '0.75rem', marginBottom: '8px' }}>
-                        No Scan Attached
-                      </div>
+                      <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #d1d5db', borderRadius: '4px', color: '#94a3b8', fontSize: '0.68rem', marginBottom: '6px' }}>No Scan</div>
                     )}
-
-                    <div style={{ display: 'flex', gap: '6px' }}>
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        style={{ flex: 1, padding: '4px 8px', fontSize: '0.7rem', height: '28px' }}
-                        onClick={() => document.getElementById(`doc-pick-${doc.id}`).click()}
-                      >
-                        Choose File
-                      </button>
-                      <input
-                        id={`doc-pick-${doc.id}`}
-                        type="file"
-                        accept="image/*"
-                        style={{ display: 'none' }}
-                        onChange={e => handleDocFileChange(e, doc.id)}
-                      />
-
-                      <button
-                        type="button"
-                        className="btn btn-success"
-                        style={{ flex: 1, padding: '4px 8px', fontSize: '0.7rem', height: '28px', background: 'rgba(16,185,129,0.1)', borderColor: 'var(--status-available-border)', color: 'var(--status-available)' }}
-                        onClick={() => startCamera(doc.id)}
-                      >
-                        <Camera size={13} style={{ marginRight: 4 }} /> Camera
-                      </button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px' }} onClick={() => document.getElementById(`doc-pick-${doc.id}`).click()}>Browse</button>
+                      <input id={`doc-pick-${doc.id}`} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleDocFileChange(e, doc.id)} />
+                      <button type="button" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#059669', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }} onClick={() => startCamera(doc.id)}><Camera size={11} /></button>
                     </div>
                   </div>
                 ))}
               </div>
 
-              {/* Live Webcam Popup inside upload section */}
               {cameraActive && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300 }}>
-                  <div className="glass-panel" style={{ width: '90%', maxWidth: '500px', padding: '16px', background: 'var(--bg-glass)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                      <h4 style={{ margin: 0 }}>Document Scan: {activeDocType.toUpperCase()}</h4>
-                      <button type="button" className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={stopCamera}><X size={16} /></button>
+                  <div className="glass-panel" style={{ width: '90%', maxWidth: '480px', padding: '16px', background: 'var(--bg-glass)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                      <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Scan: {activeDocType.toUpperCase()}</h4>
+                      <button type="button" className="fo-btn-outline" style={{ borderRadius: '50%', width: '28px', height: '28px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={stopCamera}><X size={14} /></button>
                     </div>
-
-                    <div style={{ background: '#000', borderRadius: '8px', overflow: 'hidden', height: '300px', position: 'relative' }}>
-                      {cameraStream ? (
-                        <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                      ) : (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyItems: 'center', height: '100%', color: 'var(--text-muted)', padding: '20px', textAlign: 'center' }}>
-                          Local simulation active. Click "Take Capture" to generate scanned document canvas drawing.
-                        </div>
-                      )}
+                    <div style={{ background: '#000', borderRadius: '8px', overflow: 'hidden', height: '260px', position: 'relative' }}>
+                      {cameraStream ? <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8', padding: '20px', textAlign: 'center', fontSize: '0.8rem' }}>Simulation active. Click "Capture" to save.</div>}
                     </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '12px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
                       <button type="button" className="btn btn-secondary" onClick={stopCamera}>Cancel</button>
-                      <button type="button" className="btn btn-accent" onClick={captureDocSnapshot}>Take Capture</button>
+                      <button type="button" className="btn btn-accent" onClick={captureDocSnapshot}>Capture</button>
                     </div>
                   </div>
                 </div>
@@ -1501,42 +1233,29 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           )}
         </div>
 
-        {/* SECTION 9: ADDITIONAL NOTES */}
-        <div className="bform-section-box" style={{ marginBottom: '20px' }}>
-          <h4 className="bform-section-title">
-            <StickyNote size={15} /> Additional Notes (Optional)
-          </h4>
-          <div className="form-group">
-            <label>Booking Notes / Handover Comments</label>
-            <textarea
-              className="form-control"
-              rows="2"
-              placeholder="Any special instructions, damages, or notes..."
-              value={bookingNotes}
-              onChange={e => setBookingNotes(e.target.value)}
-            />
-          </div>
-          <div className="form-group" style={{ marginBottom: 0 }}>
-            <label>Special Instructions</label>
-            <textarea
-              className="form-control"
-              rows="2"
-              placeholder="e.g. Needs extra cleaning, return instructions"
-              value={specialInstructions}
-              onChange={e => setSpecialInstructions(e.target.value)}
-            />
-          </div>
+        {/* SECTION 9: NOTES (single compact textarea) */}
+        <div className="bform-section-box" style={{ marginBottom: '14px' }}>
+          <h4 className="bform-section-title"><StickyNote size={13} /> Additional Notes (Optional)</h4>
+          <textarea
+            className="form-control"
+            rows="2"
+            placeholder="Any special instructions, damages, or notes..."
+            value={bookingNotes}
+            onChange={e => setBookingNotes(e.target.value)}
+          />
         </div>
 
-        {/* BOTTOM FORM CONTROLS */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e5e7eb', paddingTop: '16px' }}>
-          <button type="button" className="btn btn-secondary" onClick={onCancel}>Cancel</button>
+        {/* FOOTER BUTTONS */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e5e7eb', paddingTop: '12px' }}>
+          <button type="button" className="btn btn-secondary" onClick={onCancel}>
+            <X size={13} /> Cancel
+          </button>
           <button type="submit" className="fo-btn-primary">
-            Create Booking & Handover Vehicle
+            Create Booking &amp; Handover Vehicle
           </button>
         </div>
 
       </form>
     </div>
   );
-}
+}

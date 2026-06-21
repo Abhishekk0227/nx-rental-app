@@ -21,7 +21,6 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   // Section 3: Rental Period
   const getDefaultDates = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + (30 - (now.getMinutes() % 30)));
     now.setSeconds(0);
     now.setMilliseconds(0);
 
@@ -859,7 +858,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label><Key size={11} style={{ marginRight: 3 }} />Start Meter Reading (KM) *</label>
               <input
-                type="number"
+                type="text" inputMode="numeric"
                 className="form-control"
                 value={startMeter === '' ? '' : startMeter}
                 onChange={e => setStartMeter(e.target.value === '' ? '' : Number(e.target.value))}
@@ -899,7 +898,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '7px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               <label style={{ fontSize: '0.78rem', color: '#4f46e5', fontWeight: 600, margin: 0, whiteSpace: 'nowrap' }}>⏱ Duration (hrs)</label>
               <input
-                type="number"
+                type="text" inputMode="numeric"
                 min="1"
                 className="form-control"
                 style={{ width: '75px', marginBottom: 0, textAlign: 'center', fontWeight: 'bold' }}
@@ -992,7 +991,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             <div className="form-group" style={{ marginBottom: 0 }}>
               <label>Security Deposit (₹)</label>
               <input
-                type="number"
+                type="text" inputMode="numeric"
                 className="form-control"
                 value={securityDeposit === '' ? '' : securityDeposit}
                 onChange={e => setSecurityDeposit(e.target.value === '' ? '' : Number(e.target.value))}
@@ -1026,24 +1025,24 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             {depositMethod === 'Cash' && (
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Cash Amount Received for Deposit (₹)</label>
-                <input type="number" className="form-control" value={depositCash} disabled />
+                <input type="text" inputMode="numeric" className="form-control" value={depositCash} disabled />
               </div>
             )}
             {depositMethod === 'Online' && (
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label>Online Amount Received for Deposit (₹)</label>
-                <input type="number" className="form-control" value={depositOnline} disabled />
+                <input type="text" inputMode="numeric" className="form-control" value={depositOnline} disabled />
               </div>
             )}
             {depositMethod === 'Mixed' && (
               <div className="grid-2col" style={{ gap: '8px' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Cash ₹</label>
-                  <input type="number" className="form-control" value={depositCash} onChange={e => handleDepositCashChange(e.target.value === '' ? 0 : Number(e.target.value))} />
+                  <input type="text" inputMode="numeric" className="form-control" value={depositCash} onChange={e => handleDepositCashChange(e.target.value === '' ? 0 : Number(e.target.value))} />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Online ₹</label>
-                  <input type="number" className="form-control" value={depositOnline} onChange={e => handleDepositOnlineChange(e.target.value === '' ? 0 : Number(e.target.value))} />
+                  <input type="text" inputMode="numeric" className="form-control" value={depositOnline} onChange={e => handleDepositOnlineChange(e.target.value === '' ? 0 : Number(e.target.value))} />
                 </div>
               </div>
             )}
@@ -1085,25 +1084,25 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               {paymentMethod === 'Cash' && (
                 <div className="form-group" style={{ marginBottom: 0 }}>
                   <label>Cash Amount Received (₹)</label>
-                  <input type="number" className="form-control" value={cashReceived === '' ? '' : cashReceived} onChange={e => setCashReceived(e.target.value === '' ? '' : Number(e.target.value))} />
+                  <input type="text" inputMode="numeric" className="form-control" value={cashReceived === '' ? '' : cashReceived} onChange={e => setCashReceived(e.target.value === '' ? '' : Number(e.target.value))} />
                 </div>
               )}
               {paymentMethod === 'UPI' && (
                 <div className="grid-2col" style={{ gap: '6px' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="number" className="form-control" value={upiAmount === '' ? '' : upiAmount} onChange={e => setUpiAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="text" inputMode="numeric" className="form-control" value={upiAmount === '' ? '' : upiAmount} onChange={e => setUpiAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
                   <div className="form-group" style={{ marginBottom: 0 }}><label>UPI Txn ID</label><input type="text" className="form-control" placeholder="TXN100028" value={upiTxnId} onChange={e => setUpiTxnId(e.target.value)} /></div>
                 </div>
               )}
               {paymentMethod === 'Card' && (
                 <div className="grid-2col" style={{ gap: '6px' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="number" className="form-control" value={cardAmount === '' ? '' : cardAmount} onChange={e => setCardAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Amount (₹)</label><input type="text" inputMode="numeric" className="form-control" value={cardAmount === '' ? '' : cardAmount} onChange={e => setCardAmount(e.target.value === '' ? '' : Number(e.target.value))} /></div>
                   <div className="form-group" style={{ marginBottom: 0 }}><label>Card Ref</label><input type="text" className="form-control" placeholder="Reference code" value={cardRef} onChange={e => setCardRef(e.target.value)} /></div>
                 </div>
               )}
               {paymentMethod === 'Mixed' && (
                 <div className="grid-2col" style={{ gap: '6px' }}>
-                  <div className="form-group" style={{ marginBottom: 0 }}><label>Cash (₹)</label><input type="number" className="form-control" value={mixedCash === '' ? '' : mixedCash} onChange={e => setMixedCash(e.target.value === '' ? '' : Number(e.target.value))} /></div>
-                  <div className="form-group" style={{ marginBottom: 0 }}><label>Online (₹)</label><input type="number" className="form-control" value={mixedOnline === '' ? '' : mixedOnline} onChange={e => setMixedOnline(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Cash (₹)</label><input type="text" inputMode="numeric" className="form-control" value={mixedCash === '' ? '' : mixedCash} onChange={e => setMixedCash(e.target.value === '' ? '' : Number(e.target.value))} /></div>
+                  <div className="form-group" style={{ marginBottom: 0 }}><label>Online (₹)</label><input type="text" inputMode="numeric" className="form-control" value={mixedOnline === '' ? '' : mixedOnline} onChange={e => setMixedOnline(e.target.value === '' ? '' : Number(e.target.value))} /></div>
                 </div>
               )}
 
@@ -1111,7 +1110,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               <div style={{ marginTop: '6px', paddingTop: '6px', borderTop: '1px solid #e5e7eb', display: 'flex', gap: '6px', alignItems: 'flex-end' }}>
                 <div className="form-group" style={{ marginBottom: 0, flex: 1 }}>
                   <label>Discount (optional)</label>
-                  <input type="number" className="form-control" value={discountAmount === '' ? '' : discountAmount} onChange={e => setDiscountAmount(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))} placeholder="0" />
+                  <input type="text" inputMode="numeric" className="form-control" value={discountAmount === '' ? '' : discountAmount} onChange={e => setDiscountAmount(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))} placeholder="0" />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0, width: '80px', flexShrink: 0 }}>
                   <label>Type</label>

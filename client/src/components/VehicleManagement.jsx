@@ -1070,7 +1070,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Seating Capacity</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={formData.seatingCapacity}
                               onChange={e => setFormData({ ...formData, seatingCapacity: Number(e.target.value) })}
@@ -1091,7 +1091,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Meter Reading (KM)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={formData.meterReading}
                               onChange={e => setFormData({ ...formData, meterReading: Number(e.target.value) })}
@@ -1101,7 +1101,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Fuel Capacity (Liters or %)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={formData.fuelCapacity}
                               onChange={e => setFormData({ ...formData, fuelCapacity: Number(e.target.value) })}
@@ -1111,7 +1111,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Mileage (KM/L or KM/Charge)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={formData.mileage}
                               onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })}
@@ -1156,27 +1156,27 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Rate Per Hour (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.rate} onChange={e => handlePricingPlanChange('hourly', 'rate', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.rate} onChange={e => handlePricingPlanChange('hourly', 'rate', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Free KM Per Hour</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.freeKm} onChange={e => handlePricingPlanChange('hourly', 'freeKm', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.freeKm} onChange={e => handlePricingPlanChange('hourly', 'freeKm', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Fuel Charge Per KM (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.fuelChargePerKm} onChange={e => handlePricingPlanChange('hourly', 'fuelChargePerKm', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.fuelChargePerKm} onChange={e => handlePricingPlanChange('hourly', 'fuelChargePerKm', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra KM Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.extraKmCharge} onChange={e => handlePricingPlanChange('hourly', 'extraKmCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.extraKmCharge} onChange={e => handlePricingPlanChange('hourly', 'extraKmCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>With Fuel Rate (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.withFuel} onChange={e => handlePricingPlanChange('hourly', 'withFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.withFuel} onChange={e => handlePricingPlanChange('hourly', 'withFuel', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Without Fuel Rate (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.hourly.withoutFuel} onChange={e => handlePricingPlanChange('hourly', 'withoutFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.hourly.withoutFuel} onChange={e => handlePricingPlanChange('hourly', 'withoutFuel', e.target.value)} />
                             </div>
                           </div>
                         </div>
@@ -1187,39 +1187,39 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Base Rate (12h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.baseRate} onChange={e => handlePricingPlanChange('twelveHour', 'baseRate', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.baseRate} onChange={e => handlePricingPlanChange('twelveHour', 'baseRate', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Rate Per Hour (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.ratePerHour} onChange={e => handlePricingPlanChange('twelveHour', 'ratePerHour', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.ratePerHour} onChange={e => handlePricingPlanChange('twelveHour', 'ratePerHour', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>KM Limit (12h)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.kmLimit} onChange={e => handlePricingPlanChange('twelveHour', 'kmLimit', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.kmLimit} onChange={e => handlePricingPlanChange('twelveHour', 'kmLimit', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Fuel Charge Per KM (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.fuelChargePerKm} onChange={e => handlePricingPlanChange('twelveHour', 'fuelChargePerKm', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.fuelChargePerKm} onChange={e => handlePricingPlanChange('twelveHour', 'fuelChargePerKm', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra KM Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.extraKmCharge} onChange={e => handlePricingPlanChange('twelveHour', 'extraKmCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.extraKmCharge} onChange={e => handlePricingPlanChange('twelveHour', 'extraKmCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra Hour Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.extraHourCharge} onChange={e => handlePricingPlanChange('twelveHour', 'extraHourCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.extraHourCharge} onChange={e => handlePricingPlanChange('twelveHour', 'extraHourCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Grace Period (Minutes)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.gracePeriod} onChange={e => handlePricingPlanChange('twelveHour', 'gracePeriod', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.gracePeriod} onChange={e => handlePricingPlanChange('twelveHour', 'gracePeriod', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>With Fuel Price (12h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.withFuel} onChange={e => handlePricingPlanChange('twelveHour', 'withFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.withFuel} onChange={e => handlePricingPlanChange('twelveHour', 'withFuel', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Without Fuel Price (12h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twelveHour.withoutFuel} onChange={e => handlePricingPlanChange('twelveHour', 'withoutFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twelveHour.withoutFuel} onChange={e => handlePricingPlanChange('twelveHour', 'withoutFuel', e.target.value)} />
                             </div>
                           </div>
                         </div>
@@ -1230,39 +1230,39 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Base Rate (24h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.baseRate} onChange={e => handlePricingPlanChange('twentyFourHour', 'baseRate', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.baseRate} onChange={e => handlePricingPlanChange('twentyFourHour', 'baseRate', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Rate Per Hour (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.ratePerHour} onChange={e => handlePricingPlanChange('twentyFourHour', 'ratePerHour', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.ratePerHour} onChange={e => handlePricingPlanChange('twentyFourHour', 'ratePerHour', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>KM Limit (24h)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.kmLimit} onChange={e => handlePricingPlanChange('twentyFourHour', 'kmLimit', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.kmLimit} onChange={e => handlePricingPlanChange('twentyFourHour', 'kmLimit', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Fuel Charge Per KM (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.fuelChargePerKm} onChange={e => handlePricingPlanChange('twentyFourHour', 'fuelChargePerKm', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.fuelChargePerKm} onChange={e => handlePricingPlanChange('twentyFourHour', 'fuelChargePerKm', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra KM Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.extraKmCharge} onChange={e => handlePricingPlanChange('twentyFourHour', 'extraKmCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.extraKmCharge} onChange={e => handlePricingPlanChange('twentyFourHour', 'extraKmCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra Hour Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.extraHourCharge} onChange={e => handlePricingPlanChange('twentyFourHour', 'extraHourCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.extraHourCharge} onChange={e => handlePricingPlanChange('twentyFourHour', 'extraHourCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Grace Period (Minutes)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.gracePeriod} onChange={e => handlePricingPlanChange('twentyFourHour', 'gracePeriod', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.gracePeriod} onChange={e => handlePricingPlanChange('twentyFourHour', 'gracePeriod', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>With Fuel Price (24h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.withFuel} onChange={e => handlePricingPlanChange('twentyFourHour', 'withFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.withFuel} onChange={e => handlePricingPlanChange('twentyFourHour', 'withFuel', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Without Fuel Price (24h) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.twentyFourHour.withoutFuel} onChange={e => handlePricingPlanChange('twentyFourHour', 'withoutFuel', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.twentyFourHour.withoutFuel} onChange={e => handlePricingPlanChange('twentyFourHour', 'withoutFuel', e.target.value)} />
                             </div>
                           </div>
                         </div>
@@ -1273,23 +1273,23 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Base Rate (Weekly) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.weekly.baseRate} onChange={e => handlePricingPlanChange('weekly', 'baseRate', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.weekly.baseRate} onChange={e => handlePricingPlanChange('weekly', 'baseRate', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>KM Limit (Weekly)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.weekly.kmLimit} onChange={e => handlePricingPlanChange('weekly', 'kmLimit', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.weekly.kmLimit} onChange={e => handlePricingPlanChange('weekly', 'kmLimit', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra KM Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.weekly.extraKmCharge} onChange={e => handlePricingPlanChange('weekly', 'extraKmCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.weekly.extraKmCharge} onChange={e => handlePricingPlanChange('weekly', 'extraKmCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra Day Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.weekly.extraDayCharge} onChange={e => handlePricingPlanChange('weekly', 'extraDayCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.weekly.extraDayCharge} onChange={e => handlePricingPlanChange('weekly', 'extraDayCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Grace Period (Minutes)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.weekly.gracePeriod} onChange={e => handlePricingPlanChange('weekly', 'gracePeriod', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.weekly.gracePeriod} onChange={e => handlePricingPlanChange('weekly', 'gracePeriod', e.target.value)} />
                             </div>
                           </div>
                         </div>
@@ -1300,19 +1300,19 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Base Rate (Monthly) (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.monthly.baseRate} onChange={e => handlePricingPlanChange('monthly', 'baseRate', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.monthly.baseRate} onChange={e => handlePricingPlanChange('monthly', 'baseRate', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>KM Limit (Monthly)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.monthly.kmLimit} onChange={e => handlePricingPlanChange('monthly', 'kmLimit', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.monthly.kmLimit} onChange={e => handlePricingPlanChange('monthly', 'kmLimit', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra KM Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.monthly.extraKmCharge} onChange={e => handlePricingPlanChange('monthly', 'extraKmCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.monthly.extraKmCharge} onChange={e => handlePricingPlanChange('monthly', 'extraKmCharge', e.target.value)} />
                             </div>
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Extra Day Charge (₹)</label>
-                              <input type="number" className="form-control" value={formData.pricingPlans.monthly.extraDayCharge} onChange={e => handlePricingPlanChange('monthly', 'extraDayCharge', e.target.value)} />
+                              <input type="text" inputMode="numeric" className="form-control" value={formData.pricingPlans.monthly.extraDayCharge} onChange={e => handlePricingPlanChange('monthly', 'extraDayCharge', e.target.value)} />
                             </div>
                           </div>
                         </div>
@@ -1345,7 +1345,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                               <div className="form-group">
                                 <label>Deposit Amount (₹)</label>
                                 <input
-                                  type="number"
+                                  type="text" inputMode="numeric"
                                   className="form-control"
                                   value={formData.depositSettings.amount}
                                   onChange={e => handleNestedChange('depositSettings', 'amount', Number(e.target.value))}
@@ -1373,7 +1373,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                               <div className="form-group animate-fade">
                                 <label>Required Payment Percentage (%)</label>
                                 <input
-                                  type="number"
+                                  type="text" inputMode="numeric"
                                   className="form-control"
                                   value={formData.paymentSettings.percentage}
                                   onChange={e => handleNestedChange('paymentSettings', 'percentage', Number(e.target.value))}
@@ -1410,7 +1410,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Minimum Buffer Time (Minutes)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={formData.bookingConfig.bufferTime}
                               onChange={e => handleNestedChange('bookingConfig', 'bufferTime', Number(e.target.value))}
@@ -1421,7 +1421,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                           <div className="form-group">
                             <label>Minimum Booking Duration (Hours)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               min="0"
                               className="form-control"
                               value={formData.bookingConfig.minBookingHours ?? 0}
@@ -1919,7 +1919,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   <div className="form-group">
                     <label>GPS Latitude (Optional)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       step="any"
                       className="form-control"
                       value={formData.locationDetails.gps.lat}
@@ -1938,7 +1938,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   <div className="form-group">
                     <label>GPS Longitude (Optional)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       step="any"
                       className="form-control"
                       value={formData.locationDetails.gps.lng}

@@ -209,7 +209,7 @@ export default function BookedVehicles({
   };
 
   // Core View State
-  const [viewState, setViewState] = useState('list'); // 'list' | 'view-booking' | 'drop-off'
+  const [viewState, setViewState] = useState('list'); // 'list' | 'view-booking' | 'drop-off' | 'edit' | 'extend' | 'replace' | 'delete'
   const [selectedBooking, setSelectedBooking] = useState(null);
 
   // Resolve current active vehicle for selectedBooking
@@ -225,7 +225,7 @@ export default function BookedVehicles({
   const [timelineExpanded, setTimelineExpanded] = useState(true);
 
   // Modal Control States
-  const [activeModal, setActiveModal] = useState(null); // 'pickup' | 'extend' | 'replace' | 'collect' | 'edit' | 'override' | null
+  const [activeModal, setActiveModal] = useState(null); // 'pickup' | 'collect' | 'override' | null
 
   // Search & Filters Panel States
   const [searchTerm, setSearchTerm] = useState('');
@@ -439,6 +439,13 @@ export default function BookedVehicles({
     dropCleaningCharges,
     dropTowingCharges
   ]);
+
+  // Guarantee: refresh drop-off return time to NOW whenever the dropoff page opens
+  useEffect(() => {
+    if (viewState === 'dropoff') {
+      setDropReturnDate(formatLocalISO(new Date()));
+    }
+  }, [viewState]);
 
   // Recalculation Effect for Edit Modal
   useEffect(() => {
@@ -5118,7 +5125,7 @@ export default function BookedVehicles({
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label>Return Odometer Reading (km) *</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={dropEndMeter}
                         onChange={e => setDropEndMeter(e.target.value)}
@@ -5143,7 +5150,7 @@ export default function BookedVehicles({
                           <div className="form-group" style={{ marginBottom: 0 }}>
                             <label>Helmets Returned (Expected: {calc.helmetExpected}) *</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={dropHelmetReturned}
                               min={0}
@@ -5213,7 +5220,7 @@ export default function BookedVehicles({
                           <div className="form-group" style={{ marginBottom: 0 }}>
                             <label>Damage Recovery (₹)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={dropDamageCharges}
                               onChange={e => setDropDamageCharges(Number(e.target.value))}
@@ -5222,7 +5229,7 @@ export default function BookedVehicles({
                           <div className="form-group" style={{ marginBottom: 0 }}>
                             <label>Cleaning Fee (₹)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={dropCleaningCharges}
                               onChange={e => setDropCleaningCharges(Number(e.target.value))}
@@ -5231,7 +5238,7 @@ export default function BookedVehicles({
                           <div className="form-group" style={{ marginBottom: 0 }}>
                             <label>Towing Fee (₹)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={dropTowingCharges}
                               onChange={e => setDropTowingCharges(Number(e.target.value))}
@@ -5240,7 +5247,7 @@ export default function BookedVehicles({
                           <div className="form-group" style={{ marginBottom: 0 }}>
                             <label>Other Return Charges (₹)</label>
                             <input
-                              type="number"
+                              type="text" inputMode="numeric"
                               className="form-control"
                               value={dropAdditionalCharges}
                               onChange={e => setDropAdditionalCharges(Number(e.target.value))}
@@ -5273,7 +5280,7 @@ export default function BookedVehicles({
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label>Free Minutes Waiver (reduce from extra time)</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={dropFreeMinutes}
                         onChange={e => setDropFreeMinutes(Number(e.target.value))}
@@ -5285,7 +5292,7 @@ export default function BookedVehicles({
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label>Additional Free KM Waiver</label>
                         <input
-                          type="number"
+                          type="text" inputMode="numeric"
                           className="form-control"
                           value={dropAddFreeKm}
                           onChange={e => setDropAddFreeKm(Number(e.target.value))}
@@ -5303,7 +5310,7 @@ export default function BookedVehicles({
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label>Discount / Waiver Amount (₹)</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={dropDiscountWaiver}
                         onChange={e => setDropDiscountWaiver(Number(e.target.value))}
@@ -5686,7 +5693,7 @@ export default function BookedVehicles({
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Cash Received (₹) *</label>
                               <input
-                                type="number"
+                                type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropCashReceived}
                                 onChange={e => setDropCashReceived(Number(e.target.value))}
@@ -5696,7 +5703,7 @@ export default function BookedVehicles({
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Online Received (₹) *</label>
                               <input
-                                type="number"
+                                type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropOnlineReceived}
                                 onChange={e => setDropOnlineReceived(Number(e.target.value))}
@@ -5774,7 +5781,7 @@ export default function BookedVehicles({
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Cash Refunded (₹) *</label>
                               <input
-                                type="number"
+                                type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropCashReceived}
                                 onChange={e => setDropCashReceived(Number(e.target.value))}
@@ -5784,7 +5791,7 @@ export default function BookedVehicles({
                             <div className="form-group" style={{ marginBottom: 0 }}>
                               <label>Online Refunded (₹) *</label>
                               <input
-                                type="number"
+                                type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropOnlineReceived}
                                 onChange={e => setDropOnlineReceived(Number(e.target.value))}
@@ -5965,7 +5972,7 @@ export default function BookedVehicles({
                 <div className="form-group">
                   <label>Odometer Reading (Start)</label>
                   <input
-                    type="number"
+                    type="text" inputMode="numeric"
                     className="form-control"
                     placeholder="e.g. 15450"
                     value={odometerStart}
@@ -6073,7 +6080,7 @@ export default function BookedVehicles({
                     <div className="form-group">
                       <label>Additional Rental Cost (₹) *</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={extensionExtraCharges}
                         onChange={(e) => setExtensionExtraCharges(Number(e.target.value))}
@@ -6084,7 +6091,7 @@ export default function BookedVehicles({
                     <div className="form-group">
                       <label>Additional Deposit (₹)</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={extensionAdditionalDeposit}
                         onChange={(e) => setExtensionAdditionalDeposit(Number(e.target.value))}
@@ -6112,7 +6119,7 @@ export default function BookedVehicles({
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label style={{ fontSize: '0.75rem' }}>Cash Portion (₹)</label>
                         <input
-                          type="number"
+                          type="text" inputMode="numeric"
                           className="form-control"
                           value={extensionMixedCash}
                           onChange={e => setExtensionMixedCash(Number(e.target.value))}
@@ -6121,7 +6128,7 @@ export default function BookedVehicles({
                       <div className="form-group" style={{ marginBottom: 0 }}>
                         <label style={{ fontSize: '0.75rem' }}>Online Portion (₹)</label>
                         <input
-                          type="number"
+                          type="text" inputMode="numeric"
                           className="form-control"
                           value={extensionMixedOnline}
                           onChange={e => setExtensionMixedOnline(Number(e.target.value))}
@@ -6242,7 +6249,7 @@ export default function BookedVehicles({
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Current Vehicle Closing Meter (KM) *</label>
                       <input
-                        type="number"
+                        type="text" inputMode="numeric"
                         className="form-control"
                         value={oldVehicleClosingMeter}
                         onChange={e => setOldVehicleClosingMeter(Number(e.target.value))}
@@ -6303,7 +6310,7 @@ export default function BookedVehicles({
                       <div className="form-group">
                         <label>Replacement Vehicle Starting Meter (KM) *</label>
                         <input
-                          type="number"
+                          type="text" inputMode="numeric"
                           className="form-control"
                           value={newVehicleStartingMeter}
                           onChange={e => setNewVehicleStartingMeter(Number(e.target.value))}
@@ -6402,11 +6409,11 @@ export default function BookedVehicles({
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '4px' }}>
                               <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label style={{ fontSize: '0.7rem' }}>Cash portion (₹)</label>
-                                <input type="number" className="form-control" value={replaceMixedCash} onChange={e => setReplaceMixedCash(Number(e.target.value))} />
+                                <input type="text" inputMode="numeric" className="form-control" value={replaceMixedCash} onChange={e => setReplaceMixedCash(Number(e.target.value))} />
                               </div>
                               <div className="form-group" style={{ marginBottom: 0 }}>
                                 <label style={{ fontSize: '0.7rem' }}>Online portion (₹)</label>
-                                <input type="number" className="form-control" value={replaceMixedOnline} onChange={e => setReplaceMixedOnline(Number(e.target.value))} />
+                                <input type="text" inputMode="numeric" className="form-control" value={replaceMixedOnline} onChange={e => setReplaceMixedOnline(Number(e.target.value))} />
                               </div>
                             </div>
                           )}
@@ -6508,7 +6515,7 @@ export default function BookedVehicles({
                       </div>
                       <div className="form-group">
                         <label>Helmet Counts {selectedBooking.status !== 'Reserved' && <span style={{ fontSize: '0.7rem', color: '#f43f5e' }}>(Locked)</span>}</label>
-                        <input type="number" className="form-control" value={editHelmetsCount} onChange={e => setEditHelmetsCount(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} />
+                        <input type="text" inputMode="numeric" className="form-control" value={editHelmetsCount} onChange={e => setEditHelmetsCount(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} />
                       </div>
                       <div className="form-group" style={{ gridColumn: 'span 2' }}>
                         <label>Additional Accessories Notes</label>
@@ -6523,15 +6530,15 @@ export default function BookedVehicles({
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Rental Cost (Base Fare) (₹) * {selectedBooking.status !== 'Reserved' && <span style={{ fontSize: '0.7rem', color: '#f43f5e' }}>(Locked)</span>}</label>
-                        <input type="number" className="form-control" value={editBaseFare} onChange={e => setEditBaseFare(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} required />
+                        <input type="text" inputMode="numeric" className="form-control" value={editBaseFare} onChange={e => setEditBaseFare(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} required />
                       </div>
                       <div className="form-group">
                         <label>Discount Amount (₹) {selectedBooking.status !== 'Reserved' && <span style={{ fontSize: '0.7rem', color: '#f43f5e' }}>(Locked)</span>}</label>
-                        <input type="number" className="form-control" value={editDiscountAmount} onChange={e => setEditDiscountAmount(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} />
+                        <input type="text" inputMode="numeric" className="form-control" value={editDiscountAmount} onChange={e => setEditDiscountAmount(Number(e.target.value))} disabled={selectedBooking.status !== 'Reserved'} />
                       </div>
                       <div className="form-group">
                         <label>Paid Amount (Advance Paid) (₹) *</label>
-                        <input type="number" className="form-control" value={editAdvancePaid} onChange={e => setEditAdvancePaid(Number(e.target.value))} required />
+                        <input type="text" inputMode="numeric" className="form-control" value={editAdvancePaid} onChange={e => setEditAdvancePaid(Number(e.target.value))} required />
                       </div>
                       <div className="form-group">
                         <label>Rental Payment Method</label>
@@ -6547,11 +6554,11 @@ export default function BookedVehicles({
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }} className="animate-fade">
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Cash Portion (₹)</label>
-                          <input type="number" className="form-control" value={editMixedCash} onChange={e => setEditMixedCash(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editMixedCash} onChange={e => setEditMixedCash(Number(e.target.value))} />
                         </div>
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Online Portion (₹)</label>
-                          <input type="number" className="form-control" value={editMixedOnline} onChange={e => setEditMixedOnline(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editMixedOnline} onChange={e => setEditMixedOnline(Number(e.target.value))} />
                         </div>
                       </div>
                     )}
@@ -6563,7 +6570,7 @@ export default function BookedVehicles({
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
                         <label>Required Deposit (₹) *</label>
-                        <input type="number" className="form-control" value={editSecurityDeposit} onChange={e => setEditSecurityDeposit(Number(e.target.value))} required />
+                        <input type="text" inputMode="numeric" className="form-control" value={editSecurityDeposit} onChange={e => setEditSecurityDeposit(Number(e.target.value))} required />
                       </div>
                       <div className="form-group">
                         <label>Deposit Payment Mode</label>
@@ -6579,11 +6586,11 @@ export default function BookedVehicles({
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }} className="animate-fade">
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Deposit Cash Portion (₹)</label>
-                          <input type="number" className="form-control" value={editDepositMixedCash} onChange={e => setEditDepositMixedCash(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editDepositMixedCash} onChange={e => setEditDepositMixedCash(Number(e.target.value))} />
                         </div>
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Deposit Online Portion (₹)</label>
-                          <input type="number" className="form-control" value={editDepositMixedOnline} onChange={e => setEditDepositMixedOnline(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editDepositMixedOnline} onChange={e => setEditDepositMixedOnline(Number(e.target.value))} />
                         </div>
                       </div>
                     )}
@@ -6709,7 +6716,7 @@ export default function BookedVehicles({
                 <div className="form-group">
                   <label>Amount to Collect (₹) *</label>
                   <input
-                    type="number"
+                    type="text" inputMode="numeric"
                     className="form-control"
                     value={collectAmount}
                     onChange={e => {
@@ -6746,11 +6753,11 @@ export default function BookedVehicles({
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }} className="animate-fade">
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label style={{ fontSize: '0.65rem' }}>Cash portion (₹)</label>
-                      <input type="number" className="form-control" value={collectCashAmount} onChange={e => handleCollectSplitChange('Cash', Number(e.target.value), collectAmount)} />
+                      <input type="text" inputMode="numeric" className="form-control" value={collectCashAmount} onChange={e => handleCollectSplitChange('Cash', Number(e.target.value), collectAmount)} />
                     </div>
                     <div className="form-group" style={{ marginBottom: 0 }}>
                       <label style={{ fontSize: '0.65rem' }}>Online portion (₹)</label>
-                      <input type="number" className="form-control" value={collectOnlineAmount} onChange={e => handleCollectSplitChange('Online', Number(e.target.value), collectAmount)} />
+                      <input type="text" inputMode="numeric" className="form-control" value={collectOnlineAmount} onChange={e => handleCollectSplitChange('Online', Number(e.target.value), collectAmount)} />
                     </div>
                   </div>
                 ) : (
@@ -6784,7 +6791,7 @@ export default function BookedVehicles({
                   <div className="form-group">
                     <label>Base Fare (₹)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       className="form-control"
                       value={overrideBaseFare}
                       onChange={(e) => {
@@ -6797,7 +6804,7 @@ export default function BookedVehicles({
                   <div className="form-group">
                     <label>Discount Applied (₹)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       className="form-control"
                       value={overrideDiscount}
                       onChange={(e) => {
@@ -6813,7 +6820,7 @@ export default function BookedVehicles({
                   <div className="form-group">
                     <label>Advance Paid (₹)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       className="form-control"
                       value={overrideAdvancePaid}
                       onChange={(e) => {
@@ -6826,7 +6833,7 @@ export default function BookedVehicles({
                   <div className="form-group">
                     <label>Security Deposit (₹)</label>
                     <input
-                      type="number"
+                      type="text" inputMode="numeric"
                       className="form-control"
                       value={overrideSecurityDeposit}
                       onChange={(e) => setOverrideSecurityDeposit(e.target.value)}
@@ -6867,7 +6874,7 @@ export default function BookedVehicles({
                 <div className="form-group">
                   <label>Override Final Outstanding Amount (₹)</label>
                   <input
-                    type="number"
+                    type="text" inputMode="numeric"
                     className="form-control"
                     value={overrideFinalAmount}
                     onChange={(e) => setOverrideFinalAmount(Number(e.target.value))}

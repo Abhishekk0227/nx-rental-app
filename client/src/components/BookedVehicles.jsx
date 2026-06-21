@@ -2282,19 +2282,32 @@ export default function BookedVehicles({
     const extraHoursStr = extraHoursDecimal > 0 ? formatDuration(diffMs - bookedDurationHours * 3600 * 1000) : '0 hrs 0 mins';
     const chargeableHoursStr = `${chargeableHrs} hrs ${chargeableMinsPart} mins`;
 
-    // 2. Extra Hour Rate (Primary: persisted extraHourCharge. Fallback: resolve from active vehicle pricing plans)
+    // 2. Extra Hour Rate (Primary: live vehicle pricing. Fallback: persisted extraHourCharge → defaults)
+    // For scooty+fuel on Hourly plan: the 'withFuel' hourly rate IS the extra hour rate
     const activePlanType = selectedBooking.selectedPlan?.planType || '24-Hour';
     const activePlanKey = activePlanType === 'Hourly' ? 'hourly' : activePlanType === '12-Hour' ? 'twelveHour' : 'twentyFourHour';
     const activeVehiclePlan = resolvedVehicle.pricingPlans?.[activePlanKey] || {};
-    const fallbackExtraHourRate = activeVehiclePlan.extraHourCharge || (isCar ? 200 : isBike ? 100 : 30);
-    const extraHourRate = selectedBooking.selectedPlan?.extraHourCharge || fallbackExtraHourRate;
+    const isScootyFuelHourly = isScooty && selectedBooking.handover?.fuelIncluded && activePlanType === 'Hourly';
+    const fallbackExtraHourRate = isScootyFuelHourly
+      ? (activeVehiclePlan.withFuel || selectedBooking.selectedPlan?.rate || 40)
+      : (activeVehiclePlan.extraHourCharge || (isCar ? 200 : isBike ? 100 : 30));
+    const extraHourRate = isScootyFuelHourly
+      ? fallbackExtraHourRate
+      : (selectedBooking.selectedPlan?.extraHourCharge || fallbackExtraHourRate);
 
     // Minute-based extra hour billing calculation
     const extraHourCharge = (chargeableHrs * extraHourRate) + (chargeableMinsPart * (extraHourRate / 60));
 
     // 3. Extra KM Rate (Primary: persisted extraKmCharge. Fallback: resolve from active vehicle pricing plans)
-    const fallbackExtraKmRate = activeVehiclePlan.extraKmCharge || (isCar ? 12 : isBike ? 8 : isScootyFuel ? 2 : 5);
+    const fallbackExtraKmRate = activeVehiclePlan.extraKmCharge || (isCar ? 12 : isBike ? 8 : 5);
     const extraKmRate = selectedBooking.selectedPlan?.extraKmCharge || fallbackExtraKmRate;
+
+    // 3b. Fuel Charge Per KM for Scooty+Fuel
+    // Priority: (1) Live vehicle pricing plan from DB — always reflects Vehicle Management changes
+    //           (2) Value saved in selectedPlan at booking time — only used if vehicle plan is missing
+    //           (3) Hard default of 2
+    const liveFuelChargePerKm = activeVehiclePlan.fuelChargePerKm;
+    const fuelChargePerKm = liveFuelChargePerKm ?? selectedBooking.selectedPlan?.fuelChargePerKm ?? 2;
 
     // 4. KM Limit (Primary: persisted kmLimit. Fallback: dynamic scale based on duration)
     let freeKmLimit = selectedBooking.selectedPlan?.kmLimit;
@@ -2313,8 +2326,8 @@ export default function BookedVehicles({
 
     if (isScootyFuel) {
       // Scooty with fuel logic: No Allowed KM / Extra KM / Extra KM charges.
-      // Every km is chargeable, billed based on rounded distance used
-      distanceCharge = totalKmUsedRounded * extraKmRate;
+      // Every km is chargeable, billed at fuelChargePerKm (from vehicle pricing plan)
+      distanceCharge = totalKmUsedRounded * fuelChargePerKm;
     } else {
       allowedKmLimit = Math.max(freeKmLimit, actualHoursDecimal * 10);
       allowedKmLimitRounded = customRoundKm(allowedKmLimit);
@@ -2349,7 +2362,8 @@ export default function BookedVehicles({
       // Scooty with Fuel: charged hourly with a MINIMUM of 1 hour.
       // Any fraction of an hour is rounded UP (Math.ceil), and the minimum billable unit is 1 hour.
       // e.g. 30 min → 1 hr charge, 1 hr 10 min → 2 hr charge
-      const baseHourlyRate = selectedBooking.selectedPlan?.rate || 40;
+      // Base hourly rate: live vehicle pricing (withFuel) → saved selectedPlan rate → default 40
+      const baseHourlyRate = activeVehiclePlan.withFuel || selectedBooking.selectedPlan?.rate || 40;
       const chargeableHoursForFuel = Math.max(1, Math.ceil(actualHoursDecimal));
       baseHourlyCost = chargeableHoursForFuel * baseHourlyRate;
 
@@ -2371,6 +2385,8 @@ export default function BookedVehicles({
     else if (depositRefund > 0) settlementStatus = 'Refund';
 
     return {
+      fuelChargePerKm,
+      liveExtraHourRate: extraHourRate,
       startMeter,
       endMeter,
       totalKmUsed,
@@ -4829,13 +4845,13 @@ export default function BookedVehicles({
                         {calc.isScootyFuel ? 'Fuel Rate' : 'Extra KM Rate'}
                       </span>
                       <strong style={{ color: 'var(--text-primary)' }}>
-                        ₹{selectedBooking.selectedPlan?.extraKmCharge || (calc.isScootyFuel ? 2 : 5)} / km
+                        ₹{calc.isScootyFuel ? calc.fuelChargePerKm : (selectedBooking.selectedPlan?.extraKmCharge || 5)} / km
                       </strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Extra Hour Rate</span>
                       <strong style={{ color: 'var(--text-primary)' }}>
-                        ₹{selectedBooking.selectedPlan?.extraHourCharge || 30} / hr
+                        ₹{calc.isScootyFuel ? (calc.liveExtraHourRate || selectedBooking.selectedPlan?.extraHourCharge || 30) : (selectedBooking.selectedPlan?.extraHourCharge || 30)} / hr
                       </strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>

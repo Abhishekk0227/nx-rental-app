@@ -56,6 +56,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const [planKmLimit, setPlanKmLimit] = useState(0);
   const [planExtraKm, setPlanExtraKm] = useState(0);
   const [planExtraHour, setPlanExtraHour] = useState(0);
+  const [planFuelChargePerKm, setPlanFuelChargePerKm] = useState(2);
 
   const addHoursToDateString = (dateStr, hours) => {
     if (!dateStr) return '';
@@ -230,6 +231,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         setPlanRate(rateField);
         setPlanExtraKm(plans.hourly?.extraKmCharge || 5);
         setPlanExtraHour(rateField);
+        // Save fuelChargePerKm so drop-off can use the correct per-km rate for this vehicle
+        setPlanFuelChargePerKm(plans.hourly?.fuelChargePerKm ?? 2);
       } else if (selectedPlanType === '12-Hour') {
         const p = plans.twelveHour || {};
         setPlanRate(p.baseRate || 350);
@@ -647,7 +650,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         rate: planRate,
         kmLimit: bill.kmLimit,
         extraKmCharge: planExtraKm,
-        extraHourCharge: planExtraHour
+        extraHourCharge: planExtraHour,
+        ...(isScooty && includeFuel ? { fuelChargePerKm: planFuelChargePerKm } : {})
       },
       addons: {
         helmetsCount: Number(helmetsCount),

@@ -832,17 +832,13 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                     </div>
                     <div className="av-field-wrap">
                       <label className="av-label">Company / Brand</label>
-                      <select className="av-input" value={addFormData.brand} onChange={e => setAddFormData({ ...addFormData, brand: e.target.value })}>
-                        <option value="Honda">Honda</option>
-                        <option value="TVS">TVS</option>
-                        <option value="Hero">Hero</option>
-                        <option value="Bajaj">Bajaj</option>
-                        <option value="Yamaha">Yamaha</option>
-                        <option value="Suzuki">Suzuki</option>
-                        <option value="Hyundai">Hyundai</option>
-                        <option value="Tata">Tata</option>
-                        <option value="Mahindra">Mahindra</option>
-                      </select>
+                      <input
+                        type="text"
+                        className="av-input"
+                        placeholder="e.g. Honda, Yamaha, Tata..."
+                        value={addFormData.brand}
+                        onChange={e => setAddFormData({ ...addFormData, brand: e.target.value })}
+                      />
                     </div>
                     <div className="av-field-wrap">
                       <label className="av-label">Fuel Type</label>

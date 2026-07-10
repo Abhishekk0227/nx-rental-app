@@ -209,7 +209,7 @@ export default function BookedVehicles({
   };
 
   // Core View State
-  const [viewState, setViewState] = useState('list'); // 'list' | 'view-booking' | 'drop-off' | 'edit' | 'extend' | 'replace' | 'delete'
+  const [viewState, setViewState] = useState('list'); // 'list' | 'view-booking' | 'drop-off' | 'extend' | 'replace' | 'edit-booking' | 'collect' | 'delete'
   const [selectedBooking, setSelectedBooking] = useState(null);
 
   // Resolve current active vehicle for selectedBooking
@@ -449,7 +449,7 @@ export default function BookedVehicles({
 
   // Recalculation Effect for Edit Modal
   useEffect(() => {
-    if (activeModal === 'edit' && selectedBooking && selectedBooking.status === 'Reserved') {
+    if (viewState === 'edit-booking' && selectedBooking && selectedBooking.status === 'Reserved') {
       const vehicle = vehicles.find(v => v.vehicleId === selectedBooking.vehicleId);
       if (!vehicle) return;
 
@@ -527,11 +527,11 @@ export default function BookedVehicles({
 
       setEditBaseFare(recalculatedCost);
     }
-  }, [editPickupDate, editExpectedDropDate, editPlanType, editFuelIncluded, activeModal, selectedBooking]);
+  }, [editPickupDate, editExpectedDropDate, editPlanType, editFuelIncluded, viewState, selectedBooking]);
 
   // Recalculation Effect for Extend Modal
   useEffect(() => {
-    if (activeModal === 'extend' && selectedBooking) {
+    if (viewState === 'extend' && selectedBooking) {
       const currentEnd = new Date(selectedBooking.expectedDropDate || selectedBooking.rentalPeriod?.expectedEndDate);
       const newEnd = new Date(extensionEndDate);
       const diffMs = newEnd.getTime() - currentEnd.getTime();
@@ -560,7 +560,7 @@ export default function BookedVehicles({
 
       setExtensionExtraCharges(calculatedCharges);
     }
-  }, [extensionEndDate, activeModal, selectedBooking]);
+  }, [extensionEndDate, viewState, selectedBooking]);
 
   // Helper date conversions
   const formatLocalISO = (d) => {
@@ -802,7 +802,7 @@ export default function BookedVehicles({
     setExtensionPaymentMode('Cash');
     setExtensionMixedCash(0);
     setExtensionMixedOnline(0);
-    setActiveModal('extend');
+    setViewState('extend');
   };
 
   const handleExtensionPlanChange = (plan, booking) => {
@@ -890,7 +890,7 @@ export default function BookedVehicles({
     setOldVehicleClosingMeter(oldV?.meterReading || booking.handover?.startMeter || 0);
     setNewVehicleStartingMeter(0);
 
-    setActiveModal('replace');
+    setViewState('replace');
   };
 
   const openCollectPayment = (booking) => {
@@ -922,7 +922,7 @@ export default function BookedVehicles({
     setCollectOnlineAmount(0);
     setCollectCardAmount(0);
     setCollectNotes('Payment collected');
-    setActiveModal('collect');
+    setViewState('collect');
   };
 
   const handleCollectSplitChange = (type, val, total) => {
@@ -976,7 +976,7 @@ export default function BookedVehicles({
     setEditDepositPaymentMode(dDetails.mode || 'Cash');
     setEditDepositMixedCash(dDetails.cashAmount || (dDetails.mode === 'Cash' ? booking.securityDeposit : 0));
     setEditDepositMixedOnline(dDetails.onlineAmount || (dDetails.mode === 'Online' ? booking.securityDeposit : 0));
-    setActiveModal('edit');
+    setViewState('edit-booking');
   };
 
   const openOverride = (booking) => {
@@ -1402,7 +1402,7 @@ export default function BookedVehicles({
     };
 
     onExtend(selectedBooking.bookingId, payload);
-    setActiveModal(null);
+    setViewState('list');
   };
 
   const handleReplaceSubmit = (e) => {
@@ -1599,7 +1599,7 @@ export default function BookedVehicles({
     payload.revisions = [...(selectedBooking.revisions || []), replaceRevision];
 
     onReplace(selectedBooking.bookingId, payload);
-    setActiveModal(null);
+    setViewState('list');
   };
 
   const handleEditSubmit = (e) => {
@@ -1900,7 +1900,7 @@ export default function BookedVehicles({
     };
 
     onAdminOverride(selectedBooking.bookingId, payload);
-    setActiveModal(null);
+    setViewState('list');
     alert('Booking details updated successfully!');
   };
 
@@ -2093,7 +2093,7 @@ export default function BookedVehicles({
         alert('Network error connecting to backend.');
       }
     }
-    setActiveModal(null);
+    setViewState('list');
   };
 
 
@@ -2122,7 +2122,7 @@ export default function BookedVehicles({
       alert(`Booking ${bookingToDelete.bookingId} removed (offline mode).`);
     }
     setDeleteInProgress(false);
-    setShowDeleteConfirm(false);
+    setViewState('list');
     setBookingToDelete(null);
   };
 
@@ -3161,7 +3161,7 @@ export default function BookedVehicles({
                         <button
                           className="btn btn-secondary"
                           title="Permanently delete this booking"
-                          onClick={() => { setBookingToDelete(b); setShowDeleteConfirm(true); }}
+                          onClick={() => { setBookingToDelete(b); setViewState('delete'); }}
                           style={{
                             padding: '6px 10px',
                             fontSize: '0.8rem',
@@ -6016,7 +6016,7 @@ export default function BookedVehicles({
       )}
 
       {/* B. EXTEND BOOKING MODAL */}
-      {activeModal === 'extend' && selectedBooking && (() => {
+      {viewState === 'extend' && selectedBooking && (() => {
         const currentEnd = new Date(selectedBooking.expectedDropDate || selectedBooking.rentalPeriod?.expectedEndDate);
         const newEnd = new Date(extensionEndDate);
         const diffMs = newEnd.getTime() - currentEnd.getTime();
@@ -6024,11 +6024,11 @@ export default function BookedVehicles({
         const comp = getExtendDepositComparison();
 
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '550px' }}>
-              <div className="modal-header">
-                <h2>Extend Rental Period - {selectedBooking.bookingId}</h2>
-                <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setActiveModal(null)}><X size={16} /></button>
+          <div>
+            <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '900px', margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px 24px', borderBottom: '1px solid var(--border-light)' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+                <div><h2 style={{ margin: 0, fontSize: '1.4rem' }}>Extend Rental Period</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Booking: <strong>{selectedBooking.bookingId}</strong></span></div>
               </div>
               <form onSubmit={handleExtendSubmit}>
                 <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -6220,7 +6220,7 @@ export default function BookedVehicles({
 
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancel</button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save Extension</button>
                 </div>
               </form>
@@ -6230,14 +6230,14 @@ export default function BookedVehicles({
       })()}
 
       {/* C. REPLACE VEHICLE SWAP MODAL */}
-      {activeModal === 'replace' && selectedBooking && (() => {
+      {viewState === 'replace' && selectedBooking && (() => {
         const comp = getReplacePricingComparison();
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '550px' }}>
-              <div className="modal-header">
-                <h2>Swap / Replace Vehicle - {selectedBooking.bookingId}</h2>
-                <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setActiveModal(null)}><X size={16} /></button>
+          <div>
+            <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '900px', margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px 24px', borderBottom: '1px solid var(--border-light)' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+                <div><h2 style={{ margin: 0, fontSize: '1.4rem' }}>Swap / Replace Vehicle</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Booking: <strong>{selectedBooking.bookingId}</strong></span></div>
               </div>
               <form onSubmit={handleReplaceSubmit}>
                 <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -6424,7 +6424,7 @@ export default function BookedVehicles({
 
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancel</button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Confirm Replacement</button>
                 </div>
               </form>
@@ -6434,14 +6434,14 @@ export default function BookedVehicles({
       })()}
 
       {/* D. EDIT BOOKING MODAL */}
-      {activeModal === 'edit' && selectedBooking && (() => {
+      {viewState === 'edit-booking' && selectedBooking && (() => {
         const comp = getEditDepositComparison();
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ maxWidth: '650px' }}>
-              <div className="modal-header">
-                <h2>Edit Booking Info - {selectedBooking.bookingId}</h2>
-                <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setActiveModal(null)}><X size={16} /></button>
+          <div>
+            <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px 24px', borderBottom: '1px solid var(--border-light)' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+                <div><h2 style={{ margin: 0, fontSize: '1.4rem' }}>Edit Booking Info</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Booking: <strong>{selectedBooking.bookingId}</strong></span></div>
               </div>
               <form onSubmit={handleEditSubmit}>
                 <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -6627,7 +6627,7 @@ export default function BookedVehicles({
 
                 </div>
                 <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancel</button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')}>Cancel</button>
                   <button type="submit" className="btn btn-primary">Save Details</button>
                 </div>
               </form>
@@ -6637,12 +6637,12 @@ export default function BookedVehicles({
       })()}
 
       {/* E. COLLECT MONEY STANDALONE POPUP */}
-      {activeModal === 'collect' && selectedBooking && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ maxWidth: '450px' }}>
-            <div className="modal-header">
-              <h2>Collect Money Payment - {selectedBooking.bookingId}</h2>
-              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setActiveModal(null)}><X size={16} /></button>
+      {viewState === 'collect' && selectedBooking && (
+        <div>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '750px', margin: '0 auto' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', padding: '20px 24px', borderBottom: '1px solid var(--border-light)' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+              <div><h2 style={{ margin: 0, fontSize: '1.4rem' }}>Collect Money Payment</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Booking: <strong>{selectedBooking.bookingId}</strong></span></div>
             </div>
             <form onSubmit={handleStandaloneCollectSubmit}>
               <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -6769,7 +6769,7 @@ export default function BookedVehicles({
 
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setActiveModal(null)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setViewState('list')}>Cancel</button>
                 <button type="submit" className="btn btn-success">Record Payment</button>
               </div>
             </form>
@@ -6895,50 +6895,42 @@ export default function BookedVehicles({
       {/* ====================================================================
          DELETE CONFIRMATION MODAL
          ==================================================================== */}
-      {showDeleteConfirm && bookingToDelete && (
-        <div className="modal-overlay" style={{ zIndex: 9999 }}>
-          <div className="modal-container" style={{ maxWidth: '420px', background: '#fff', borderRadius: '12px', overflow: 'hidden' }}>
-            <div className="modal-header" style={{ background: '#ef4444', color: '#fff', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Trash2 size={18} />
-              <span style={{ fontWeight: 700, fontSize: '1rem' }}>Permanently Delete Booking</span>
+      {viewState === 'delete' && bookingToDelete && (
+        <div>
+          <div className="glass-panel animate-slide-up" style={{ maxWidth: '560px', margin: '0 auto', overflow: 'hidden', border: '1px solid rgba(239,68,68,0.3)' }}>
+            <div style={{ background: 'linear-gradient(135deg,#ef4444,#b91c1c)', color: '#fff', padding: '20px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button type="button" onClick={() => { setViewState('list'); setBookingToDelete(null); }} disabled={deleteInProgress} style={{ background: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#fff', fontSize: '1rem' }}>←</button>
+              <Trash2 size={20} />
+              <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>Permanently Delete Booking</span>
             </div>
-            <div className="modal-body" style={{ padding: '24px', color: '#1e293b' }}>
-              <p style={{ marginBottom: '12px', fontSize: '0.95rem' }}>
-                Are you sure you want to <strong>permanently delete</strong> this booking?
+            <div style={{ padding: '28px', color: 'var(--text-primary)' }}>
+              <p style={{ marginBottom: '16px', fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+                Are you sure you want to <strong style={{ color: '#ef4444' }}>permanently delete</strong> this booking? This action <strong>cannot be undone</strong>.
               </p>
-              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px' }}>
-                <div style={{ fontWeight: 700, color: '#dc2626', marginBottom: '4px' }}>
-                  {bookingToDelete.bookingId}
-                </div>
-                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
-                  Customer: <strong>{bookingToDelete.customerName}</strong>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
-                  Status: <strong>{bookingToDelete.status}</strong>
-                </div>
-                <div style={{ fontSize: '0.85rem', color: '#374151' }}>
-                  Vehicle: <strong>{bookingToDelete.vehicleDetails?.regNumber || bookingToDelete.vehicleId}</strong>
-                </div>
+              <div style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.25)', borderRadius: '10px', padding: '16px 20px', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <div style={{ fontWeight: 700, color: '#ef4444', fontSize: '1rem', marginBottom: '4px' }}>{bookingToDelete.bookingId}</div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Customer: <strong style={{ color: 'var(--text-primary)' }}>{bookingToDelete.customerName}</strong></div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--text-primary)' }}>{bookingToDelete.status}</strong></div>
+                <div style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>Vehicle: <strong style={{ color: 'var(--text-primary)' }}>{bookingToDelete.vehicleDetails?.regNumber || bookingToDelete.vehicleId}</strong></div>
               </div>
-              <p style={{ fontSize: '0.82rem', color: '#6b7280' }}>
-                ⚠️ This action cannot be undone. The booking will be removed from the database and the vehicle status will be reset to Active.
+              <p style={{ fontSize: '0.83rem', color: 'var(--text-muted)', padding: '10px 14px', background: 'rgba(255,255,255,0.03)', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                ⚠️ The booking will be removed from the database and the vehicle status will be reset to Active.
               </p>
             </div>
-            <div className="modal-footer" style={{ padding: '12px 20px', display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #e2e8f0' }}>
+            <div style={{ padding: '16px 24px', display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid var(--border-light)' }}>
               <button
                 type="button"
                 className="btn btn-secondary"
-                onClick={() => { setShowDeleteConfirm(false); setBookingToDelete(null); }}
+                onClick={() => { setViewState('list'); setBookingToDelete(null); }}
                 disabled={deleteInProgress}
               >
                 Cancel
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
                 onClick={handleDeleteBooking}
                 disabled={deleteInProgress}
-                style={{ background: '#ef4444', borderColor: '#ef4444', color: '#fff' }}
+                style={{ background: '#ef4444', border: 'none', borderRadius: '8px', color: '#fff', padding: '8px 20px', fontWeight: 600, cursor: deleteInProgress ? 'not-allowed' : 'pointer', opacity: deleteInProgress ? 0.7 : 1 }}
               >
                 {deleteInProgress ? 'Deleting...' : 'Yes, Delete Permanently'}
               </button>

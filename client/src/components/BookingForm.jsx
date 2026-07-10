@@ -313,13 +313,13 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const [discountType, setDiscountType] = useState('₹'); // '₹' | '%'
 
   // Payment section collapsible
-  const [showPaymentSection, setShowPaymentSection] = useState(true);
+  const [showPaymentSection, setShowPaymentSection] = useState(false);
 
   // Section 7: Billing Summary Collapsible accordion
-  const [showBillingSummary, setShowBillingSummary] = useState(true);
+  const [showBillingSummary, setShowBillingSummary] = useState(false);
 
   // Section 8: Customer Documents Upload & Camera
-  const [showDocuments, setShowDocuments] = useState(true);
+  const [showDocuments, setShowDocuments] = useState(false);
   const [docAadhaarFront, setDocAadhaarFront] = useState('');
   const [docAadhaarBack, setDocAadhaarBack] = useState('');
   const [docLicense, setDocLicense] = useState('');

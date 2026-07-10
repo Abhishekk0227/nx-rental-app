@@ -11,9 +11,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
   const [showFilters, setShowFilters] = useState(true);
 
   // Modal State Controllers
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [avViewState, setAvViewState] = useState('list'); // 'list' | 'config' | 'history' | 'maintenance'
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
   // Details Config tabs & form state
@@ -321,7 +319,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       maintenanceRecords: v.maintenanceRecords || []
     });
     setActiveSubTab(1);
-    setShowEditModal(true);
+    setAvViewState('config');
   };
 
   const openHistoryModal = (v) => {
@@ -329,7 +327,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
     setHistorySearch('');
     setHistoryStatus('All');
     setHistoryDate('');
-    setShowHistoryModal(true);
+    setAvViewState('history');
   };
 
   const openAvailabilityModal = (v) => {
@@ -341,7 +339,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
         reason: v.availability?.reason || ''
       }
     }));
-    setShowAvailabilityModal(true);
+    setAvViewState('maintenance');
   };
 
   const handleEditSubmit = (e) => {
@@ -355,7 +353,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       type: formData.category
     };
     onUpdateVehicle(selectedVehicle.vehicleId, finalPayload);
-    setShowEditModal(false);
+    setAvViewState('list');
   };
 
   const handleAvailabilitySubmit = (e) => {
@@ -365,7 +363,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
     const mappedStatus = isAvail ? 'Active' : (reason || 'Maintenance');
 
     onToggleStatus(selectedVehicle.vehicleId, mappedStatus, reason);
-    setShowAvailabilityModal(false);
+    setAvViewState('list');
   };
 
   const handleNestedChange = (category, field, value) => {
@@ -398,7 +396,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
 
   return (
     <div className="animate-slide-up">
-
+      {avViewState === 'list' && (<>
       {/* PAGE HEADER */}
       <div className="fo-page-header">
         <div>
@@ -661,15 +659,17 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
         </div>
       </div>
 
+      </>)}
+
       {/* ==========================================================================
-         POPUP MODAL 1: EDIT / CONFIG MODAL (📝)
+         VEHICLE CONFIGURATION — FULL PAGE
          ========================================================================== */}
-      {showEditModal && selectedVehicle && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '1000px', height: '80vh', display: 'flex', flexDirection: 'column', padding: 0 }}>
-            <div className="modal-header" style={{ padding: '16px 24px', borderBottom: '1px solid var(--border-light)' }}>
-              <h2>Vehicle Configuration ({selectedVehicle.vehicleId})</h2>
-              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowEditModal(false)}><X size={16}/></button>
+      {avViewState === 'config' && selectedVehicle && (
+        <div>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', display: 'flex', flexDirection: 'column', minHeight: '75vh', padding: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 24px', borderBottom: '1px solid var(--border-light)' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+              <div><h2 style={{ margin: 0 }}>Vehicle Configuration</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{selectedVehicle.vehicleId} · {selectedVehicle.name}</span></div>
             </div>
 
             <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
@@ -977,7 +977,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
                   </div>
 
                   <div className="modal-footer" style={{ borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
-                    <button type="button" className="btn btn-secondary" onClick={() => setShowEditModal(false)}>Cancel</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')}>Cancel</button>
                     <button type="submit" className="btn btn-primary">Save Changes</button>
                   </div>
                 </form>
@@ -990,7 +990,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       {/* ==========================================================================
          POPUP MODAL 2: VEHICLE HISTORY MODAL (👁️)
          ========================================================================== */}
-      {showHistoryModal && selectedVehicle && (() => {
+      {avViewState === 'history' && selectedVehicle && (() => {
         const matchedBookings = bookings.filter(b => b.vehicleId === selectedVehicle.vehicleId);
         const completed = matchedBookings.filter(b => b.status === 'Completed');
         const revenue = completed.reduce((sum, b) => sum + (b.settlement?.totalBill || b.baseFare || 0), 0);
@@ -1017,11 +1017,11 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
         });
 
         return (
-          <div className="modal-overlay">
-            <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '850px', maxHeight: '80vh' }}>
-              <div className="modal-header">
-                <h2>Booking Operations History</h2>
-                <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowHistoryModal(false)}><X size={16}/></button>
+          <div>
+            <div className="glass-panel animate-slide-up" style={{ width: '100%', padding: '28px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px', marginBottom: '20px' }}>
+                <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+                <div><h2 style={{ margin: 0 }}>Booking Operations History</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{selectedVehicle.name} ({selectedVehicle.vehicleId})</span></div>
               </div>
 
               <div className="modal-body" style={{ overflowY: 'auto' }}>
@@ -1092,7 +1092,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowHistoryModal(false)}>Close</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')}>← Back to Vehicles</button>
               </div>
             </div>
           </div>
@@ -1102,12 +1102,12 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       {/* ==========================================================================
          POPUP MODAL 3: AVAILABILITY / MAINTENANCE MODAL (🔧)
          ========================================================================== */}
-      {showAvailabilityModal && selectedVehicle && (
-        <div className="modal-overlay">
-          <div className="modal-content glass-panel" style={{ width: '90%', maxWidth: '400px' }}>
-            <div className="modal-header">
-              <h2>Set Availability / Maintenance</h2>
-              <button className="fo-btn-outline" style={{borderRadius:'50%',width:'32px',height:'32px',padding:0,display:'flex',alignItems:'center',justifyContent:'center'}} onClick={() => setShowAvailabilityModal(false)}><X size={16}/></button>
+      {avViewState === 'maintenance' && selectedVehicle && (
+        <div>
+          <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '28px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px', marginBottom: '20px' }}>
+              <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
+              <div><h2 style={{ margin: 0 }}>Availability / Maintenance</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{selectedVehicle.name} ({selectedVehicle.vehicleId})</span></div>
             </div>
             
             <form onSubmit={handleAvailabilitySubmit}>
@@ -1135,7 +1135,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowAvailabilityModal(false)}>Cancel</button>
+                <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')}>Cancel</button>
                 <button type="submit" className="btn btn-primary">Save Settings</button>
               </div>
             </form>

@@ -240,7 +240,7 @@ export default function BookedVehicles({
   const [deleteInProgress, setDeleteInProgress] = useState(false);
 
   // Starting Date Filters
-  const [startFilterType, setStartFilterType] = useState('All'); // 'All' | 'Today' | 'Yesterday' | 'Custom'
+  const [startFilterType, setStartFilterType] = useState('Today'); // 'All' | 'Today' | 'Yesterday' | 'Custom'
   const [startCustomMin, setStartCustomMin] = useState('');
   const [startCustomMax, setStartCustomMax] = useState('');
 
@@ -2629,12 +2629,12 @@ export default function BookedVehicles({
           if (Math.abs(sum - reqVal) > 0.01) {
             setDropCashReceived(reqVal);
             setDropOnlineReceived(0);
-            setDropPaymentMethod(isRefund ? 'Cash Refund' : 'Cash');
+            setDropPaymentMethod(isRefund ? '' : 'Cash');
           }
         } else {
           setDropCashReceived(reqVal);
           setDropOnlineReceived(0);
-          setDropPaymentMethod(isRefund ? 'Cash Refund' : 'Cash');
+          setDropPaymentMethod(isRefund ? '' : 'Cash');
         }
       } else {
         setDropCashReceived(0);
@@ -2661,6 +2661,11 @@ export default function BookedVehicles({
     const isRefund = calc.depositRefund > 0;
     const reqVal = isRefund ? calc.depositRefund : calc.remainingCollection;
 
+    // Validate refund mode is selected
+    if (isRefund && reqVal > 0 && !dropPaymentMethod) {
+      return alert('Please select a Refund Mode (Cash, UPI, or Card) before submitting.');
+    }
+
     // Mixed split details
     let mixedDetails = '';
     if (dropPaymentMethod === 'Mixed' || dropPaymentMethod === 'Mixed Refund') {
@@ -2685,7 +2690,7 @@ export default function BookedVehicles({
     const refundDetailsObj = isRefund ? {
       amount: reqVal,
       status: 'Completed',
-      method: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'UPI Refund' ? 'UPI' : 'Cash'),
+      method: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'UPI Refund' ? 'UPI' : dropPaymentMethod === 'Card Refund' ? 'Card' : 'Cash'),
       notes: dropPaymentMethod === 'Mixed Refund' ? mixedDetails : (dropRefundReason || 'Refund processed')
     } : {
       amount: 0,
@@ -5766,13 +5771,15 @@ export default function BookedVehicles({
                           <label>Refund Mode *</label>
                           <select
                             className="form-control"
-                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : 'Cash Refund'}
+                            value={['Cash Refund', 'UPI Refund', 'Card Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
+                            style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
                           >
+                            <option value="" disabled>-- Select Refund Mode --</option>
                             <option value="Cash Refund">Cash</option>
                             <option value="UPI Refund">UPI</option>
-                            <option value="Mixed Refund">Mixed</option>
+                            <option value="Card Refund">Card</option>
                           </select>
                         </div>
 

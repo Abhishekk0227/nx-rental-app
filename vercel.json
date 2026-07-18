@@ -6,11 +6,8 @@
       "use": "@vercel/node"
     },
     {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "src": "client/dist/index.html",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -23,16 +20,20 @@
       "dest": "server/index.js"
     },
     {
-      "src": "^/$",
-      "dest": "server/index.js"
+      "src": "/assets/(.*)",
+      "dest": "client/dist/assets/$1"
     },
     {
-      "src": "/(assets/.*|favicon.svg|icons.svg)",
-      "dest": "/client/$1"
+      "src": "/favicon.svg",
+      "dest": "client/dist/favicon.svg"
+    },
+    {
+      "src": "/icons.svg",
+      "dest": "client/dist/icons.svg"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/index.html"
+      "dest": "client/dist/index.html"
     }
   ],
   "env": {

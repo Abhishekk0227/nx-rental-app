@@ -10,7 +10,6 @@ client/.env
 
 # Build outputs
 dist/
-client/dist/
 
 # OS files
 .DS_Store

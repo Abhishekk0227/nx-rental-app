@@ -134,6 +134,23 @@ app.get('/api/db-status', (req, res) => {
   });
 });
 
+// ─── Root Route ───────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    name: 'NX Car Rental API',
+    status: 'running',
+    version: '1.0.0',
+    time: new Date().toISOString(),
+    endpoints: {
+      vehicles: '/api/vehicles',
+      bookings: '/api/bookings',
+      accounting: '/api/accounting',
+      health: '/health',
+      dbStatus: '/api/system/database-status'
+    }
+  });
+});
+
 // ─── 404 handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({ message: `Route ${req.method} ${req.path} not found` });

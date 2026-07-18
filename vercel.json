@@ -23,11 +23,12 @@
       "dest": "server/index.js"
     },
     {
-      "handle": "filesystem"
+      "src": "/(assets/.*|favicon.svg|icons.svg)",
+      "dest": "/client/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/client/index.html"
     }
   ],
   "env": {

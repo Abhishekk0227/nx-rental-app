@@ -3484,6 +3484,32 @@ export default function BookedVehicles({
                       <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Email</span>
                     </div>
                   </div>
+
+                  {/* Father Name — show only if provided */}
+                  {(selectedBooking.customer?.fatherName || selectedBooking.fatherName) && (
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '1.5rem', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><User size={24} color="#94a3b8" /></span>
+                      <div>
+                        <strong style={{ color: '#0f172a', fontSize: '0.95rem', display: 'block' }}>
+                          {selectedBooking.customer?.fatherName || selectedBooking.fatherName}
+                        </strong>
+                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Father's Name</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Alternate Phone — show only if provided */}
+                  {(selectedBooking.customer?.alternatePhone || selectedBooking.altPhoneNumber) && (
+                    <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '1.5rem', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Phone size={24} color="#94a3b8" /></span>
+                      <div>
+                        <strong style={{ color: '#0f172a', fontSize: '0.95rem', display: 'block' }}>
+                          {selectedBooking.customer?.alternatePhone || selectedBooking.altPhoneNumber}
+                        </strong>
+                        <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Alternate Phone</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -4796,8 +4822,26 @@ export default function BookedVehicles({
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Customer Name</span>
-                      <strong style={{ color: 'var(--text-primary)' }}>{selectedBooking.customerName || 'N/A'}</strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>{selectedBooking.customer?.name || selectedBooking.customerName || selectedBooking.customer?.fullName || 'N/A'}</strong>
                     </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>Phone</span>
+                      <strong style={{ color: 'var(--text-primary)' }}>{selectedBooking.customer?.phone || selectedBooking.customerPhone || 'N/A'}</strong>
+                    </div>
+                    {/* Father Name — only if provided */}
+                    {(selectedBooking.customer?.fatherName || selectedBooking.fatherName) && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Father's Name</span>
+                        <strong style={{ color: 'var(--text-primary)' }}>{selectedBooking.customer?.fatherName || selectedBooking.fatherName}</strong>
+                      </div>
+                    )}
+                    {/* Alternate Phone — only if provided */}
+                    {(selectedBooking.customer?.alternatePhone || selectedBooking.altPhoneNumber) && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
+                        <span style={{ color: 'var(--text-secondary)' }}>Alternate Phone</span>
+                        <strong style={{ color: 'var(--text-primary)' }}>{selectedBooking.customer?.alternatePhone || selectedBooking.altPhoneNumber}</strong>
+                      </div>
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Active Vehicle</span>
                       <strong style={{ color: 'var(--text-primary)' }}>{activeVehicle?.name} ({activeVehicle?.regNumber})</strong>
@@ -5686,10 +5730,10 @@ export default function BookedVehicles({
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
                           >
-                            <option value="Cash">Cash</option>
-                            <option value="UPI">UPI</option>
-                            <option value="Card">Card</option>
-                            <option value="Mixed">Mixed</option>
+                            <option value="" disabled>-- Select Refund Mode --</option>
+                            <option value="Cash Refund">Cash</option>
+                            <option value="UPI Refund">UPI</option>
+                            <option value="Card Refund">Card</option>
                           </select>
                         </div>
 

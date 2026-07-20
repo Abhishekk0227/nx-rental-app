@@ -538,8 +538,12 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
                     {/* Column 1: VEHICLE (Icon, Name, Number, fuel label) */}
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '36px', height: '36px', borderRadius: '8px', background: '#f1f5f9' }}>
-                          {category === 'Car' ? <Car size={20} color="#6366f1"/> : <Bike size={20} color="#6366f1"/>}
+                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '42px', borderRadius: '8px', background: '#f1f5f9', overflow: 'hidden', flexShrink: 0 }}>
+                          {v.images?.front ? (
+                            <img src={v.images.front} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                          ) : (
+                            category === 'Car' ? <Car size={20} color="#6366f1"/> : <Bike size={20} color="#6366f1"/>
+                          )}
                         </span>
                         <div>
                           <strong style={{ color: '#1e293b', display: 'block' }}>{v.name}</strong>

@@ -1,5 +1,6 @@
 import express from 'express';
 import Vehicle from '../models/Vehicle.js';
+import User from '../models/User.js';
 import { isDbConnected, getVehicles, addVehicle, updateVehicle } from '../memoryDb.js';
 
 const router = express.Router();
@@ -8,7 +9,9 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     if (isDbConnected()) {
-      const vehicles = await Vehicle.find().sort({ createdAt: -1 });
+      const filter = {};
+      if (req.query.zoneId) filter.zoneId = req.query.zoneId;
+      const vehicles = await Vehicle.find(filter).sort({ createdAt: -1 });
       res.json(vehicles);
     } else {
       res.json(getVehicles().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -41,7 +44,15 @@ router.post('/', async (req, res) => {
     if (isDbConnected()) {
       // Force status compatibilities if needed
       const payload = { ...req.body };
-      if (!payload.assignedWorker && payload.assignedWorker !== '') {
+      if (payload.zoneId) {
+        // Auto-assign to the first worker in this zone
+        const worker = await User.findOne({ role: 'worker', zoneId: payload.zoneId });
+        if (worker) {
+          payload.assignedWorker = worker.name; // Can be updated to ObjectId if frontend supports it later
+        } else {
+          payload.assignedWorker = 'Unassigned';
+        }
+      } else if (!payload.assignedWorker && payload.assignedWorker !== '') {
         payload.assignedWorker = 'Unassigned';
       }
       const vehicle = new Vehicle(payload);
@@ -81,6 +92,16 @@ router.put('/:vehicleId', async (req, res) => {
           vehicle[key] = body[key];
         }
       });
+
+      // Auto-assign worker if zoneId changed or is present in body
+      if (body.zoneId) {
+        const worker = await User.findOne({ role: 'worker', zoneId: body.zoneId });
+        if (worker) {
+          vehicle.assignedWorker = worker.name;
+        } else {
+          vehicle.assignedWorker = 'Unassigned';
+        }
+      }
 
       const updatedVehicle = await vehicle.save();
       res.json(updatedVehicle);

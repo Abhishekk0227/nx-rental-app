@@ -9,10 +9,9 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
     { id: 'vehicles', label: 'Vehicle management', icon: <Car size={20} />, adminOnly: true },    
     { id: 'available', label: 'Available vehicle', icon: <Users size={20} /> },
     { id: 'bookings', label: ' Booked vehicle', icon: <Calendar size={20} /> },
-    // { id: 'fleet', label: 'Fleet Tracking', icon: <Crosshair size={20}/>, disabled: true },
     { id: 'hisab', label: 'Daily Hisab', icon: <DollarSign size={20} /> },
-    // { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20}/>, disabled: true },
-    // { id: 'maintenance', label: 'Maintenance', icon: <Wrench size={20}/>, disabled: true },
+    { id: 'admin/zones', label: 'Zone Management', icon: <Crosshair size={20}/>, adminOnly: true },
+    { id: 'admin/workers', label: 'Worker Management', icon: <Wrench size={20}/>, adminOnly: true },
   ];
 
   const handleNavClick = (item) => {
@@ -74,14 +73,25 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
         </div>
 
         {/* User Footer */}
-        <div className="fo-sidebar-footer">
-          <div className="fo-user-avatar">
-            <User size={18} color="white" strokeWidth={2} />
+        <div className="fo-sidebar-footer" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="fo-user-avatar">
+              <User size={18} color="white" strokeWidth={2} />
+            </div>
+            <div className="fo-user-info">
+              <span className="fo-user-name">{isAdmin ? 'Admin User' : 'Worker'}</span>
+              <span className="fo-user-role">Fleet Manager</span>
+            </div>
           </div>
-          <div className="fo-user-info">
-            <span className="fo-user-name">{isAdmin ? 'Admin User' : 'Worker'}</span>
-            <span className="fo-user-role">Fleet Manager</span>
-          </div>
+          <button 
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = '/login';
+            }} 
+            style={{ width: '100%', padding: '8px', background: '#fee2e2', color: '#b91c1c', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}
+          >
+            Logout
+          </button>
         </div>
       </aside>
     </>

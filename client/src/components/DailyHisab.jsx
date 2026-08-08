@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock } from 'lucide-react';
+import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock, Clock } from 'lucide-react';
 
 // Embedded high-fidelity styles to match your design guidelines
 const rawStyles = `
@@ -700,7 +700,8 @@ export default function DailyHisab({
   userRole, 
   currentWorker, 
   vehicles, 
-  bookings, 
+  bookings,
+  zones = [],
   onRecordDeposit 
 }) {
   const isAdmin = userRole === 'admin';
@@ -1659,7 +1660,7 @@ export default function DailyHisab({
     const vehicle = vehicles.find(v => v.vehicleId === b.vehicleId);
 
     // Zone Filter
-    const zone = vehicle?.locationDetails?.currentZone || vehicle?.location || b.pickupLocation || 'Vijay Nagar';
+    const zone = zones.find(z => z._id === b.zoneId)?.name || zones.find(z => z._id === vehicle?.zoneId)?.name || 'Unassigned';
     if (selectedZone !== 'All Zones' && zone !== selectedZone) return false;
 
     // Category Filter
@@ -1793,10 +1794,9 @@ export default function DailyHisab({
           {/* Zone filter */}
           <select className="hisab-select" value={selectedZone} onChange={e => setSelectedZone(e.target.value)}>
             <option value="All Zones">All Zones</option>
-            <option value="Vijay Nagar">Vijay Nagar</option>
-            <option value="Bhawarkua">Bhawarkua</option>
-            <option value="Rajendra Nagar">Rajendra Nagar</option>
-            <option value="Palasia">Palasia</option>
+            {zones.map(z => (
+              <option key={z._id || z.name} value={z.name}>{z.name}</option>
+            ))}
           </select>
 
           {/* Vehicle Category filter */}
@@ -1847,7 +1847,7 @@ export default function DailyHisab({
         {filteredBookings.map(b => {
           const vehicle = vehicles.find(v => v.vehicleId === b.vehicleId);
           const category = vehicle?.category || b.vehicleDetails?.category || vehicle?.type || 'Car';
-          const zone = vehicle?.locationDetails?.currentZone || vehicle?.location || b.pickupLocation || 'Vijay Nagar';
+          const zone = zones.find(z => z._id === b.zoneId)?.name || zones.find(z => z._id === vehicle?.zoneId)?.name || 'Unassigned';
           const fuel = vehicle?.fuelType || 'Petrol';
 
           const isNewBooking = safeDateStr(b.createdAt) === dateFilter;
@@ -2014,6 +2014,22 @@ export default function DailyHisab({
                       <span className="hisab-pill fuel">{fuel}</span>
                       <span className="hisab-pill location" style={{display:'inline-flex',alignItems:'center',gap:'3px'}}><MapPin size={10}/>{zone}</span>
                       <span className={`hisab-pill status-${b.status.toLowerCase()}`}>{b.status}</span>
+                      {(() => {
+                        const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
+                        const endT = b.actualReturnDate || b.rentalPeriod?.actualReturnDate;
+                        if (!startT) return null;
+                        const formatTime = (iso) => {
+                          const dt = new Date(iso);
+                          if (isNaN(dt)) return '';
+                          return dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        };
+                        const startStr = formatTime(startT);
+                        if (!startStr) return null;
+                        const tStr = (b.status === 'Completed' && endT) 
+                          ? `${startStr} - ${formatTime(endT)}`
+                          : startStr;
+                        return <span className="hisab-pill time" style={{display:'inline-flex',alignItems:'center',gap:'3px', background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0'}}><Clock size={10}/>{tStr}</span>;
+                      })()}
                       {isNewBooking && <span className="hisab-pill new-badge">NEW</span>}
                       {isReturnBooking && <span className="hisab-pill returned-badge">RETURNED</span>}
                       {isOperationalCarryover && (

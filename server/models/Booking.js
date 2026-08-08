@@ -5,6 +5,14 @@ const bookingSchema = new mongoose.Schema({
     type: String,
     unique: true
   },
+  zoneId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Zone'
+  },
+  workerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
 
   // ─── Customer ──────────────────────────────────────────────────────────────
   customer: {

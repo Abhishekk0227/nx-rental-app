@@ -4,6 +4,7 @@ import { RefreshCw, AlertTriangle, Clock, Calendar, CheckCircle, Search, Sliders
 export default function BookedVehicles({
   bookings,
   vehicles,
+  zones = [],
   userRole,
   currentWorker,
   onPickup,
@@ -324,7 +325,7 @@ export default function BookedVehicles({
   // 6. Return / Drop-off 16-SECTION screen state
   const [dropReturnDate, setDropReturnDate] = useState('');
   const [dropBranch, setDropBranch] = useState('Vijay Nagar Branch');
-  const [dropZone, setDropZone] = useState('Vijay Nagar');
+  const [dropZone, setDropZone] = useState('');
   const [dropParkingLocation, setDropParkingLocation] = useState('Slot B-3');
   const [dropEndMeter, setDropEndMeter] = useState('');
 
@@ -728,7 +729,7 @@ export default function BookedVehicles({
     }
 
     // 3. Zone Filter
-    const bZone = b.pickupLocation || b.locationDetails?.currentZone || 'Vijay Nagar';
+    const bZone = zones.find(z => z._id === b.zoneId)?.name || '';
     if (zoneFilter !== 'All' && bZone.toLowerCase() !== zoneFilter.toLowerCase()) return false;
 
     // 4. Starting Date Filter
@@ -762,8 +763,8 @@ export default function BookedVehicles({
     return true;
   });
 
-  // Unique Zones list
-  const uniqueZones = Array.from(new Set(bookings.map(b => b.pickupLocation || b.locationDetails?.currentZone || 'Vijay Nagar')));
+  // Use passed zones prop if available, otherwise fallback to unique zones from bookings
+  const uniqueZones = zones.length > 0 ? zones.map(z => z.name) : Array.from(new Set(bookings.map(b => zones.find(z => z._id === b.zoneId)?.name || 'Unassigned')));
 
   // Sorting
   const sortedBookings = [...filteredBookings].sort((a, b) => {
@@ -1007,8 +1008,8 @@ export default function BookedVehicles({
 
     // Set 16-sections defaults
     setDropReturnDate(formatLocalISO(new Date()));
-    setDropBranch('Vijay Nagar Branch');
-    setDropZone(booking.dropLocation || 'Vijay Nagar');
+    setDropBranch('');
+    setDropZone(booking.zoneId || (zones.length > 0 ? zones[0]._id : ''));
     setDropParkingLocation('Slot B-3');
 
     setDropEndMeter('');
@@ -2064,7 +2065,7 @@ export default function BookedVehicles({
       revisions: updatedRevisions
     };
 
-    if (isAdmin || backendActive) {
+    if (true) {
       try {
         const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${selectedBooking.bookingId}/payment`, {
           method: 'POST',
@@ -3121,7 +3122,7 @@ export default function BookedVehicles({
                             </span>
                             <span style={{ color: 'var(--text-muted)' }}>•</span>
                             <span style={{ fontSize: '0.78rem', color: '#f87171', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                              <MapPin size={11} /> {b.pickupLocation || 'Vijay Nagar'}
+                              <MapPin size={11} /> {zones.find(z => z._id === b.zoneId)?.name || 'Unassigned'}
                             </span>
                           </div>
 
@@ -3623,7 +3624,7 @@ export default function BookedVehicles({
                     <MapPin size={20} color="#10b981" />
                     <div>
                       <strong style={{ color: '#0f172a', fontSize: '0.9rem', display: 'block' }}>Pickup Location</strong>
-                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{selectedBooking.pickupLocation || 'Bhawarkua'}</div>
+                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{zones.find(z => z._id === selectedBooking.zoneId)?.name || 'Unassigned'}</div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Center Pickup</div>
                     </div>
                   </div>
@@ -3631,7 +3632,7 @@ export default function BookedVehicles({
                     <MapPin size={20} color="#dc2626" />
                     <div>
                       <strong style={{ color: '#0f172a', fontSize: '0.9rem', display: 'block' }}>Drop Location</strong>
-                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{selectedBooking.dropLocation || 'Bhawarkua'}</div>
+                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{zones.find(z => z._id === selectedBooking.zoneId)?.name || 'Unassigned'}</div>
                       <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Center Drop</div>
                     </div>
                   </div>
@@ -3639,8 +3640,8 @@ export default function BookedVehicles({
                     <MapPin size={20} color="#3b82f6" />
                     <div>
                       <strong style={{ color: '#0f172a', fontSize: '0.9rem', display: 'block' }}>Zone</strong>
-                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{selectedBooking.pickupLocation || 'Bhawarkua'}</div>
-                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{selectedBooking.pickupLocation || 'Bhawarkua'} Zone</div>
+                      <div style={{ color: '#334155', fontSize: '0.85rem', fontWeight: '500' }}>{zones.find(z => z._id === selectedBooking.zoneId)?.name || 'Unassigned'}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{zones.find(z => z._id === selectedBooking.zoneId)?.name || 'Unassigned'} Zone</div>
                     </div>
                   </div>
                 </div>
@@ -6339,7 +6340,7 @@ export default function BookedVehicles({
                         const rate = v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 500;
                         return (
                           <option key={v.vehicleId} value={v.vehicleId}>
-                            {v.name} ({v.regNumber}) - ₹{rate}/day - Zone: {v.locationDetails?.currentZone || 'Vijay Nagar'}
+                            {v.name} ({v.regNumber}) - ₹{rate}/day - Zone: {zones.find(z => z._id === v.zoneId)?.name || 'Unassigned'}
                           </option>
                         );
                       })}

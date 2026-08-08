@@ -51,7 +51,9 @@ function isVehicleAvailable(vehicle) {
 router.get('/', async (req, res) => {
   try {
     if (isDbConnected()) {
-      const bookings = await Booking.find().sort({ createdAt: -1 });
+      const filter = {};
+      if (req.query.zoneId) filter.zoneId = req.query.zoneId;
+      const bookings = await Booking.find(filter).sort({ createdAt: -1 });
       return res.json(bookings);
     }
     res.json(getBookings().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));

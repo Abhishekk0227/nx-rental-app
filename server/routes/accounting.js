@@ -78,7 +78,7 @@ router.get('/', async (req, res) => {
 
   try {
     const allBookings = isDbConnected()
-      ? await Booking.find()
+      ? await Booking.find(req.query.zoneId ? { zoneId: req.query.zoneId } : {})
       : getBookings();
 
     const targetDate = date || new Date().toISOString().slice(0, 10);
@@ -298,7 +298,7 @@ router.post('/settle', async (req, res) => {
   }
 
   try {
-    const allBookings = isDbConnected() ? await Booking.find() : getBookings();
+    const allBookings = isDbConnected() ? await Booking.find(req.query.zoneId ? { zoneId: req.query.zoneId } : {}) : getBookings();
 
     // Calculate total cash this worker collected on this date
     // Use workerId stored directly on each payment entry (reliable — no fuzzy timestamp matching)

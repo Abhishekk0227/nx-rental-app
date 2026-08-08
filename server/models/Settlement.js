@@ -5,8 +5,14 @@ const settlementSchema = new mongoose.Schema({
     type: String, // YYYY-MM-DD format
     required: true
   },
+  zoneId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Zone',
+    required: true
+  },
   workerId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   cashCollected: {

@@ -24,8 +24,16 @@ export const addVehicle = (v) => {
     .map(item => parseInt(item.vehicleId?.split('-')[1] || '0', 10))
     .filter(n => !isNaN(n));
   const nextNum = existingNums.length > 0 ? Math.max(...existingNums) + 1 : 1;
+  
+  let assignedWorker = v.assignedWorker || 'Unassigned';
+  if (v.zoneId) {
+    const worker = users.find(u => u.role === 'worker' && u.zoneId === v.zoneId);
+    if (worker) assignedWorker = worker.name;
+  }
+
   const newV = {
     ...v,
+    assignedWorker,
     vehicleId: `VEH-${String(nextNum).padStart(5, '0')}`,
     createdAt: new Date()
   };
@@ -36,7 +44,18 @@ export const addVehicle = (v) => {
 export const updateVehicle = (id, data) => {
   const idx = vehicles.findIndex(v => v.vehicleId === id);
   if (idx === -1) return null;
-  vehicles[idx] = { ...vehicles[idx], ...data };
+
+  let assignedWorker = data.assignedWorker !== undefined ? data.assignedWorker : vehicles[idx].assignedWorker;
+  if (data.zoneId && data.zoneId !== vehicles[idx].zoneId) {
+    const worker = users.find(u => u.role === 'worker' && u.zoneId === data.zoneId);
+    if (worker) {
+      assignedWorker = worker.name;
+    } else {
+      assignedWorker = 'Unassigned';
+    }
+  }
+
+  vehicles[idx] = { ...vehicles[idx], ...data, assignedWorker };
   return vehicles[idx];
 };
 
@@ -103,4 +122,55 @@ export const addSettlement = (s) => {
   };
   settlements.push(newS);
   return newS;
+};
+
+// ─── Zone CRUD ────────────────────────────────────────────────────────────────
+export let zones = [
+  { _id: 'z1', name: 'Vijay Nagar', branchName: 'HQ', address: 'Vijay Nagar', city: 'Indore', state: 'MP', status: 'Active' },
+  { _id: 'z2', name: 'Bhawarkuan', branchName: 'South Branch', address: 'Bhawarkuan', city: 'Indore', state: 'MP', status: 'Active' }
+];
+
+export const getZones = () => zones;
+export const addZone = (z) => {
+  const newZ = { ...z, _id: `z${zones.length + 1}`, createdAt: new Date() };
+  zones.push(newZ);
+  return newZ;
+};
+export const updateZone = (id, data) => {
+  const idx = zones.findIndex(z => z._id === id);
+  if (idx === -1) return null;
+  zones[idx] = { ...zones[idx], ...data };
+  return zones[idx];
+};
+export const deleteZone = (id) => {
+  const idx = zones.findIndex(z => z._id === id);
+  if (idx === -1) return false;
+  zones.splice(idx, 1);
+  return true;
+};
+
+// ─── User CRUD ────────────────────────────────────────────────────────────────
+export let users = [
+  { _id: 'u1', name: 'Admin User', username: 'admin', role: 'admin', status: 'Active' },
+  { _id: 'u2', name: 'Ramesh Kumar', username: '9876543210', role: 'worker', status: 'Active', zoneId: 'z1' },
+  { _id: 'u3', name: 'Suresh Singh', username: '9123456789', role: 'worker', status: 'Active', zoneId: 'z2' }
+];
+
+export const getUsers = () => users;
+export const addUser = (u) => {
+  const newU = { ...u, _id: `u${users.length + 1}`, createdAt: new Date() };
+  users.push(newU);
+  return newU;
+};
+export const updateUser = (id, data) => {
+  const idx = users.findIndex(u => u._id === id);
+  if (idx === -1) return null;
+  users[idx] = { ...users[idx], ...data };
+  return users[idx];
+};
+export const deleteUser = (id) => {
+  const idx = users.findIndex(u => u._id === id);
+  if (idx === -1) return false;
+  users.splice(idx, 1);
+  return true;
 };

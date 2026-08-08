@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, Car, Bike, Calendar, Eye, Pencil, Wrench, X, Camera, Upload, MapPin, Fuel, Gauge, Users, ChevronDown } from 'lucide-react';
 
-export default function AvailableVehicles({ vehicles, bookings = [], onBookVehicle, onUpdateVehicle, onToggleStatus }) {
+export default function AvailableVehicles({ vehicles, bookings = [], zones = [], userRole = 'worker', onBookVehicle, onUpdateVehicle, onToggleStatus }) {
   // Search & Filters State
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedZone, setSelectedZone] = useState('All');
@@ -40,7 +40,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
     depositSettings: { requireDeposit: true, amount: 1000 },
     paymentSettings: { advanceRequired: false, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
-    locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Main Branch', parkingLocation: '', gps: { lat: 22.7196, lng: 75.8577 } },
+    zoneId: '',
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
     images: { front: '', back: '', left: '', right: '', interior: '', document: '', other: '' },
     availability: { availableForBooking: true, reason: '' },
@@ -167,7 +167,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       }
 
       // 2. Zone
-      const zone = v.locationDetails?.currentZone || v.location || 'Vijay Nagar';
+      const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
       if (selectedZone !== 'All' && zone !== selectedZone) return false;
 
       // 3. Status
@@ -288,15 +288,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
         bookingEnabled: v.bookingConfig?.bookingEnabled ?? true,
         instantBooking: v.bookingConfig?.instantBooking ?? true
       },
-      locationDetails: {
-        currentZone: v.locationDetails?.currentZone || v.location || 'Vijay Nagar',
-        currentBranch: v.locationDetails?.currentBranch || 'Main Branch',
-        parkingLocation: v.locationDetails?.parkingLocation || '',
-        gps: {
-          lat: v.locationDetails?.gps?.lat ?? 22.7196,
-          lng: v.locationDetails?.gps?.lng ?? 75.8577
-        }
-      },
+      zoneId: v.zoneId || (zones.length > 0 ? zones[0]._id : ''),
       documents: {
         rcUrl: v.documents?.rcUrl || '',
         insuranceUrl: v.documents?.insuranceUrl || '',
@@ -349,7 +341,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
       perDayRate: formData.pricingPlans.twentyFourHour.baseRate,
       perHourRate: formData.pricingPlans.hourly.rate,
       securityDeposit: formData.depositSettings.amount,
-      location: formData.locationDetails.currentZone,
+      zoneId: formData.zoneId,
       type: formData.category
     };
     onUpdateVehicle(selectedVehicle.vehicleId, finalPayload);
@@ -470,10 +462,9 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
             <div>
               <select className="form-control" value={selectedZone} onChange={e => setSelectedZone(e.target.value)}>
                 <option value="All">All Zones</option>
-                <option value="Vijay Nagar">Vijay Nagar</option>
-                <option value="Bhawarkua">Bhawarkua</option>
-                <option value="Rajendra Nagar">Rajendra Nagar</option>
-                <option value="Palasia">Palasia</option>
+                {zones.map(z => (
+                  <option key={z._id} value={z.name}>{z.name}</option>
+                ))}
               </select>
             </div>
             <div>
@@ -524,9 +515,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
             </thead>
             <tbody>
               {filteredVehicles.map(v => {
-                const zone = v.locationDetails?.currentZone || v.location || 'Vijay Nagar';
-                const branch = v.locationDetails?.currentBranch || 'Main Branch';
-                const slot = v.locationDetails?.parkingLocation || 'Slot A';
+                const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
                 const category = v.category || v.type || 'Car';
                 const rate24h = v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0;
                 const rate12h = v.pricingPlans?.twelveHour?.baseRate || 500;
@@ -540,7 +529,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '42px', borderRadius: '8px', background: '#f1f5f9', overflow: 'hidden', flexShrink: 0 }}>
                           {v.images?.front ? (
-                            <img src={v.images.front} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
+                            <img src={v.images.front?.replace(/\s+/g, '')} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
                           ) : (
                             category === 'Car' ? <Car size={20} color="#6366f1"/> : <Bike size={20} color="#6366f1"/>
                           )}
@@ -642,10 +631,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
                     <td>
                       <div>
                         <strong style={{ color: '#1e293b', display: 'block', fontSize: '0.85rem' }}>{zone}</strong>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>{slot}</span>
-                        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {branch} Office, Indore MP
-                        </span>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Indore MP</span>
                       </div>
                     </td>
                   </tr>
@@ -769,11 +755,11 @@ export default function AvailableVehicles({ vehicles, bookings = [], onBookVehic
                           </div>
                           <div className="form-group">
                             <label>Operation Zone</label>
-                            <select className="form-control" value={formData.locationDetails.currentZone} onChange={e => handleNestedChange('locationDetails', 'currentZone', e.target.value)}>
-                              <option value="Vijay Nagar">Vijay Nagar</option>
-                              <option value="Bhawarkua">Bhawarkua</option>
-                              <option value="Rajendra Nagar">Rajendra Nagar</option>
-                              <option value="Palasia">Palasia</option>
+                            <select className="form-control" value={formData.zoneId} onChange={e => setFormData({ ...formData, zoneId: e.target.value })}>
+                              <option value="" disabled>Select Zone</option>
+                              {zones.map(z => (
+                                <option key={z._id} value={z._id}>{z.name}</option>
+                              ))}
                             </select>
                           </div>
                         </div>

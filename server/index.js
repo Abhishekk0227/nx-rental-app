@@ -10,6 +10,10 @@ import connectDB from './db.js';
 import vehicleRoutes from './routes/vehicles.js';
 import bookingRoutes from './routes/bookings.js';
 import accountingRoutes from './routes/accounting.js';
+import authRoutes from './routes/auth.js';
+import zoneRoutes from './routes/zones.js';
+import userRoutes from './routes/users.js';
+import { protect, isolateWorkerData } from './middleware/authMiddleware.js';
 
 dotenv.config();
 
@@ -94,9 +98,14 @@ app.use(async (req, res, next) => {
 });
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
-app.use('/api/vehicles', vehicleRoutes);
-app.use('/api/bookings', bookingRoutes);
-app.use('/api/accounting', accountingRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/zones', zoneRoutes);
+app.use('/api/users', userRoutes);
+
+// Protected routes with Worker Data Isolation
+app.use('/api/vehicles', protect, isolateWorkerData, vehicleRoutes);
+app.use('/api/bookings', protect, isolateWorkerData, bookingRoutes);
+app.use('/api/accounting', protect, isolateWorkerData, accountingRoutes);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

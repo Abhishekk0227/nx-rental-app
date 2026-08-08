@@ -6,6 +6,10 @@ const vehicleSchema = new mongoose.Schema({
     unique: true,
     sparse: true  // allows multiple documents without vehicleId during pre-save
   },
+  zoneId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Zone'
+  },
   name: {
     type: String,
     required: true
@@ -125,17 +129,6 @@ const vehicleSchema = new mongoose.Schema({
     status: { type: String, default: 'Active' },
     bookingEnabled: { type: Boolean, default: true },
     instantBooking: { type: Boolean, default: true }
-  },
-
-  // Location configuration
-  locationDetails: {
-    currentZone: { type: String, required: true }, // Vijay Nagar, Bhawarkua, Rajendra Nagar, Palasia
-    currentBranch: { type: String, default: 'Main Branch' },
-    parkingLocation: { type: String }, // e.g. Basement A-12
-    gps: {
-      lat: { type: Number },
-      lng: { type: Number }
-    }
   },
 
   // Documentation URLs

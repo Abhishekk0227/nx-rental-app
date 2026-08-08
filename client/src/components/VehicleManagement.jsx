@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, Plus, Car, Bike, Eye, Clock, ToggleLeft, ToggleRight, MapPin, Trash2, X, Pencil, Camera, Upload, AlertTriangle } from 'lucide-react';
 
-export default function VehicleManagement({ vehicles, bookings = [], onAddVehicle, onUpdateVehicle, onToggleStatus, autoOpenAdd, onAutoOpenConsumed }) {
+export default function VehicleManagement({ vehicles, bookings = [], zones = [], onAddVehicle, onUpdateVehicle, onToggleStatus, autoOpenAdd, onAutoOpenConsumed }) {
   // Search & Filter state variables
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('All Zones');
@@ -47,8 +47,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     category: 'Scooty',
     fuelType: 'Petrol',
     description: '',
-    zone: 'Vijay Nagar',
-    branch: 'Vijay Nagar Branch'
+    zoneId: ''
   });
 
   // Edit / Config Form state
@@ -76,7 +75,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     depositSettings: { requireDeposit: true, amount: 1000 },
     paymentSettings: { advanceRequired: false, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
     bookingConfig: { bufferTime: 30, minBookingHours: 0, status: 'Active', bookingEnabled: true, instantBooking: true },
-    locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Main Branch', parkingLocation: '', gps: { lat: 22.7196, lng: 75.8577 } },
+    zoneId: '',
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
     images: { front: '', back: '', left: '', right: '', interior: '', document: '', other: '' },
     availability: { availableForBooking: true, reason: '' },
@@ -199,7 +198,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       }
 
       // 2. Zone
-      const zone = v.locationDetails?.currentZone || v.location || 'Vijay Nagar';
+      const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
       if (selectedZone !== 'All Zones' && zone !== selectedZone) return false;
 
       // 3. Status
@@ -244,8 +243,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       category: 'Scooty',
       fuelType: 'Petrol',
       description: '',
-      zone: 'Vijay Nagar',
-      branch: 'Vijay Nagar Branch'
+      zoneId: ''
     });
     setShowAddModal(true);
   };
@@ -327,15 +325,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         bookingEnabled: v.bookingConfig?.bookingEnabled ?? true,
         instantBooking: v.bookingConfig?.instantBooking ?? true
       },
-      locationDetails: {
-        currentZone: v.locationDetails?.currentZone || v.location || 'Vijay Nagar',
-        currentBranch: v.locationDetails?.currentBranch || 'Main Branch',
-        parkingLocation: v.locationDetails?.parkingLocation || '',
-        gps: {
-          lat: v.locationDetails?.gps?.lat ?? 22.7196,
-          lng: v.locationDetails?.gps?.lng ?? 75.8577
-        }
-      },
+      zoneId: v.zoneId || '',
       documents: {
         rcUrl: v.documents?.rcUrl || '',
         insuranceUrl: v.documents?.insuranceUrl || '',
@@ -385,15 +375,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     setSelectedVehicle(v);
     setFormData(prev => ({
       ...prev,
-      locationDetails: {
-        currentZone: v.locationDetails?.currentZone || v.location || 'Vijay Nagar',
-        currentBranch: v.locationDetails?.currentBranch || 'Main Branch',
-        parkingLocation: v.locationDetails?.parkingLocation || '',
-        gps: {
-          lat: v.locationDetails?.gps?.lat ?? 22.7196,
-          lng: v.locationDetails?.gps?.lng ?? 75.8577
-        }
-      }
+      zoneId: v.zoneId || ''
     }));
     setShowLocationModal(true);
   };
@@ -428,12 +410,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       depositSettings: { requireDeposit: true, amount: 1000 },
       paymentSettings: { advanceRequired: false, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
       bookingConfig: { bufferTime: 30, minBookingHours: 0, status: 'Active', bookingEnabled: true, instantBooking: true },
-      locationDetails: {
-        currentZone: addFormData.zone,
-        currentBranch: addFormData.branch,
-        parkingLocation: '',
-        gps: { lat: 22.7196, lng: 75.8577 }
-      },
+      zoneId: addFormData.zoneId,
       documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
       images: { front: '', back: '', left: '', right: '', interior: '', document: '', other: '' },
       availability: { availableForBooking: true, reason: '' },
@@ -459,7 +436,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
       perDayRate: formData.pricingPlans.twentyFourHour.baseRate,
       perHourRate: formData.pricingPlans.hourly.rate,
       securityDeposit: formData.depositSettings.amount,
-      location: formData.locationDetails.currentZone,
+      zoneId: formData.zoneId,
       type: formData.category
     };
 
@@ -481,14 +458,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     e.preventDefault();
     const updatedPayload = {
       ...selectedVehicle,
-      locationDetails: {
-        ...selectedVehicle.locationDetails,
-        currentZone: formData.locationDetails.currentZone,
-        currentBranch: formData.locationDetails.currentBranch,
-        parkingLocation: formData.locationDetails.parkingLocation,
-        gps: formData.locationDetails.gps
-      },
-      location: formData.locationDetails.currentZone
+      zoneId: formData.zoneId
     };
     onUpdateVehicle(selectedVehicle.vehicleId, updatedPayload);
     setShowLocationModal(false);
@@ -610,7 +580,6 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
     (showEditModal && !!selectedVehicle) ||
     (showHistoryModal && !!selectedVehicle) ||
     (showAvailabilityModal && !!selectedVehicle) ||
-    (showLocationModal && !!selectedVehicle) ||
     (showDeleteModal && !!selectedVehicle);
 
   return (
@@ -655,10 +624,9 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
             <div>
               <select className="form-control" value={selectedZone} onChange={(e) => setSelectedZone(e.target.value)}>
                 <option value="All Zones">All Zones</option>
-                <option value="Vijay Nagar">Vijay Nagar</option>
-                <option value="Bhawarkua">Bhawarkua</option>
-                <option value="Rajendra Nagar">Rajendra Nagar</option>
-                <option value="Palasia">Palasia</option>
+                {zones.map(z => (
+                  <option key={z._id} value={z.name}>{z.name}</option>
+                ))}
               </select>
             </div>
 
@@ -701,38 +669,13 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
         {filteredVehicles.map(v => (
           <div key={v.vehicleId} className="vehicle-grid-card">
 
-            {/* Status Badges Floating Top-Left */}
-            <div style={{ position: 'absolute', top: '12px', left: '12px', display: 'flex', flexDirection: 'column', gap: '4px', zIndex: 10 }}>
-              <span className={`badge badge-${(v.status === 'Booked' ? 'ongoing' : (v.status || 'Active').toLowerCase())}`}>{v.status === 'Booked' ? 'Ongoing' : (v.status || 'Active')}</span>
-              {/* Stacked indicator if reservation is blocked */}
-              {v.availability?.availableForBooking === false && (
-                <span className="badge badge-maintenance" style={{ fontSize: '0.65rem' }}>Blocked</span>
-              )}
-            </div>
 
             {/* Circular Actions Floating Top-Right */}
             <div className="card-header-actions">
               <button className="circle-action-btn view" title="Details / Config" onClick={() => openEditModal(v)}><Eye size={14} /></button>
               <button className="circle-action-btn history" title="Rent History" onClick={() => openHistoryModal(v)}><Clock size={14} /></button>
 
-              {/* Availability toggle: green+left when available, red+right when not */}
-              {(() => {
-                const isAvail = v.status === 'Active' || v.status === 'Available';
-                return (
-                  <button
-                    className={`avail-toggle-btn ${isAvail ? 'is-available' : 'is-unavailable'}`}
-                    title="Booking Availability"
-                    onClick={() => openAvailabilityModal(v)}
-                  >
-                    <span className="avail-icon">
-                      {isAvail ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}
-                    </span>
-                    <span style={{ fontSize: '0.65rem', fontWeight: 700 }}>
-                      {isAvail ? 'Open' : v.status || 'Blocked'}
-                    </span>
-                  </button>
-                );
-              })()}
+
 
               <button className="circle-action-btn location" title="Coordinate Location" onClick={() => openLocationModal(v)}><MapPin size={14} /></button>
               <button className="circle-action-btn delete" title="Delete Fleet Item" onClick={() => openDeleteModal(v)}><Trash2 size={14} /></button>
@@ -741,7 +684,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
             {/* Vehicle Image View */}
             <div className="vehicle-card-image-wrapper">
               {v.images?.front ? (
-                <img src={v.images.front} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                <img src={v.images.front?.replace(/\s+/g, '')} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               ) : (
                 <div className="vehicle-card-image-placeholder">
                   {renderVehiclePlaceholder(v.category || v.type)}
@@ -758,7 +701,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   ₹{v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0}/day • ₹{v.pricingPlans?.hourly?.rate || v.perHourRate || 0}/hr
                 </div>
                 <div className="vehicle-card-info-zone">
-                  <MapPin size={12} style={{ marginRight: 2 }} /> {v.locationDetails?.currentZone || v.location || 'Vijay Nagar'}
+                  <MapPin size={12} style={{ marginRight: 2 }} /> {zones.find(z => z._id === v.zoneId)?.name || 'Unassigned'}
                 </div>
               </div>
             </div>
@@ -889,11 +832,11 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   <div className="av-field-grid">
                     <div className="av-field-wrap">
                       <label className="av-label">Operation Zone</label>
-                      <select className="av-input" value={addFormData.zone} onChange={e => setAddFormData({ ...addFormData, zone: e.target.value })}>
-                        <option value="Vijay Nagar">Vijay Nagar</option>
-                        <option value="Bhawarkua">Bhawarkua</option>
-                        <option value="Rajendra Nagar">Rajendra Nagar</option>
-                        <option value="Palasia">Palasia</option>
+                      <select className="av-input" value={addFormData.zoneId} onChange={e => setAddFormData({ ...addFormData, zoneId: e.target.value })}>
+                        <option value="" disabled>Select Zone</option>
+                        {zones.map(z => (
+                          <option key={z._id} value={z._id}>{z.name}</option>
+                        ))}
                       </select>
                     </div>
                     <div className="av-field-wrap">
@@ -1118,13 +1061,13 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                             <label>Operation Zone</label>
                             <select
                               className="form-control"
-                              value={formData.locationDetails.currentZone}
-                              onChange={e => handleNestedChange('locationDetails', 'currentZone', e.target.value)}
+                              value={formData.zoneId}
+                              onChange={e => setFormData({ ...formData, zoneId: e.target.value })}
                             >
-                              <option value="Vijay Nagar">Vijay Nagar</option>
-                              <option value="Bhawarkua">Bhawarkua</option>
-                              <option value="Rajendra Nagar">Rajendra Nagar</option>
-                              <option value="Palasia">Palasia</option>
+                              <option value="" disabled>Select Zone</option>
+                              {zones.map(z => (
+                                <option key={z._id} value={z._id}>{z.name}</option>
+                              ))}
                             </select>
                           </div>
                         </div>
@@ -1680,7 +1623,7 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                 <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '20px', paddingBottom: '16px', borderBottom: '1px solid var(--border-light)' }}>
                   <div style={{ width: '100px', height: '60px', borderRadius: '4px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     {selectedVehicle.images?.front ? (
-                      <img src={selectedVehicle.images.front} alt="front" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                      <img src={selectedVehicle.images.front?.replace(/\s+/g, '')} alt="front" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                     ) : (
                       renderVehiclePlaceholder(selectedVehicle.category)
                     )}
@@ -1879,13 +1822,13 @@ export default function VehicleManagement({ vehicles, bookings = [], onAddVehicl
                   <label>Current Zone</label>
                   <select
                     className="form-control"
-                    value={formData.locationDetails.currentZone}
-                    onChange={e => handleNestedChange('locationDetails', 'currentZone', e.target.value)}
+                    value={formData.zoneId}
+                    onChange={e => setFormData({ ...formData, zoneId: e.target.value })}
                   >
-                    <option value="Vijay Nagar">Vijay Nagar</option>
-                    <option value="Bhawarkua">Bhawarkua</option>
-                    <option value="Rajendra Nagar">Rajendra Nagar</option>
-                    <option value="Palasia">Palasia</option>
+                    <option value="" disabled>Select Zone</option>
+                    {zones.map(z => (
+                      <option key={z._id} value={z._id}>{z.name}</option>
+                    ))}
                   </select>
                 </div>
 

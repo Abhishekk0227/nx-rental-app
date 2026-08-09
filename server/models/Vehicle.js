@@ -157,11 +157,25 @@ const vehicleSchema = new mongoose.Schema({
   },
 
   // Maintenance and Service Logs
+  maintenanceIntervalKm: { type: Number, default: 5000 },
+  lastServiceKm: { type: Number, default: 0 },
+  nextServiceKm: { type: Number, default: 5000 },
   maintenanceRecords: [{
+    status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Completed' },
     serviceDate: { type: Date, default: Date.now },
+    serviceKm: { type: Number },
     cost: { type: Number, default: 0 },
+    vendor: { type: String },
+    issue: { type: String },
+    workDone: { type: String },
+    priority: { type: String, enum: ['Low', 'Medium', 'High'] },
     nextDue: { type: Date },
-    notes: { type: String }
+    nextServiceKm: { type: Number },
+    notes: { type: String },
+    createdBy: { type: String },
+    completedBy: { type: String },
+    createdAt: { type: Date, default: Date.now },
+    completedAt: { type: Date }
   }],
 
   // Employee actions audits
@@ -174,7 +188,19 @@ const vehicleSchema = new mongoose.Schema({
   assignedWorker: {
     type: String,
     default: 'Unassigned'
-  }
+  },
+  
+  // Zone change tracking
+  zoneChangeHistory: [{
+    previousZoneId: { type: mongoose.Schema.Types.ObjectId, ref: 'Zone' },
+    newZoneId: { type: mongoose.Schema.Types.ObjectId, ref: 'Zone' },
+    previousZoneName: { type: String },
+    newZoneName: { type: String },
+    previousWorker: { type: String },
+    newWorker: { type: String },
+    changedBy: { type: String },
+    timestamp: { type: Date, default: Date.now }
+  }]
 }, {
   timestamps: true
 });

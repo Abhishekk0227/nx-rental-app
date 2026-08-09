@@ -6,12 +6,13 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
 
   const mainNav = [
     { id: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
-    { id: 'vehicles', label: 'Vehicle management', icon: <Car size={20} />, adminOnly: true },    
+    { id: 'vehicles', label: 'Vehicle management', icon: <Car size={20} /> },    
     { id: 'available', label: 'Available vehicle', icon: <Users size={20} /> },
     { id: 'bookings', label: ' Booked vehicle', icon: <Calendar size={20} /> },
     { id: 'hisab', label: 'Daily Hisab', icon: <DollarSign size={20} /> },
     { id: 'admin/zones', label: 'Zone Management', icon: <Crosshair size={20}/>, adminOnly: true },
     { id: 'admin/workers', label: 'Worker Management', icon: <Wrench size={20}/>, adminOnly: true },
+    { id: 'admin/maintenance', label: 'Maintenance & Service', icon: <Wrench size={20}/>, adminOnly: true },
   ];
 
   const handleNavClick = (item) => {
@@ -38,7 +39,7 @@ export default function Sidebar({ currentTab, setCurrentTab, userRole, isOpen, o
             <LayoutDashboard size={20} color="white" strokeWidth={2.5} />
           </div>
           <div className="fo-logo-text">
-            <span className="fo-logo-title">NX Rental</span>
+            <span className="fo-logo-title">Ride Your Bike</span>
             <span className="fo-logo-subtitle">Enterprise Management</span>
           </div>
           {/* Close button – visible only on mobile */}

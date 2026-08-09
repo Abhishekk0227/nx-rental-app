@@ -258,9 +258,9 @@ router.post('/:bookingId/extend', async (req, res) => {
       ? Number(req.body.baseFare)
       : currentRentalCost + extensionCost;
 
-    const newRentalPaid = req.body.advancePaid !== undefined
-      ? Number(req.body.advancePaid)
-      : Number(booking.rentalPaid) || 0;
+    const newRentalPaid = req.body.rentalPaid !== undefined
+      ? Number(req.body.rentalPaid)
+      : (req.body.advancePaid !== undefined ? Number(req.body.advancePaid) : Number(booking.rentalPaid) || 0);
 
     const newDepositHeld = req.body.securityDeposit !== undefined
       ? Number(req.body.securityDeposit)
@@ -299,8 +299,8 @@ router.post('/:bookingId/extend', async (req, res) => {
       ...(paymentCollection?.mode && { paymentMode: paymentCollection.mode }),
       settlement: {
         ...(booking.settlement || {}),
-        totalBill: newRentalCost,
-        actualBill: newRentalCost,
+        totalBill: 0,
+        actualBill: 0,
         previousPaid: newRentalPaid,
         depositCollected: newDepositHeld,
         remainingToPay: outstandingRent

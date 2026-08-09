@@ -12,7 +12,8 @@ export default function BookedVehicles({
   onReplace,
   onDropOff,
   onCancelBooking,
-  onAdminOverride
+  onAdminOverride,
+  onDeleteBooking
 }) {
   const isAdmin = userRole === 'admin';
 
@@ -364,7 +365,7 @@ export default function BookedVehicles({
   const [dropRefundReason, setDropRefundReason] = useState('Returned safely in good condition');
 
   // Return payment collections
-  const [dropPaymentMethod, setDropPaymentMethod] = useState('Cash'); // 'Cash' | 'UPI' | 'Card' | 'Mixed'
+  const [dropPaymentMethod, setDropPaymentMethod] = useState(''); // '' | 'Cash' | 'UPI' | 'Card' | 'Mixed' | etc
   const [dropCashReceived, setDropCashReceived] = useState(0);
   const [dropOnlineReceived, setDropOnlineReceived] = useState(0);
   const [dropCollectTxnId, setDropCollectTxnId] = useState('');
@@ -1040,7 +1041,7 @@ export default function BookedVehicles({
     setDropRefundReason('Returned safely');
 
     // Collect Payment defaults
-    setDropPaymentMethod('Cash');
+    setDropPaymentMethod('');
     setDropCashReceived(0);
     setDropOnlineReceived(0);
     setDropCollectTxnId('');
@@ -1328,7 +1329,8 @@ export default function BookedVehicles({
         cashAmount: newCashDeposit,
         onlineAmount: newOnlineDeposit
       },
-      advancePaid: selectedBooking.advancePaid + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
+      advancePaid: (selectedBooking.rentalPaid !== undefined ? selectedBooking.rentalPaid : (selectedBooking.advancePaid || 0)) + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
+      rentalPaid: (selectedBooking.rentalPaid !== undefined ? selectedBooking.rentalPaid : (selectedBooking.advancePaid || 0)) + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
       additionalPayment: addPayment,
       durationDetails: {
         oldDuration: selectedBooking.durationHours || 0,
@@ -1385,7 +1387,8 @@ export default function BookedVehicles({
         cashAmount: newCashDeposit,
         onlineAmount: newOnlineDeposit
       },
-      advancePaid: selectedBooking.advancePaid + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
+      advancePaid: (selectedBooking.rentalPaid !== undefined ? selectedBooking.rentalPaid : (selectedBooking.advancePaid || 0)) + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
+      rentalPaid: (selectedBooking.rentalPaid !== undefined ? selectedBooking.rentalPaid : (selectedBooking.advancePaid || 0)) + (extensionCollectNow ? Number(extensionExtraCharges) : 0),
       paymentCollection: extensionCollectNow && extensionExtraCharges > 0 ? {
         mode: extensionPaymentMode,
         amount: Number(extensionExtraCharges),
@@ -1516,8 +1519,8 @@ export default function BookedVehicles({
         advancePaid: newAdvancePaid,
         paymentCollection: finalPayments,
         settlement: {
-          totalBill: newTotal,
-          actualBill: newTotal,
+          totalBill: 0,
+          actualBill: 0,
           previousPaid: newAdvancePaid,
           depositCollected: comp.newDeposit,
           depositRefund: 0,
@@ -1892,8 +1895,8 @@ export default function BookedVehicles({
       // Sync variables inside settlement to prevent pre-save hooks override
       settlement: {
         ...selectedBooking.settlement,
-        totalBill: Number(editBaseFare) + (Number(editHelmetsCount) * 50),
-        actualBill: Number(editBaseFare) + (Number(editHelmetsCount) * 50),
+        totalBill: 0,
+        actualBill: 0,
         previousPaid: Number(editAdvancePaid),
         depositCollected: Number(editSecurityDeposit),
         remainingToPay: Math.max(0, (Number(editBaseFare) + (Number(editHelmetsCount) * 50) - Number(editDiscountAmount)) - Number(editAdvancePaid))
@@ -2102,25 +2105,29 @@ export default function BookedVehicles({
   const handleDeleteBooking = async () => {
     if (!bookingToDelete) return;
     setDeleteInProgress(true);
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${bookingToDelete.bookingId}`,
-        { method: 'DELETE' }
-      );
-      if (res.ok) {
-        // Remove from local bookings array immediately so UI refreshes
+    if (onDeleteBooking) {
+      onDeleteBooking(bookingToDelete.bookingId);
+    } else {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${bookingToDelete.bookingId}`,
+          { method: 'DELETE' }
+        );
+        if (res.ok) {
+          // Remove from local bookings array immediately so UI refreshes
+          const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
+          if (idx !== -1) bookings.splice(idx, 1);
+          alert(`Booking ${bookingToDelete.bookingId} permanently deleted.`);
+        } else {
+          const err = await res.json();
+          alert(`Failed to delete: ${err.message || 'Server error'}`);
+        }
+      } catch (e) {
+        // Offline fallback — remove from local array
         const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
         if (idx !== -1) bookings.splice(idx, 1);
-        alert(`Booking ${bookingToDelete.bookingId} permanently deleted.`);
-      } else {
-        const err = await res.json();
-        alert(`Failed to delete: ${err.message || 'Server error'}`);
+        alert(`Booking ${bookingToDelete.bookingId} removed (offline mode).`);
       }
-    } catch (e) {
-      // Offline fallback — remove from local array
-      const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
-      if (idx !== -1) bookings.splice(idx, 1);
-      alert(`Booking ${bookingToDelete.bookingId} removed (offline mode).`);
     }
     setDeleteInProgress(false);
     setViewState('list');
@@ -2144,14 +2151,35 @@ export default function BookedVehicles({
   // PRINT DETAILS HTML GENERATOR
   const triggerPrintDetails = (booking) => {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
-    const flow = getCardFlow(booking);
-
+    
     const resolvedVObj = vehicles.find(v => v.vehicleId === booking.vehicleId);
     const resolvedV = {
       name: resolvedVObj?.name || booking.vehicleName || 'Unknown Vehicle',
       regNumber: resolvedVObj?.regNumber || booking.vehicleRegNumber || '',
       category: resolvedVObj?.category || booking.vehicleDetails?.category || 'Bike'
     };
+
+    const snapshot = getBookingFinancialSnapshot(booking);
+    
+    const startPickup = new Date(
+      booking.pickupDetails?.actualTime ||
+      booking.rentalPeriod?.actualPickupDate ||
+      booking.pickupDate ||
+      booking.rentalPeriod?.startDate || new Date()
+    ).toLocaleString();
+
+    const endDrop = booking.dropDetails?.actualTime ? new Date(booking.dropDetails.actualTime).toLocaleString() : 'Not Dropped Off';
+    
+    const extensionsHTML = (booking.extensions && booking.extensions.length > 0) ? booking.extensions.map(ext => 
+      `<p style="margin:4px 0;"><strong>Extended:</strong> ${ext.extraHours || 0} hrs - ₹${ext.extraCharges || 0}</p>`
+    ).join('') : '<p style="margin:4px 0;">No extensions</p>';
+
+    const dropDetailsHTML = booking.dropDetails ? `
+      <p style="margin:4px 0;"><strong>Damage Charges:</strong> ₹${booking.dropDetails.damageCharges || 0}</p>
+      <p style="margin:4px 0;"><strong>Cleaning Charges:</strong> ₹${booking.dropDetails.cleaningCharges || 0}</p>
+      <p style="margin:4px 0;"><strong>Late/Extra Hours:</strong> ₹${booking.dropDetails.lateCharges || 0}</p>
+      <p style="margin:4px 0;"><strong>Other Charges:</strong> ₹${booking.dropDetails.otherCharges || 0}</p>
+    ` : '<p style="margin:4px 0;">No drop-off charges</p>';
 
     printWindow.document.write(`
       <html>
@@ -2162,19 +2190,20 @@ export default function BookedVehicles({
             .header { display: flex; justify-content: space-between; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
             .section { margin-bottom: 20px; }
             .section-title { font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; color: #555; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
             table { width: 100%; border-collapse: collapse; margin-top: 10px; }
             th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
             th { background-color: #f2f2f2; }
             .total-box { margin-top: 20px; padding: 12px; background-color: #f9f9f9; border: 1px solid #e2e8f0; border-radius: 6px; text-align: right; font-size: 1.1rem; font-weight: bold; }
             .footer { margin-top: 40px; text-align: center; font-size: 0.8rem; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+            p { margin: 4px 0; }
           </style>
         </head>
         <body onload="window.print()">
           <div class="header">
             <div>
               <h2 style="margin: 0; color: #4f46e5;">NX Rental RENTALS</h2>
-              <span style="font-size: 0.85rem; color: #666;">Indore Branch Office</span>
+              <span style="font-size: 0.85rem; color: #666;">Branch Office</span>
             </div>
             <div style="text-align: right;">
               <h3 style="margin: 0;">INVOICE #${booking.bookingId}</h3>
@@ -2196,10 +2225,46 @@ export default function BookedVehicles({
               <p><strong>Plan Details:</strong> ${booking.selectedPlan?.planType || '24-Hour'}</p>
             </div>
           </div>
+          
+          <div class="section grid">
+            <div>
+              <div class="section-title">Journey Details</div>
+              <p><strong>Pickup:</strong> ${startPickup}</p>
+              <p><strong>Return:</strong> ${endDrop}</p>
+              <p><strong>Start KM:</strong> ${booking.pickupDetails?.odometerStart || booking.handover?.startMeter || 'N/A'}</p>
+              <p><strong>End KM:</strong> ${booking.dropDetails?.endMeter || 'N/A'}</p>
+            </div>
+            <div>
+              <div class="section-title">Extensions Log</div>
+              ${extensionsHTML}
+            </div>
+          </div>
+
+          <div class="section grid">
+            <div>
+              <div class="section-title">Extra Drop-off Charges</div>
+              ${dropDetailsHTML}
+            </div>
+            <div>
+              <div class="section-title">Financial Settlement</div>
+              <p><strong>Base Fare:</strong> ₹${snapshot.originalBaseFare || 0}</p>
+              <p><strong>Extensions Total:</strong> ₹${snapshot.extTotal || 0}</p>
+              <p><strong>Add-ons Total:</strong> ₹${snapshot.addonsTotal || 0}</p>
+              <p><strong>Discount:</strong> -₹${snapshot.discount || 0}</p>
+              <p><strong>Total Rental Cost:</strong> ₹${snapshot.rentalCost || 0}</p>
+              <p><strong>Advance Paid:</strong> -₹${snapshot.rentalPaid || 0}</p>
+              <p><strong>Security Deposit Held:</strong> ₹${snapshot.depositHeld || 0}</p>
+            </div>
+          </div>
+          
+          <div class="total-box">
+             Final Settlement Status: 
+             ${booking.status === 'Completed' ? `₹${booking.settlement?.finalCollection || booking.settlement?.depositReturned || 0} ${booking.settlement?.depositReturned > 0 ? '(Refunded)' : '(Collected)'}` : '(Pending Drop-off)'}
+          </div>
 
           <div class="footer">
-            <p>Thank you for choosing NX Rental Rentals. For help, contact +91 98765 43210.</p>
-            <p>Authorized Handover Operator: ${booking.workerId || 'Ramesh Kumar'}</p>
+            <p>Thank you for choosing NX Rental. For help, contact support.</p>
+            <p>Authorized Handover Operator: ${booking.workerId || 'System'}</p>
           </div>
         </body>
       </html>
@@ -2630,12 +2695,12 @@ export default function BookedVehicles({
           if (Math.abs(sum - reqVal) > 0.01) {
             setDropCashReceived(reqVal);
             setDropOnlineReceived(0);
-            setDropPaymentMethod(isRefund ? '' : 'Cash');
+            setDropPaymentMethod('');
           }
         } else {
           setDropCashReceived(reqVal);
           setDropOnlineReceived(0);
-          setDropPaymentMethod(isRefund ? '' : 'Cash');
+          setDropPaymentMethod('');
         }
       } else {
         setDropCashReceived(0);
@@ -2662,9 +2727,12 @@ export default function BookedVehicles({
     const isRefund = calc.depositRefund > 0;
     const reqVal = isRefund ? calc.depositRefund : calc.remainingCollection;
 
-    // Validate refund mode is selected
+    // Validate payment/refund mode is selected
     if (isRefund && reqVal > 0 && !dropPaymentMethod) {
-      return alert('Please select a Refund Mode (Cash, UPI, or Card) before submitting.');
+      return alert('Please select a Refund Mode (Cash, UPI, Card, Mixed) before submitting.');
+    }
+    if (!isRefund && reqVal > 0 && !dropPaymentMethod) {
+      return alert('Please select a Payment Mode (Cash, UPI, Card, Mixed) before submitting.');
     }
 
     // Mixed split details
@@ -4394,7 +4462,7 @@ export default function BookedVehicles({
                     const depositCollected = Number(selectedBooking.securityDeposit || 0);
                     const totalBookingValue = rentalCostTotal + depositCollected;
 
-                    const rentalPaid = selectedBooking.advancePaid || 0;
+                    const rentalPaid = (selectedBooking.rentalPaid !== undefined ? selectedBooking.rentalPaid : selectedBooking.advancePaid) || 0;
                     const totalPaidCollected = rentalPaid + depositCollected;
                     const pendingCollection = Math.max(0, totalBookingValue - totalPaidCollected);
 
@@ -4422,9 +4490,32 @@ export default function BookedVehicles({
                               <strong>₹{addonsTotal}</strong>
                             </div>
                             {extTotal > 0 && (
-                              <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0' }}>
-                                <span>Extensions:</span>
-                                <strong>₹{extTotal}</strong>
+                              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', margin: '8px 0', padding: '8px', background: 'rgba(255,255,255,0.5)', borderRadius: '6px', border: '1px solid #cbd5e1' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', color: '#0f172a', borderBottom: '1px solid #cbd5e1', paddingBottom: '4px', marginBottom: '4px' }}>
+                                  <span>Extensions ({selectedBooking.extensions?.length || 0}):</span>
+                                  <strong>₹{extTotal}</strong>
+                                </div>
+                                {selectedBooking.extensions?.map((ext, idx) => {
+                                  const extRev = selectedBooking.revisions?.find(r => r.actionType === 'Extend' && new Date(r.timestamp).getTime() >= new Date(ext.timestamp).getTime() - 5000 && new Date(r.timestamp).getTime() <= new Date(ext.timestamp).getTime() + 5000);
+                                  const paidForExt = extRev?.collectionDetails?.amount || extRev?.overrides?.additionalPayment?.amount || 0;
+                                  const durationDiff = extRev?.durationDetails?.difference || 0;
+                                  return (
+                                    <div key={idx} style={{ display: 'flex', flexDirection: 'column', fontSize: '0.75rem', paddingBottom: '6px', borderBottom: idx < (selectedBooking.extensions.length - 1) ? '1px dashed #cbd5e1' : 'none', marginBottom: idx < (selectedBooking.extensions.length - 1) ? '6px' : '0' }}>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#64748b' }}>Ext Date:</span> <span>{new Date(ext.timestamp || ext.newEndDateTime).toLocaleDateString()}</span>
+                                      </div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#64748b' }}>Duration:</span> <span>{durationDiff > 0 ? `+${durationDiff} Hrs` : 'N/A'}</span>
+                                      </div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#64748b' }}>Charge:</span> <strong>₹{ext.extraCharges || 0}</strong>
+                                      </div>
+                                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ color: '#64748b' }}>Paid upfront:</span> <strong style={{ color: '#16a34a' }}>₹{paidForExt}</strong>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             )}
                             {extra > 0 && (
@@ -5543,7 +5634,7 @@ export default function BookedVehicles({
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid var(--border-light)', paddingTop: '10px', fontSize: '1rem', marginTop: '4px' }}>
-                      <span style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>Actual Rental Bill</span>
+                      <span style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>{selectedBooking.status === 'Completed' ? 'Actual Rental Bill' : 'Estimated Rental Bill'}</span>
                       <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
                     </div>
                   </div>
@@ -5613,7 +5704,7 @@ export default function BookedVehicles({
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
-                      <span style={{ color: 'var(--text-secondary)' }}>Actual Rental Bill</span>
+                      <span style={{ color: 'var(--text-secondary)' }}>{selectedBooking.status === 'Completed' ? 'Actual Rental Bill' : 'Estimated Rental Bill'}</span>
                       <strong style={{ color: 'var(--text-primary)' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-maintenance)' }}>
@@ -5727,14 +5818,16 @@ export default function BookedVehicles({
                           <label>Payment Mode *</label>
                           <select
                             className="form-control"
-                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund'].includes(dropPaymentMethod) ? 'Cash' : dropPaymentMethod}
+                            value={['Cash', 'UPI', 'Card', 'Mixed'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
+                            style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
                           >
-                            <option value="" disabled>-- Select Refund Mode --</option>
-                            <option value="Cash Refund">Cash</option>
-                            <option value="UPI Refund">UPI</option>
-                            <option value="Card Refund">Card</option>
+                            <option value="" disabled>-- Select Payment Mode --</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Card">Card</option>
+                            <option value="Mixed">Mixed Split</option>
                           </select>
                         </div>
 
@@ -5816,7 +5909,7 @@ export default function BookedVehicles({
                           <label>Refund Mode *</label>
                           <select
                             className="form-control"
-                            value={['Cash Refund', 'UPI Refund', 'Card Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
+                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund', 'Card Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
                             style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
@@ -5825,6 +5918,7 @@ export default function BookedVehicles({
                             <option value="Cash Refund">Cash</option>
                             <option value="UPI Refund">UPI</option>
                             <option value="Card Refund">Card</option>
+                            <option value="Mixed Refund">Mixed Split</option>
                           </select>
                         </div>
 

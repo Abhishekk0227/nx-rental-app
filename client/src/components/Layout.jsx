@@ -26,7 +26,8 @@ export default function Layout({
     '/bookings': 'bookings',
     '/hisab': 'hisab',
     '/admin/zones': 'admin/zones',
-    '/admin/workers': 'admin/workers'
+    '/admin/workers': 'admin/workers',
+    '/admin/maintenance': 'admin/maintenance'
   };
   const activeTab = pathTabMap[location.pathname] || 'dashboard';
 

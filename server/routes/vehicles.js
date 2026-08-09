@@ -1,6 +1,7 @@
 import express from 'express';
 import Vehicle from '../models/Vehicle.js';
 import User from '../models/User.js';
+import Zone from '../models/Zone.js';
 import { isDbConnected, getVehicles, addVehicle, updateVehicle } from '../memoryDb.js';
 
 const router = express.Router();
@@ -78,6 +79,7 @@ router.put('/:vehicleId', async (req, res) => {
       // Deep merge: for nested objects (bookingConfig, pricingPlans, etc.)
       // use Object.assign so sibling keys are preserved, then markModified
       Object.keys(body).forEach(key => {
+        if (key === '_id' || key === '__v') return;
         if (
           body[key] !== null &&
           typeof body[key] === 'object' &&
@@ -93,14 +95,32 @@ router.put('/:vehicleId', async (req, res) => {
         }
       });
 
-      // Auto-assign worker if zoneId changed or is present in body
-      if (body.zoneId) {
+      // Auto-assign worker if zoneId changed
+      if (body.zoneId && vehicle.zoneId?.toString() !== body.zoneId.toString()) {
+        const oldZoneId = vehicle.zoneId;
+        const oldWorker = vehicle.assignedWorker;
+        
+        // Fetch new worker
         const worker = await User.findOne({ role: 'worker', zoneId: body.zoneId });
-        if (worker) {
-          vehicle.assignedWorker = worker.name;
-        } else {
-          vehicle.assignedWorker = 'Unassigned';
-        }
+        const newWorker = worker ? worker.name : 'Unassigned';
+        vehicle.assignedWorker = newWorker;
+
+        // Fetch zones for names
+        const oldZone = oldZoneId ? await Zone.findById(oldZoneId) : null;
+        const newZone = await Zone.findById(body.zoneId);
+
+        // Record history
+        if (!vehicle.zoneChangeHistory) vehicle.zoneChangeHistory = [];
+        vehicle.zoneChangeHistory.push({
+          previousZoneId: oldZoneId,
+          newZoneId: body.zoneId,
+          previousZoneName: oldZone?.name || 'Unknown',
+          newZoneName: newZone?.name || 'Unknown',
+          previousWorker: oldWorker,
+          newWorker: newWorker,
+          changedBy: req.user?.name || 'Admin',
+          timestamp: new Date()
+        });
       }
 
       const updatedVehicle = await vehicle.save();

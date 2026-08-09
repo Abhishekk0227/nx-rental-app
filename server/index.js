@@ -11,6 +11,8 @@ import vehicleRoutes from './routes/vehicles.js';
 import bookingRoutes from './routes/bookings.js';
 import accountingRoutes from './routes/accounting.js';
 import authRoutes from './routes/auth.js';
+
+import maintenanceRouter from './routes/maintenance.js';
 import zoneRoutes from './routes/zones.js';
 import userRoutes from './routes/users.js';
 import { protect, isolateWorkerData } from './middleware/authMiddleware.js';
@@ -100,6 +102,8 @@ app.use(async (req, res, next) => {
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 app.use('/api/zones', zoneRoutes);
+
+app.use('/api/maintenance', maintenanceRouter);
 app.use('/api/users', userRoutes);
 
 // Protected routes with Worker Data Isolation

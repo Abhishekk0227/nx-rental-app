@@ -29,9 +29,11 @@ export default function Header({ currentTab, userRole, setUserRole, currentWorke
           <HelpCircle size={20} color="#64748b" strokeWidth={2}/>
         </button>
 
-        <button className="fo-btn-outline fo-hide-mobile" onClick={() => window.print()}>
-          <Download size={16}/> Export
-        </button>
+        {userRole === 'admin' && (
+          <button className="fo-btn-outline fo-hide-mobile" onClick={() => window.print()}>
+            <Download size={16}/> Export
+          </button>
+        )}
 
         {/* Add Vehicle – only visible in admin mode */}
         {userRole === 'admin' && (
@@ -45,26 +47,7 @@ export default function Header({ currentTab, userRole, setUserRole, currentWorke
           </button>
         )}
 
-        {/* Worker mode indicator */}
-        {userRole === 'worker' && (
-          <>
-            <button
-              className="fo-btn-outline"
-              onClick={() => setUserRole('admin')}
-              title="Switch to Admin mode"
-            >
-              Switch to Admin
-            </button>
-            <select
-              className="fo-worker-select fo-hide-mobile"
-              value={currentWorker}
-              onChange={(e) => setCurrentWorker(e.target.value)}
-            >
-              <option value="Ramesh Kumar">Ramesh Kumar</option>
-              <option value="Suresh Singh">Suresh Singh</option>
-            </select>
-          </>
-        )}
+        {/* Worker mode indicator (removed switch and dropdown) */}
 
         {/* Role toggle for admin (subtle) */}
         {userRole === 'admin' && (

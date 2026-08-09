@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, SlidersHorizontal, Plus, Car, Bike, Eye, Clock, ToggleLeft, ToggleRight, MapPin, Trash2, X, Pencil, Camera, Upload, AlertTriangle } from 'lucide-react';
 
-export default function VehicleManagement({ vehicles, bookings = [], zones = [], onAddVehicle, onUpdateVehicle, onToggleStatus, autoOpenAdd, onAutoOpenConsumed }) {
+export default function VehicleManagement({ vehicles, bookings = [], zones = [], userRole, onAddVehicle, onUpdateVehicle, onToggleStatus, onDeleteVehicle, autoOpenAdd, onAutoOpenConsumed }) {
   // Search & Filter state variables
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedZone, setSelectedZone] = useState('All Zones');
@@ -23,7 +23,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
   const [showEditModal, setShowEditModal] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
-  const [showLocationModal, setShowLocationModal] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Selected vehicle object for modals
@@ -79,6 +79,9 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
     images: { front: '', back: '', left: '', right: '', interior: '', document: '', other: '' },
     availability: { availableForBooking: true, reason: '' },
+    maintenanceIntervalKm: 5000,
+    lastServiceKm: 0,
+    nextServiceKm: 5000,
     maintenanceRecords: []
   });
 
@@ -264,6 +267,9 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
       description: v.description || '',
       status: v.status || 'Active',
       assignedWorker: v.assignedWorker || 'Unassigned',
+      maintenanceIntervalKm: v.maintenanceIntervalKm || 5000,
+      lastServiceKm: v.lastServiceKm || 0,
+      nextServiceKm: v.nextServiceKm || 5000,
       pricingPlans: {
         hourly: {
           rate: v.pricingPlans?.hourly?.rate ?? v.perHourRate ?? 50,
@@ -371,14 +377,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
     setShowAvailabilityModal(true);
   };
 
-  const openLocationModal = (v) => {
-    setSelectedVehicle(v);
-    setFormData(prev => ({
-      ...prev,
-      zoneId: v.zoneId || ''
-    }));
-    setShowLocationModal(true);
-  };
+
 
   const openDeleteModal = (v) => {
     setSelectedVehicle(v);
@@ -419,6 +418,9 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
       meterReading: 0,
       fuelCapacity: addFormData.category === 'Car' ? 40 : 6,
       mileage: addFormData.category === 'Car' ? 18 : 45,
+      maintenanceIntervalKm: 5000,
+      lastServiceKm: 0,
+      nextServiceKm: 5000,
       maintenanceRecords: [],
       auditLogs: []
     };
@@ -454,14 +456,14 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
     setShowAvailabilityModal(false);
   };
 
-  const handleLocationSubmit = (e) => {
-    e.preventDefault();
+
+
+  const handleDirectZoneChange = (vehicle, newZoneId) => {
     const updatedPayload = {
-      ...selectedVehicle,
-      zoneId: formData.zoneId
+      ...vehicle,
+      zoneId: newZoneId
     };
-    onUpdateVehicle(selectedVehicle.vehicleId, updatedPayload);
-    setShowLocationModal(false);
+    onUpdateVehicle(vehicle.vehicleId, updatedPayload);
   };
 
   const handleDeleteSubmit = async (e) => {
@@ -470,20 +472,25 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
       return alert('Please type DELETE to confirm vehicle deletion.');
     }
 
-    try {
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/vehicles/${selectedVehicle.vehicleId}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        alert('Vehicle deleted successfully.');
+    if (onDeleteVehicle) {
+      onDeleteVehicle(selectedVehicle.vehicleId);
+      setShowDeleteModal(false);
+    } else {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/vehicles/${selectedVehicle.vehicleId}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          alert('Vehicle deleted successfully.');
+          window.location.reload();
+        } else {
+          alert('Failed to delete vehicle.');
+        }
+      } catch (err) {
+        console.warn("Offline simulation: Deleting vehicle locally.");
+        alert('Local Mode: Vehicle deleted from local memory array.');
         window.location.reload();
-      } else {
-        alert('Failed to delete vehicle.');
       }
-    } catch (err) {
-      console.warn("Offline simulation: Deleting vehicle locally.");
-      alert('Local Mode: Vehicle deleted from local memory array.');
-      window.location.reload();
     }
   };
 
@@ -677,7 +684,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
 
 
 
-              <button className="circle-action-btn location" title="Coordinate Location" onClick={() => openLocationModal(v)}><MapPin size={14} /></button>
+
               <button className="circle-action-btn delete" title="Delete Fleet Item" onClick={() => openDeleteModal(v)}><Trash2 size={14} /></button>
             </div>
 
@@ -700,9 +707,34 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                 <div className="vehicle-card-info-price">
                   ₹{v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0}/day • ₹{v.pricingPlans?.hourly?.rate || v.perHourRate || 0}/hr
                 </div>
-                <div className="vehicle-card-info-zone">
-                  <MapPin size={12} style={{ marginRight: 2 }} /> {zones.find(z => z._id === v.zoneId)?.name || 'Unassigned'}
-                </div>
+                {userRole === 'admin' ? (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Users size={12} style={{ marginRight: 2 }} /> {v.seats || 4} Seats
+                    <select 
+                      value={v.zoneId || ''} 
+                      onChange={(e) => handleDirectZoneChange(v, e.target.value)}
+                      style={{ 
+                        background: 'transparent', 
+                        border: 'none', 
+                        color: 'inherit', 
+                        fontSize: 'inherit',
+                        cursor: 'pointer',
+                        outline: 'none',
+                        padding: 0
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <option value="" style={{ color: '#000' }}>Unassigned</option>
+                      {zones.map(z => (
+                        <option key={z._id} value={z._id} style={{ color: '#000' }}>{z.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <span className="badge">
+                    {v.category}
+                  </span>
+                )}
               </div>
             </div>
 
@@ -832,7 +864,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                   <div className="av-field-grid">
                     <div className="av-field-wrap">
                       <label className="av-label">Operation Zone</label>
-                      <select className="av-input" value={addFormData.zoneId} onChange={e => setAddFormData({ ...addFormData, zoneId: e.target.value })}>
+                      <select className="av-input" value={addFormData.zoneId} onChange={e => setAddFormData({ ...addFormData, zoneId: e.target.value })} disabled={userRole === 'worker'}>
                         <option value="" disabled>Select Zone</option>
                         {zones.map(z => (
                           <option key={z._id} value={z._id}>{z.name}</option>
@@ -1058,11 +1090,49 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                           </div>
 
                           <div className="form-group">
+                            <label>Maintenance Interval (KM)</label>
+                            <input
+                              type="text" inputMode="numeric"
+                              className="form-control"
+                              value={formData.maintenanceIntervalKm}
+                              onChange={e => {
+                                const interval = Number(e.target.value) || 0;
+                                setFormData({ ...formData, maintenanceIntervalKm: interval, nextServiceKm: (formData.lastServiceKm || 0) + interval });
+                              }}
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label>Last Service (KM)</label>
+                            <input
+                              type="text" inputMode="numeric"
+                              className="form-control"
+                              value={formData.lastServiceKm}
+                              onChange={e => {
+                                const last = Number(e.target.value) || 0;
+                                setFormData({ ...formData, lastServiceKm: last, nextServiceKm: last + (formData.maintenanceIntervalKm || 0) });
+                              }}
+                            />
+                          </div>
+
+                          <div className="form-group">
+                            <label>Next Service (KM)</label>
+                            <input
+                              type="text" inputMode="numeric"
+                              className="form-control"
+                              value={formData.nextServiceKm}
+                              disabled
+                              style={{ background: '#334155' }}
+                            />
+                          </div>
+
+                          <div className="form-group">
                             <label>Operation Zone</label>
                             <select
                               className="form-control"
                               value={formData.zoneId}
                               onChange={e => setFormData({ ...formData, zoneId: e.target.value })}
+                              disabled={userRole === 'worker'}
                             >
                               <option value="" disabled>Select Zone</option>
                               {zones.map(z => (
@@ -1739,6 +1809,47 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
 
               </div>
 
+              {/* Zone Change History Table (Admin Only) */}
+              {userRole === 'admin' && (
+                <div className="modal-body" style={{ marginTop: '20px', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '20px' }}>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '16px' }}>Zone Change History</h3>
+                  <div className="table-responsive" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                    <table className="custom-table" style={{ fontSize: '0.85rem' }}>
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Previous Zone</th>
+                          <th>New Zone</th>
+                          <th>Previous Worker</th>
+                          <th>New Worker</th>
+                          <th>Changed By</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedVehicle.zoneChangeHistory && selectedVehicle.zoneChangeHistory.length > 0 ? (
+                          selectedVehicle.zoneChangeHistory.map((zh, idx) => (
+                            <tr key={idx}>
+                              <td>{new Date(zh.timestamp).toLocaleString()}</td>
+                              <td>{zh.previousZoneName || 'N/A'}</td>
+                              <td>{zh.newZoneName || 'N/A'}</td>
+                              <td>{zh.previousWorker || 'N/A'}</td>
+                              <td>{zh.newWorker || 'N/A'}</td>
+                              <td>{zh.changedBy || 'System'}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="6" style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
+                              No zone change history found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowHistoryModal(false)}>Close</button>
               </div>
@@ -1806,105 +1917,6 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
       )}
 
       {/* ==========================================================================
-         8. LOCATION MODAL (Dedicated Popup - 📍)
-         ========================================================================== */}
-      {showLocationModal && selectedVehicle && (
-        <div className="fullpage-form-wrap animate-slide-up">
-          <div className="modal-content glass-panel" style={{ width: '100%', maxWidth: '700px' }}>
-            <div className="modal-header">
-              <h2>Vehicle Coordinate Location</h2>
-              <button className="fo-btn-outline" style={{ borderRadius: '50%', width: '32px', height: '32px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowLocationModal(false)}><X size={16} /></button>
-            </div>
-
-            <form onSubmit={handleLocationSubmit}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label>Current Zone</label>
-                  <select
-                    className="form-control"
-                    value={formData.zoneId}
-                    onChange={e => setFormData({ ...formData, zoneId: e.target.value })}
-                  >
-                    <option value="" disabled>Select Zone</option>
-                    {zones.map(z => (
-                      <option key={z._id} value={z._id}>{z.name}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>Current Branch</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    value={formData.locationDetails.currentBranch}
-                    onChange={e => handleNestedChange('locationDetails', 'currentBranch', e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label>Parking Location</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="e.g. Basement A-12, Slot 34"
-                    value={formData.locationDetails.parkingLocation}
-                    onChange={e => handleNestedChange('locationDetails', 'parkingLocation', e.target.value)}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                  <div className="form-group">
-                    <label>GPS Latitude (Optional)</label>
-                    <input
-                      type="text" inputMode="numeric"
-                      step="any"
-                      className="form-control"
-                      value={formData.locationDetails.gps.lat}
-                      onChange={e => {
-                        const newLat = Number(e.target.value);
-                        setFormData(prev => ({
-                          ...prev,
-                          locationDetails: {
-                            ...prev.locationDetails,
-                            gps: { ...prev.locationDetails.gps, lat: newLat }
-                          }
-                        }));
-                      }}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>GPS Longitude (Optional)</label>
-                    <input
-                      type="text" inputMode="numeric"
-                      step="any"
-                      className="form-control"
-                      value={formData.locationDetails.gps.lng}
-                      onChange={e => {
-                        const newLng = Number(e.target.value);
-                        setFormData(prev => ({
-                          ...prev,
-                          locationDetails: {
-                            ...prev.locationDetails,
-                            gps: { ...prev.locationDetails.gps, lng: newLng }
-                          }
-                        }));
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowLocationModal(false)}>Cancel</button>
-                <button type="submit" className="btn btn-primary">Save Location</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
       {/* ==========================================================================
          9. DELETE MODAL (Dedicated Popup - 🗑️)
          ========================================================================== */}

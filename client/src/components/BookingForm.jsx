@@ -673,8 +673,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         firstAid: true
       },
       settlement: {
-        totalBill: rentalCostTotal,
-        actualBill: rentalCostTotal,
+        totalBill: 0,
+        actualBill: 0,
         previousPaid: bill.moneyReceived,
         depositCollected: depositCollected,
         depositRefund: 0,
@@ -747,6 +747,10 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           newVehicleReg: vehicle?.regNumber,
           newPricing: rentalCostTotal,
           newDeposit: depositCollected
+        },
+        depositDetails: {
+          mode: depositMethod,
+          difference: depositCollected
         }
       }],
 

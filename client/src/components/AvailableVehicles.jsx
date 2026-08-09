@@ -521,6 +521,11 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                 const rate12h = v.pricingPlans?.twelveHour?.baseRate || 500;
                 const ratePerHour = v.pricingPlans?.hourly?.rate || v.perHourRate || 0;
                 const isUsable = v.status === 'Active' || v.status === 'Available';
+                
+                const meter = v.meterReading || 0;
+                const nextService = v.nextServiceKm || 5000;
+                const isMaintenanceDue = meter >= nextService;
+                const isServiceDueSoon = !isMaintenanceDue && (nextService - meter <= 500);
 
                 return (
                   <tr key={v.vehicleId}>
@@ -556,6 +561,18 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                       ) : (
                         <span className={`badge badge-${v.status === 'Booked' ? 'ongoing' : v.status.toLowerCase()}`} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
                           {v.status === 'Booked' ? 'Ongoing' : v.status}
+                        </span>
+                      )}
+                      
+                      {/* Maintenance Alerts */}
+                      {isMaintenanceDue && (
+                        <span className="badge" style={{ display: 'block', marginTop: '6px', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', fontSize: '0.7rem', padding: '4px 8px' }}>
+                          🔴 Maintenance Due
+                        </span>
+                      )}
+                      {isServiceDueSoon && (
+                        <span className="badge" style={{ display: 'block', marginTop: '6px', background: '#ffedd5', color: '#c2410c', border: '1px solid #fed7aa', fontSize: '0.7rem', padding: '4px 8px' }}>
+                          🟠 Service Due Soon ({nextService - meter} KM)
                         </span>
                       )}
                     </td>

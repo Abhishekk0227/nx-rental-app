@@ -696,13 +696,13 @@ const rawStyles = `
   }
 `;
 
-export default function DailyHisab({ 
-  userRole, 
-  currentWorker, 
-  vehicles, 
+export default function DailyHisab({
+  userRole,
+  currentWorker,
+  vehicles,
   bookings,
   zones = [],
-  onRecordDeposit 
+  onRecordDeposit
 }) {
   const isAdmin = userRole === 'admin';
 
@@ -793,7 +793,7 @@ export default function DailyHisab({
       b.expectedReturnDate;
 
     const startDate = safeDateStr(startRaw);
-    const endDate   = safeDateStr(endRaw);
+    const endDate = safeDateStr(endRaw);
 
     if (!startDate) return false;
 
@@ -820,19 +820,19 @@ export default function DailyHisab({
     try {
       const d = new Date(dateVal);
       if (isNaN(d.getTime())) return '';
-      
+
       const day = d.getDate();
       const realMonthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       const month = realMonthNames[d.getMonth()];
       const year = d.getFullYear();
-      
+
       let hours = d.getHours();
       const minutes = d.getMinutes().toString().padStart(2, '0');
       const ampm = hours >= 12 ? 'pm' : 'am';
       hours = hours % 12;
       hours = hours ? hours : 12;
       const formattedHours = hours.toString().padStart(2, '0');
-      
+
       return `${day} ${month} ${year} ${formattedHours}:${minutes} ${ampm}`;
     } catch (err) {
       return '';
@@ -935,7 +935,7 @@ export default function DailyHisab({
       if (!hasWorkerActivity) return;
 
       totalBookings++;
-      let revenueContrib = b.settlement?.actualBill || b.settlement?.totalBill || b.baseFare || 0;
+      let revenueContrib = b.status === 'Completed' ? (b.settlement?.actualBill || b.settlement?.totalBill || b.baseFare || 0) : 0;
       totalRevenue += revenueContrib;
 
       // Loop through individual payments
@@ -1189,7 +1189,7 @@ export default function DailyHisab({
     b.revisions.forEach((rev, idx) => {
       const dateStr = formatDateTime(rev.timestamp);
       const op = rev.operator || 'System';
-      
+
       if (rev.actionType === 'CustomerDetailsUpdated') {
         logs.push(`[${dateStr}] Customer details updated by ${op}`);
       } else if (rev.actionType === 'BookingDetailsUpdated') {
@@ -1546,8 +1546,8 @@ export default function DailyHisab({
       todayPayments.length > 0 ||
       todayRevisions.length > 0 ||
       createdDateStr === dateFilter ||
-      pickupDateStr  === dateFilter ||
-      returnDateStr  === dateFilter ||
+      pickupDateStr === dateFilter ||
+      returnDateStr === dateFilter ||
       isRefundToday
     );
 
@@ -1689,7 +1689,7 @@ export default function DailyHisab({
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <button className="hisab-refresh-btn" title="Refresh Data" onClick={fetchHisabData} disabled={loading}>
-            <RefreshCw size={16}/>
+            <RefreshCw size={16} />
           </button>
         </div>
       </div>
@@ -1697,11 +1697,11 @@ export default function DailyHisab({
       {/* 2. SLICK NAVIGATION BAR */}
       <div className="hisab-date-picker-bar">
         <button className="hisab-date-btn" onClick={handlePrevDate}>&lt;</button>
-        
+
         <div className="hisab-date-input-wrapper">
-          <input 
-            type="date" 
-            className="hisab-date-input" 
+          <input
+            type="date"
+            className="hisab-date-input"
             value={dateFilter}
             onChange={(e) => { setDateFilter(e.target.value); setExpandedBookingId(null); }}
           />
@@ -1718,7 +1718,7 @@ export default function DailyHisab({
       <div className="hisab-kpi-grid">
         {/* TODAY'S BOOKINGS */}
         <div className="hisab-kpi-card bookings">
-          <span className="hisab-kpi-title" style={{display:'flex',alignItems:'center',gap:'4px'}}><Calendar size={13}/>Today's Bookings</span>
+          <span className="hisab-kpi-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Calendar size={13} />Today's Bookings</span>
           <span className="hisab-kpi-value">{bookingsCreatedCount}</span>
           <div className="hisab-kpi-desc">
             Bookings created on selected date
@@ -1727,7 +1727,7 @@ export default function DailyHisab({
 
         {/* TODAY'S COMPLETED */}
         <div className="hisab-kpi-card total-in">
-          <span className="hisab-kpi-title" style={{display:'flex',alignItems:'center',gap:'4px'}}><CheckCircle size={13}/>Today's Completed</span>
+          <span className="hisab-kpi-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><CheckCircle size={13} />Today's Completed</span>
           <span className="hisab-kpi-value">{returnsTodayCount}</span>
           <div className="hisab-kpi-desc">
             Bookings completed on selected date
@@ -1736,7 +1736,7 @@ export default function DailyHisab({
 
         {/* TODAY'S EARNINGS */}
         <div className="hisab-kpi-card collect">
-          <span className="hisab-kpi-title" style={{display:'flex',alignItems:'center',gap:'4px'}}><DollarSign size={13}/>Today's Earnings</span>
+          <span className="hisab-kpi-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><DollarSign size={13} />Today's Earnings</span>
           <span className="hisab-kpi-value">₹{Math.round(todayEarnings).toLocaleString()}</span>
           <div className="hisab-kpi-desc">
             Sum of completed Actual Rental Bills
@@ -1745,7 +1745,7 @@ export default function DailyHisab({
 
         {/* ONGOING BOOKINGS */}
         <div className="hisab-kpi-card ongoing">
-          <span className="hisab-kpi-title" style={{display:'flex',alignItems:'center',gap:'4px'}}><Zap size={13}/>Ongoing Bookings</span>
+          <span className="hisab-kpi-title" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Zap size={13} />Ongoing Bookings</span>
           <span className="hisab-kpi-value">{ongoingBookingsCount}</span>
           <div className="hisab-kpi-desc">
             Active ongoing bookings count
@@ -1755,7 +1755,7 @@ export default function DailyHisab({
 
       {/* Daily Activity Summary Row */}
       <div className="hisab-activity-summary-row">
-        <span className="hisab-activity-summary-title"><BarChart2 size={16} style={{marginRight: 4}}/>Daily Activity Summary ({workerFilter === 'All' ? 'All Workers' : workerFilter})</span>
+        <span className="hisab-activity-summary-title"><BarChart2 size={16} style={{ marginRight: 4 }} />Daily Activity Summary ({workerFilter === 'All' ? 'All Workers' : workerFilter})</span>
         <div className="hisab-activity-summary-stats">
           <div className="hisab-activity-stat-item">
             <span className="hisab-activity-stat-label">Extensions:</span>
@@ -1829,9 +1829,9 @@ export default function DailyHisab({
           </select>
 
           {/* Worker Filter (Admins only) */}
-          <select 
-            className="hisab-select" 
-            value={workerFilter} 
+          <select
+            className="hisab-select"
+            value={workerFilter}
             onChange={e => setWorkerFilter(e.target.value)}
             disabled={!isAdmin}
           >
@@ -1987,21 +1987,21 @@ export default function DailyHisab({
           // 5. Net Collection & Outstanding Due
           const netCollectionVal = rentalTotal + collectAmount - totalRefundAmt;
           const outstandingDue = b.outstandingRent || 0;
-          
+
           const isExpanded = expandedBookingId === b.bookingId;
 
           const totalPaidAllDays = (b.paymentCollection?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0) - (b.refundDetails?.status === 'Completed' ? (b.refundDetails?.amount || 0) : 0);
 
           return (
             <div key={b.bookingId} className="hisab-item-card">
-              
+
               {/* COLLAPSED/EXPANDED HEADER BLOCK */}
               <div className="hisab-item-header" onClick={() => setExpandedBookingId(isExpanded ? null : b.bookingId)}>
-                
+
                 {/* Left Side: Vehicle Info & Pills */}
                 <div className="hisab-item-left">
                   <div className="hisab-item-icon">
-                    {category === 'Car' ? <Car size={22} color="#6366f1"/> : <Bike size={22} color="#6366f1"/>}
+                    {category === 'Car' ? <Car size={22} color="#6366f1" /> : <Bike size={22} color="#6366f1" />}
                   </div>
                   <div className="hisab-item-info">
                     <div className="hisab-item-title-row">
@@ -2009,10 +2009,10 @@ export default function DailyHisab({
                       <span className="hisab-item-reg">{vehicle?.regNumber || b.vehicleRegNumber}</span>
                     </div>
                     <div className="hisab-item-pills">
-                      <span className="hisab-pill location" style={{display:'inline-flex',alignItems:'center',gap:'3px'}}><User size={10}/>{b.customer?.name || b.customerName}</span>
+                      <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><User size={10} />{b.customer?.name || b.customerName}</span>
                       <span className="hisab-pill plan">{b.selectedPlan?.planType || '24-Hour'}</span>
                       <span className="hisab-pill fuel">{fuel}</span>
-                      <span className="hisab-pill location" style={{display:'inline-flex',alignItems:'center',gap:'3px'}}><MapPin size={10}/>{zone}</span>
+                      <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={10} />{zone}</span>
                       <span className={`hisab-pill status-${b.status.toLowerCase()}`}>{b.status}</span>
                       {(() => {
                         const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
@@ -2025,10 +2025,10 @@ export default function DailyHisab({
                         };
                         const startStr = formatTime(startT);
                         if (!startStr) return null;
-                        const tStr = (b.status === 'Completed' && endT) 
+                        const tStr = (b.status === 'Completed' && endT)
                           ? `${startStr} - ${formatTime(endT)}`
                           : startStr;
-                        return <span className="hisab-pill time" style={{display:'inline-flex',alignItems:'center',gap:'3px', background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0'}}><Clock size={10}/>{tStr}</span>;
+                        return <span className="hisab-pill time" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', background: '#f8fafc', color: '#64748b', border: '1px solid #e2e8f0' }}><Clock size={10} />{tStr}</span>;
                       })()}
                       {isNewBooking && <span className="hisab-pill new-badge">NEW</span>}
                       {isReturnBooking && <span className="hisab-pill returned-badge">RETURNED</span>}
@@ -2106,9 +2106,9 @@ export default function DailyHisab({
 
                   {/* Column 4: Actual Rent Bill */}
                   <div className="hisab-item-right-col">
-                    <span className="hisab-item-right-label">Actual Rent Bill</span>
+                    <span className="hisab-item-right-label">{b.status === 'Completed' ? 'Actual Rent Bill' : 'Estimated Rent Bill'}</span>
                     <span className="hisab-item-right-val" style={{ color: '#0e0d0dff' }}>
-                      ₹{(b.settlement?.actualBill || b.settlement?.totalBill || b.baseFare || 0).toLocaleString()}
+                      ₹{b.status === 'Completed' ? (b.settlement?.actualBill || 0).toLocaleString() : '0'}
                     </span>
                   </div>
 
@@ -2139,13 +2139,13 @@ export default function DailyHisab({
                     {/* ─── CARRYOVER: VEHICLE ACTIVE ON THIS DATE PANEL ─── */}
                     {isOperationalCarryover && (() => {
                       const startRawCarry = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.rentalPeriod?.startDate;
-                      const endRawCarry   = b.actualReturnDate || b.rentalPeriod?.actualReturnDate || b.rentalPeriod?.expectedEndDate || b.expectedReturnDate;
+                      const endRawCarry = b.actualReturnDate || b.rentalPeriod?.actualReturnDate || b.rentalPeriod?.expectedEndDate || b.expectedReturnDate;
                       const daysActive = startRawCarry
                         ? Math.max(1, Math.ceil((new Date(dateFilter) - new Date(safeDateStr(startRawCarry))) / 86400000) + 1)
                         : '—';
-                      const currentBill   = b.rentalCost || b.baseFare || 0;
+                      const currentBill = b.rentalCost || b.baseFare || 0;
                       const rentalPaidAmt = b.rentalPaid || 0;
-                      const outstanding   = b.outstandingRent || 0;
+                      const outstanding = b.outstandingRent || 0;
 
                       return (
                         <div style={{
@@ -2272,7 +2272,7 @@ export default function DailyHisab({
                             {snap.originalPlan !== snap.currentPlan ? (
                               <>
                                 <span className="hisab-snapshot-old">{snap.originalPlan}</span>
-                                <span className="hisab-snapshot-arrow"><ArrowRight size={14}/></span>
+                                <span className="hisab-snapshot-arrow"><ArrowRight size={14} /></span>
                                 <span className="hisab-snapshot-new">{snap.currentPlan}</span>
                               </>
                             ) : (
@@ -2286,7 +2286,7 @@ export default function DailyHisab({
                             {snap.originalDuration !== snap.currentDuration ? (
                               <>
                                 <span className="hisab-snapshot-old">{snap.originalDuration} hrs</span>
-                                <span className="hisab-snapshot-arrow"><ArrowRight size={14}/></span>
+                                <span className="hisab-snapshot-arrow"><ArrowRight size={14} /></span>
                                 <span className="hisab-snapshot-new">{snap.currentDuration} hrs</span>
                               </>
                             ) : (
@@ -2300,7 +2300,7 @@ export default function DailyHisab({
                             {snap.originalDeposit !== snap.currentDeposit ? (
                               <>
                                 <span className="hisab-snapshot-old">₹{snap.originalDeposit}</span>
-                                <span className="hisab-snapshot-arrow"><ArrowRight size={14}/></span>
+                                <span className="hisab-snapshot-arrow"><ArrowRight size={14} /></span>
                                 <span className="hisab-snapshot-new">₹{snap.currentDeposit}</span>
                               </>
                             ) : (
@@ -2392,7 +2392,7 @@ export default function DailyHisab({
                             <span className="hisab-detail-label">Customer Phone</span>
                             <span className="hisab-detail-val">
                               <a href={`tel:${b.customer?.phone || b.customerPhone}`} style={{ color: '#2563eb', textDecoration: 'none' }}>
-                                <span style={{display:'inline-flex',alignItems:'center',gap:'4px'}}><Phone size={12}/>{b.customer?.phone || b.customerPhone}</span>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}><Phone size={12} />{b.customer?.phone || b.customerPhone}</span>
                               </a>
                             </span>
                           </div>
@@ -2447,7 +2447,7 @@ export default function DailyHisab({
                     {/* SECTION 3: THREE-COLUMN TIMELINES */}
                     <div style={{ marginBottom: '20px' }}>
                       <div className="hisab-timeline-three-col">
-                        
+
                         {/* COLUMN 1: ACTIVITY TIMELINE */}
                         <div>
                           <div className="hisab-subsec-title" style={{ marginBottom: '12px' }}>Activity Timeline</div>
@@ -2530,7 +2530,7 @@ export default function DailyHisab({
                     <div>
                       <div className="hisab-subsec-title">Daily Financial Activity ({formatDateDisplay(dateFilter)})</div>
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px' }}>
-                        
+
                         {/* Rental Collections Group */}
                         <div className="hisab-group-breakdown">
                           <div className="hisab-group-title">
@@ -2637,18 +2637,18 @@ export default function DailyHisab({
       </div>
 
       {/* Handover Deposit Recording panel (Admins only, if worker selected) */}
-      {workerFilter !== 'All' && (
+      {workerFilter !== 'All' && isAdmin && (
         <div className="glass-panel" style={{ background: '#1e293b', border: '1px solid #334155', borderRadius: '12px', padding: '20px' }}>
-          <h3 style={{ fontSize: '1.1rem', color: '#ffffff', marginBottom: '16px', display:'flex', alignItems:'center', gap:'8px' }}><DollarSign size={18}/> Record Worker Cash Handover</h3>
-          
+          <h3 style={{ fontSize: '1.1rem', color: '#000000ff', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}><DollarSign size={18} /> Record Worker Cash Handover</h3>
+
           <form onSubmit={handleDepositSubmit} style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'flex-end' }}>
             <div className="form-group" style={{ flex: '1 1 200px', marginBottom: 0 }}>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>
                 Handover Amount (₹)
               </label>
-              <input 
-                type="number" 
-                className="form-control" 
+              <input
+                type="number"
+                className="form-control"
                 placeholder="e.g. 500"
                 value={depositAmount}
                 onChange={(e) => setDepositAmount(e.target.value)}
@@ -2656,14 +2656,14 @@ export default function DailyHisab({
                 style={{ background: '#0f172a', borderColor: '#334155', color: '#ffffff' }}
               />
             </div>
-            
+
             <div className="form-group" style={{ flex: '2 1 300px', marginBottom: 0 }}>
               <label style={{ display: 'block', fontSize: '0.8rem', color: '#94a3b8', marginBottom: '6px' }}>
                 Handover Remarks
               </label>
-              <input 
-                type="text" 
-                className="form-control" 
+              <input
+                type="text"
+                className="form-control"
                 placeholder="e.g. Daily cash collection deposit"
                 value={depositRemarks}
                 onChange={(e) => setDepositRemarks(e.target.value)}
@@ -2671,15 +2671,9 @@ export default function DailyHisab({
               />
             </div>
 
-            {isAdmin ? (
               <button type="submit" className="btn btn-success" style={{ height: '38px', background: '#10b981', color: '#ffffff', fontWeight: 'bold' }}>
                 Record Handover
               </button>
-            ) : (
-              <div style={{ fontSize: '0.75rem', color: '#64748b', padding: '10px', background: '#0f172a', border: '1px dashed #334155', borderRadius: '6px', textAlign: 'center' }}>
-                <Lock size={13} style={{marginRight: 4}}/> Deposit logs restricted to Admins.
-              </div>
-            )}
           </form>
         </div>
       )}

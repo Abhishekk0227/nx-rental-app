@@ -201,6 +201,11 @@ h6 {
   animation: slideUp var(--transition-normal) forwards;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* --- Surface Panels (Replacing Heavy Glass) --- */
 .glass-panel,
 .glass-card {

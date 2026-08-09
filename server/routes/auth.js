@@ -54,8 +54,8 @@ router.post('/setup', async (req, res) => {
 
     const admin = await User.create({
       name: 'Super Admin',
-      username: 'admin',
-      password: 'password123', // Force user to change in production
+      username: 'Rideyourbike@gmail.com',
+      password: 'ryb@0001',
       role: 'admin'
     });
 

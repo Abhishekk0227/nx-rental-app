@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { X, Edit2, UserCheck, Shield, MapPin, Plus, Lock, Smartphone } from 'lucide-react';
+import { X, Edit2, UserCheck, Shield, MapPin, Plus, Lock, Mail } from 'lucide-react';
 
 export default function WorkerManagement() {
   const [workers, setWorkers] = useState([]);
@@ -157,7 +157,7 @@ export default function WorkerManagement() {
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid #f1f5f9', paddingTop: '16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
-                    <Smartphone size={16} />
+                    <Mail size={16} />
                     {w.username}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#64748b', fontSize: '0.9rem' }}>
@@ -201,12 +201,12 @@ export default function WorkerManagement() {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Mobile Number (Username for Login)</label>
+                  <label>Email (Login ID)</label>
                   <input 
-                    type="text" 
+                    type="email" 
                     name="username" 
                     className="form-control" 
-                    placeholder="e.g. 9876543210" 
+                    placeholder="e.g. worker1@gmail.com" 
                     value={formData.username}
                     onChange={handleChange}
                     required 

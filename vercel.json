@@ -6,8 +6,11 @@
       "use": "@vercel/node"
     },
     {
-      "src": "client/dist/index.html",
-      "use": "@vercel/static"
+      "src": "client/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "rewrites": [
@@ -16,27 +19,8 @@
       "destination": "/server/index.js"
     },
     {
-      "source": "/health",
-      "destination": "/server/index.js"
-    },
-    {
-      "source": "/assets/(.*)",
-      "destination": "/client/dist/assets/$1"
-    },
-    {
-      "source": "/favicon.svg",
-      "destination": "/client/dist/favicon.svg"
-    },
-    {
-      "source": "/icons.svg",
-      "destination": "/client/dist/icons.svg"
-    },
-    {
       "source": "/(.*)",
       "destination": "/client/dist/index.html"
     }
-  ],
-  "env": {
-    "VERCEL": "1"
-  }
+  ]
 }

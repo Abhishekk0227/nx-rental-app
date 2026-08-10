@@ -2013,7 +2013,7 @@ export default function DailyHisab({
                       <span className="hisab-pill plan">{b.selectedPlan?.planType || '24-Hour'}</span>
                       <span className="hisab-pill fuel">{fuel}</span>
                       <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={10} />{zone}</span>
-                      <span className={`hisab-pill status-${b.status.toLowerCase()}`}>{b.status}</span>
+                      <span className={`hisab-pill status-${(b.status || '').toLowerCase()}`}>{b.status}</span>
                       {(() => {
                         const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
                         const endT = b.actualReturnDate || b.rentalPeriod?.actualReturnDate;

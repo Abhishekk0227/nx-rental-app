@@ -703,11 +703,11 @@ export default function BookedVehicles({
 
   const filteredBookings = bookings.filter(b => {
     // 1. Search text
-    const custName = b.customerName || b.customer?.name || '';
-    const bId = b.bookingId || '';
-    const vName = b.vehicleName || b.vehicleDetails?.name || '';
-    const vReg = b.vehicleRegNumber || b.vehicleDetails?.regNumber || '';
-    const phone = b.customerPhone || b.customer?.phone || '';
+    const custName = String(b.customerName || b.customer?.name || '');
+    const bId = String(b.bookingId || '');
+    const vName = String(b.vehicleName || b.vehicleDetails?.name || '');
+    const vReg = String(b.vehicleRegNumber || b.vehicleDetails?.regNumber || '');
+    const phone = String(b.customerPhone || b.customer?.phone || '');
 
     const matchesSearch =
       custName.toLowerCase().includes(searchTerm.toLowerCase()) ||

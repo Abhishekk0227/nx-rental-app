@@ -263,7 +263,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
   // ── Derived ────────────────────────────────────────────────────────────────
   const filteredHistory = serviceHistory.filter(h => {
     const q = histSearch.toLowerCase();
-    return !q || h.name?.toLowerCase().includes(q) || h.regNumber?.toLowerCase().includes(q) || h.record?.workDone?.toLowerCase().includes(q);
+    return !q || String(h.name || '').toLowerCase().includes(q) || String(h.regNumber || '').toLowerCase().includes(q) || String(h.record?.workDone || '').toLowerCase().includes(q);
   });
 
   const totalServiceCost = serviceHistory.reduce((s, h) => s + (h.record?.cost || 0), 0);

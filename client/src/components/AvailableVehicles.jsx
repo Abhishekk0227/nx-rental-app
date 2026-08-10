@@ -160,9 +160,9 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
       // 1. Search Query
       const query = searchTerm.toLowerCase().trim();
       if (query) {
-        const nameMatch = v.name?.toLowerCase().includes(query);
-        const numMatch = v.regNumber?.toLowerCase().includes(query);
-        const brandMatch = v.brand?.toLowerCase().includes(query);
+        const nameMatch = String(v.name || '').toLowerCase().includes(query);
+        const numMatch = String(v.regNumber || '').toLowerCase().includes(query);
+        const brandMatch = String(v.brand || '').toLowerCase().includes(query);
         if (!nameMatch && !numMatch && !brandMatch) return false;
       }
 
@@ -1010,9 +1010,8 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
         const filteredHistory = matchedBookings.filter(b => {
           if (historyStatus !== 'All' && b.status !== historyStatus) return false;
           if (historySearch) {
-            const custMatch = b.customerName?.toLowerCase().includes(historySearch.toLowerCase()) || 
-                              b.customer?.name?.toLowerCase().includes(historySearch.toLowerCase());
-            const bIdMatch = b.bookingId?.toLowerCase().includes(historySearch.toLowerCase());
+            const custMatch = String(b.customerName || b.customer?.name || '').toLowerCase().includes(historySearch.toLowerCase());
+            const bIdMatch = String(b.bookingId || '').toLowerCase().includes(historySearch.toLowerCase());
             if (!custMatch && !bIdMatch) return false;
           }
           if (historyDate) {

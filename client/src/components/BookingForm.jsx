@@ -899,7 +899,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
           {isBike && selectedPlanType === 'Hourly' && (
             <div style={{ marginTop: '8px', padding: '7px 10px', background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: '7px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-              <label style={{ fontSize: '0.78rem', color: '#4f46e5', fontWeight: 600, margin: 0, whiteSpace: 'nowrap' }}>⏱ Duration (hrs)</label>
+              <label style={{ fontSize: '0.78rem', color: '#6d28d9', fontWeight: 600, margin: 0, whiteSpace: 'nowrap' }}>⏱ Duration (hrs)</label>
               <input
                 type="text" inputMode="numeric"
                 min="1"
@@ -938,7 +938,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                   <label
                     key={plan.type}
                     style={{
-                      border: '1.5px solid ' + (selectedPlanType === plan.type ? '#4f46e5' : '#e5e7eb'),
+                      border: '1.5px solid ' + (selectedPlanType === plan.type ? '#6d28d9' : '#e5e7eb'),
                       background: selectedPlanType === plan.type ? 'rgba(99,102,241,0.08)' : '#f8f9fb',
                       padding: '7px 8px',
                       borderRadius: '7px',
@@ -958,7 +958,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                     />
                     <div>
                       <strong style={{ display: 'block', fontSize: '0.8rem', color: '#1e293b' }}>{plan.label}</strong>
-                      <span style={{ fontSize: '0.72rem', color: '#4f46e5', fontWeight: 'bold' }}>₹{plan.rate}</span>
+                      <span style={{ fontSize: '0.72rem', color: '#6d28d9', fontWeight: 'bold' }}>₹{plan.rate}</span>
                       <span style={{ display: 'block', fontSize: '0.62rem', color: '#64748b' }}>{plan.limit}</span>
                     </div>
                   </label>
@@ -1135,7 +1135,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
             onClick={() => setShowBillingSummary(!showBillingSummary)}
           >
             <h4 className="bform-section-title" style={{ margin: 0 }}><BarChart2 size={13} /> Billing Summary</h4>
-            <span style={{ fontSize: '0.88rem', color: '#4f46e5', fontWeight: 700 }}>₹{totalBookingValue} {showBillingSummary ? '▲' : '▼'}</span>
+            <span style={{ fontSize: '0.88rem', color: '#6d28d9', fontWeight: 700 }}>₹{totalBookingValue} {showBillingSummary ? '▲' : '▼'}</span>
           </button>
 
           {showBillingSummary && (
@@ -1143,7 +1143,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
 
                 <div style={{ flex: '1 1 200px' }}>
-                  <div style={{ fontWeight: 600, color: '#4f46e5', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Rental</div>
+                  <div style={{ fontWeight: 600, color: '#6d28d9', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Rental</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Duration:</span><strong style={{ color: '#1e293b' }}>{bill.durationText || 'N/A'}</strong></div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Incl. KM:</span><strong>{bill.kmLimit} KM</strong></div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Base Fare:</span><span>₹{bill.cost}{bill.isMinBilling && <span style={{ fontSize: '0.62rem', color: '#f59e0b', marginLeft: 3 }}>({minBookingHours}h min)</span>}</span></div>
@@ -1155,7 +1155,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                 <div style={{ width: '1px', background: '#e5e7eb', flexShrink: 0 }} />
 
                 <div style={{ flex: '1 1 200px' }}>
-                  <div style={{ fontWeight: 600, color: '#4f46e5', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Collection</div>
+                  <div style={{ fontWeight: 600, color: '#6d28d9', fontSize: '0.68rem', textTransform: 'uppercase', letterSpacing: '0.05em', borderBottom: '1px solid #e5e7eb', paddingBottom: '3px', marginBottom: '5px' }}>Collection</div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Rental Paid:</span><strong style={{ color: '#10b981' }}>₹{bill.moneyReceived}</strong></div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Deposit:</span><strong style={{ color: '#60a5fa' }}>₹{bill.deposit}</strong></div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', margin: '3px 0' }}><span style={{ color: '#64748b' }}>Total Collected:</span><strong style={{ color: '#10b981' }}>₹{totalCollected}</strong></div>

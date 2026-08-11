@@ -350,7 +350,8 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                   <p style={{ color: '#64748b', fontSize: '0.875rem' }}>No vehicles currently require maintenance service.</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ overflowX: 'auto', paddingBottom: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: '800px' }}>
                   {serviceNeeded.map(v => {
                     const reason = v.pendingRecord ? REASON_STYLE.manual : REASON_STYLE.km;
                     const priority = v.pendingRecord?.priority || 'Medium';
@@ -407,6 +408,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               )}
             </div>
@@ -422,7 +424,8 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                   <p style={{ color: '#64748b', fontSize: '0.875rem' }}>Stop a vehicle from "Service Needed" to begin maintenance.</p>
                 </div>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ overflowX: 'auto', paddingBottom: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: '900px' }}>
                   {underMaintenance.map(v => (
                     <div key={v.vehicleId} style={{
                       background: '#fff', border: '1px solid #fde68a', borderRadius: 14, padding: '18px 22px',
@@ -479,6 +482,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                       </div>
                     </div>
                   ))}
+                  </div>
                 </div>
               )}
             </div>
@@ -510,8 +514,8 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                   <p style={{ color: '#64748b', fontSize: '0.875rem' }}>{histSearch ? 'Try a different search term.' : 'Completed services will appear here.'}</p>
                 </div>
               ) : (
-                <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
                         {['Date', 'Vehicle', 'Service KM', 'Work Done', 'Vendor', 'Cost', 'Notes'].map(h => (

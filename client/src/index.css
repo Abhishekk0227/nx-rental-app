@@ -1,5 +1,5 @@
 /* ==========================================================================
-   NX Rental DESIGN SYSTEM (VANILLA CSS - PREMIUM ERP EDITION)
+   Ride Your Bike DESIGN SYSTEM (VANILLA CSS - PREMIUM ERP EDITION)
    ========================================================================== */
 
 /* --- CSS Variables & Themes --- */
@@ -1101,7 +1101,7 @@ h6 {
 }
 
 /* ==========================================================================
-   NX Rental - LIGHT THEME OVERRIDE
+   Ride Your Bike - LIGHT THEME OVERRIDE
    ========================================================================== */
 
 /* --- Override Global to Light --- */
@@ -2098,7 +2098,7 @@ select.form-control {
 
 /* ==========================================================================
    UNIFIED RESPONSIVE DESIGN SYSTEM
-   Mobile-first additions — covers all NX Rental pages
+   Mobile-first additions — covers all Ride Your Bike pages
    ========================================================================== */
 
 /* ── Mobile Sidebar Drawer ── */
@@ -2548,7 +2548,7 @@ select.form-control {
 
 /* Booking form section headers — inside light-bg forms */
 .bform-section-title {
-  color: #4f46e5 !important;
+  color: #6d28d9 !important;
   font-size: 0.95rem;
   font-weight: 600;
   display: flex;

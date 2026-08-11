@@ -34,7 +34,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   // Camera integration state variables
-  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false);  
   const [cameraStream, setCameraStream] = useState(null);
   const [selectedImageType, setSelectedImageType] = useState('front');
   const videoRef = useRef(null);
@@ -968,7 +968,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                     {/* TAB 1: BASIC INFORMATION */}
                     {activeSubTab === 1 && (
                       <div className="animate-fade">
-                        <h3 style={{ fontSize: '1rem', color: '#4f46e5', marginBottom: '16px' }}>Basic Fleet Information</h3>
+                        <h3 style={{ fontSize: '1rem', color: '#6d28d9', marginBottom: '16px' }}>Basic Fleet Information</h3>
                         <div className="grid-2col">
                           <div className="form-group">
                             <label>Basic ID</label>

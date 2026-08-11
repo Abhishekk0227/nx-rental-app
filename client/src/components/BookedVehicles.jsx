@@ -2173,8 +2173,7 @@ export default function BookedVehicles({
     const extensionsHTML = (booking.extensions && booking.extensions.length > 0) ? booking.extensions.map(ext => 
       `<p style="margin:4px 0;"><strong>Extended:</strong> ${ext.extraHours || 0} hrs - ₹${ext.extraCharges || 0}</p>`
     ).join('') : '<p style="margin:4px 0;">No extensions</p>';
-
-    const dropDetailsHTML = booking.dropDetails ? `
+      const dropDetailsHTML = booking.dropDetails ? `
       <p style="margin:4px 0;"><strong>Damage Charges:</strong> ₹${booking.dropDetails.damageCharges || 0}</p>
       <p style="margin:4px 0;"><strong>Cleaning Charges:</strong> ₹${booking.dropDetails.cleaningCharges || 0}</p>
       <p style="margin:4px 0;"><strong>Late/Extra Hours:</strong> ₹${booking.dropDetails.lateCharges || 0}</p>
@@ -2184,87 +2183,171 @@ export default function BookedVehicles({
     printWindow.document.write(`
       <html>
         <head>
-          <title>NX Rental Rental Bill - Invoice #${booking.bookingId}</title>
+          <title>Ride Your Bike - Invoice #${booking.bookingId}</title>
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
-            body { font-family: 'Inter', sans-serif; color: #333; margin: 30px; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #ccc; padding-bottom: 10px; margin-bottom: 20px; }
-            .section { margin-bottom: 20px; }
-            .section-title { font-weight: bold; font-size: 1.1rem; border-bottom: 1px solid #eee; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; color: #555; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            .total-box { margin-top: 20px; padding: 12px; background-color: #f9f9f9; border: 1px solid #e2e8f0; border-radius: 6px; text-align: right; font-size: 1.1rem; font-weight: bold; }
-            .footer { margin-top: 40px; text-align: center; font-size: 0.8rem; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
-            p { margin: 4px 0; }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; background: #fff; }
+            .invoice-container { max-width: 800px; margin: 0 auto; padding: 32px 40px; }
+
+            /* ── Header ── */
+            .inv-header { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 24px; border-bottom: 3px solid #1e293b; margin-bottom: 28px; }
+            .inv-brand h1 { font-size: 1.75rem; font-weight: 800; color: #1e293b; letter-spacing: -0.5px; }
+            .inv-brand .tagline { font-size: 0.75rem; color: #64748b; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; }
+            .inv-meta { text-align: right; }
+            .inv-meta .invoice-label { font-size: 0.7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+            .inv-meta .invoice-number { font-size: 1.3rem; font-weight: 800; color: #1e293b; margin-top: 2px; }
+            .inv-meta .invoice-date { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
+
+            /* ── Section Container ── */
+            .inv-section { margin-bottom: 22px; }
+            .inv-section-title { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0; margin-bottom: 12px; }
+            .inv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+            .inv-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 0.85rem; }
+            .inv-row .label { color: #64748b; font-weight: 500; }
+            .inv-row .value { color: #1e293b; font-weight: 600; text-align: right; }
+
+            /* ── Financial Table ── */
+            .fin-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            .fin-table th { background: #f8fafc; font-size: 0.72rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; padding: 10px 14px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+            .fin-table td { padding: 9px 14px; font-size: 0.85rem; color: #334155; border-bottom: 1px solid #f1f5f9; }
+            .fin-table td:last-child { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+            .fin-table .subtotal td { border-top: 2px solid #e2e8f0; font-weight: 700; color: #1e293b; background: #f8fafc; }
+            .fin-table .discount td { color: #10b981; }
+
+            /* ── Total Box ── */
+            .inv-total-box { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding: 16px 20px; background: #1e293b; border-radius: 10px; color: #fff; }
+            .inv-total-box .total-label { font-size: 0.85rem; font-weight: 600; color: #94a3b8; }
+            .inv-total-box .total-amount { font-size: 1.4rem; font-weight: 800; }
+            .inv-total-box .total-status { font-size: 0.75rem; padding: 3px 10px; border-radius: 20px; font-weight: 700; margin-left: 10px; }
+            .status-refund { background: rgba(239,68,68,0.2); color: #fca5a5; }
+            .status-collect { background: rgba(16,185,129,0.2); color: #6ee7b7; }
+            .status-pending { background: rgba(251,191,36,0.2); color: #fcd34d; }
+
+            /* ── Footer ── */
+            .inv-footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+            .inv-footer .thanks { text-align: center; font-size: 0.9rem; font-weight: 600; color: #1e293b; margin-bottom: 6px; }
+            .inv-footer .sub { text-align: center; font-size: 0.75rem; color: #94a3b8; }
+            .inv-footer .terms { margin-top: 16px; padding: 12px 16px; background: #f8fafc; border-radius: 8px; font-size: 0.7rem; color: #94a3b8; line-height: 1.6; }
+            .inv-footer .terms strong { color: #64748b; }
+
+            /* ── Divider ── */
+            .inv-divider { height: 1px; background: #e2e8f0; margin: 20px 0; }
+
+            @media print {
+              body { margin: 0; }
+              .invoice-container { padding: 20px 30px; }
+            }
           </style>
         </head>
         <body onload="window.print()">
-          <div class="header">
-            <div>
-              <h2 style="margin: 0; color: #4f46e5;">NX Rental RENTALS</h2>
-              <span style="font-size: 0.85rem; color: #666;">Branch Office</span>
-            </div>
-            <div style="text-align: right;">
-              <h3 style="margin: 0;">INVOICE #${booking.bookingId}</h3>
-              <span style="font-size: 0.85rem; color: #666;">Date: ${new Date().toLocaleDateString()}</span>
-            </div>
-          </div>
+          <div class="invoice-container">
 
-          <div class="section grid">
-            <div>
-              <div class="section-title">Customer Information</div>
-              <p><strong>Name:</strong> ${booking.customerName}</p>
-              <p><strong>Phone:</strong> ${booking.customerPhone}</p>
-              <p><strong>Email:</strong> ${booking.customer?.email || 'N/A'}</p>
+            <!-- Header -->
+            <div class="inv-header">
+              <div class="inv-brand">
+                <h1>🏍️ Ride Your Bike</h1>
+                <div class="tagline">Vehicle Rental Services</div>
+              </div>
+              <div class="inv-meta">
+                <div class="invoice-label">Invoice</div>
+                <div class="invoice-number">#${booking.bookingId}</div>
+                <div class="invoice-date">${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</div>
+              </div>
             </div>
-            <div>
-              <div class="section-title">Vehicle Information</div>
-              <p><strong>Name:</strong> ${resolvedV.name}</p>
-              <p><strong>Reg Number:</strong> ${resolvedV.regNumber}</p>
-              <p><strong>Plan Details:</strong> ${booking.selectedPlan?.planType || '24-Hour'}</p>
-            </div>
-          </div>
-          
-          <div class="section grid">
-            <div>
-              <div class="section-title">Journey Details</div>
-              <p><strong>Pickup:</strong> ${startPickup}</p>
-              <p><strong>Return:</strong> ${endDrop}</p>
-              <p><strong>Start KM:</strong> ${booking.pickupDetails?.odometerStart || booking.handover?.startMeter || 'N/A'}</p>
-              <p><strong>End KM:</strong> ${booking.dropDetails?.endMeter || 'N/A'}</p>
-            </div>
-            <div>
-              <div class="section-title">Extensions Log</div>
-              ${extensionsHTML}
-            </div>
-          </div>
 
-          <div class="section grid">
-            <div>
-              <div class="section-title">Extra Drop-off Charges</div>
-              ${dropDetailsHTML}
+            <!-- Customer & Vehicle Info -->
+            <div class="inv-grid">
+              <div class="inv-section">
+                <div class="inv-section-title">Customer Information</div>
+                <div class="inv-row"><span class="label">Name</span><span class="value">${booking.customerName}</span></div>
+                <div class="inv-row"><span class="label">Phone</span><span class="value">${booking.customerPhone}</span></div>
+                <div class="inv-row"><span class="label">Email</span><span class="value">${booking.customer?.email || 'N/A'}</span></div>
+              </div>
+              <div class="inv-section">
+                <div class="inv-section-title">Vehicle Details</div>
+                <div class="inv-row"><span class="label">Vehicle</span><span class="value">${resolvedV.name}</span></div>
+                <div class="inv-row"><span class="label">Reg. Number</span><span class="value">${resolvedV.regNumber}</span></div>
+                <div class="inv-row"><span class="label">Plan</span><span class="value">${booking.selectedPlan?.planType || '24-Hour'}</span></div>
+              </div>
             </div>
-            <div>
-              <div class="section-title">Financial Settlement</div>
-              <p><strong>Base Fare:</strong> ₹${snapshot.originalBaseFare || 0}</p>
-              <p><strong>Extensions Total:</strong> ₹${snapshot.extTotal || 0}</p>
-              <p><strong>Add-ons Total:</strong> ₹${snapshot.addonsTotal || 0}</p>
-              <p><strong>Discount:</strong> -₹${snapshot.discount || 0}</p>
-              <p><strong>Total Rental Cost:</strong> ₹${snapshot.rentalCost || 0}</p>
-              <p><strong>Advance Paid:</strong> -₹${snapshot.rentalPaid || 0}</p>
-              <p><strong>Security Deposit Held:</strong> ₹${snapshot.depositHeld || 0}</p>
-            </div>
-          </div>
-          
-          <div class="total-box">
-             Final Settlement Status: 
-             ${booking.status === 'Completed' ? `₹${booking.settlement?.finalCollection || booking.settlement?.depositReturned || 0} ${booking.settlement?.depositReturned > 0 ? '(Refunded)' : '(Collected)'}` : '(Pending Drop-off)'}
-          </div>
 
-          <div class="footer">
-            <p>Thank you for choosing NX Rental. For help, contact support.</p>
-            <p>Authorized Handover Operator: ${booking.workerId || 'System'}</p>
+            <div class="inv-divider"></div>
+
+            <!-- Journey Details & Extensions -->
+            <div class="inv-grid">
+              <div class="inv-section">
+                <div class="inv-section-title">Journey Details</div>
+                <div class="inv-row"><span class="label">Pickup Time</span><span class="value">${startPickup}</span></div>
+                <div class="inv-row"><span class="label">Return Time</span><span class="value">${endDrop}</span></div>
+                <div class="inv-row"><span class="label">Start KM</span><span class="value">${booking.pickupDetails?.odometerStart || booking.handover?.startMeter || 'N/A'}</span></div>
+                <div class="inv-row"><span class="label">End KM</span><span class="value">${booking.dropDetails?.endMeter || 'N/A'}</span></div>
+              </div>
+              <div class="inv-section">
+                <div class="inv-section-title">Extensions Log</div>
+                ${(booking.extensions && booking.extensions.length > 0) 
+                  ? booking.extensions.map(ext => `<div class="inv-row"><span class="label">+${ext.extraHours || 0} hrs</span><span class="value">₹${(ext.extraCharges || 0).toLocaleString()}</span></div>`).join('')
+                  : '<div class="inv-row"><span class="label" style="color:#94a3b8;">No extensions</span><span class="value">—</span></div>'}
+              </div>
+            </div>
+
+            <div class="inv-divider"></div>
+
+            <!-- Financial Summary Table -->
+            <div class="inv-section">
+              <div class="inv-section-title">Financial Summary</div>
+              <table class="fin-table">
+                <thead>
+                  <tr><th>Description</th><th style="text-align:right;">Amount</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Base Rental Fare</td><td>₹${(snapshot.originalBaseFare || 0).toLocaleString()}</td></tr>
+                  <tr><td>Extensions Total</td><td>₹${(snapshot.extTotal || 0).toLocaleString()}</td></tr>
+                  <tr><td>Add-ons Total</td><td>₹${(snapshot.addonsTotal || 0).toLocaleString()}</td></tr>
+                  ${booking.dropDetails ? `
+                    <tr><td>Damage Charges</td><td>₹${(booking.dropDetails.damageCharges || 0).toLocaleString()}</td></tr>
+                    <tr><td>Cleaning Charges</td><td>₹${(booking.dropDetails.cleaningCharges || 0).toLocaleString()}</td></tr>
+                    <tr><td>Late / Extra Hours Charges</td><td>₹${(booking.dropDetails.lateCharges || 0).toLocaleString()}</td></tr>
+                    <tr><td>Other Charges</td><td>₹${(booking.dropDetails.otherCharges || 0).toLocaleString()}</td></tr>
+                  ` : ''}
+                  <tr class="discount"><td>Discount</td><td>- ₹${(snapshot.discount || 0).toLocaleString()}</td></tr>
+                  <tr class="subtotal"><td>Total Rental Cost</td><td>₹${(snapshot.rentalCost || 0).toLocaleString()}</td></tr>
+                  <tr><td>Advance Paid</td><td style="color:#10b981;">- ₹${(snapshot.rentalPaid || 0).toLocaleString()}</td></tr>
+                  <tr><td>Security Deposit Held</td><td>₹${(snapshot.depositHeld || 0).toLocaleString()}</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Total Settlement Box -->
+            <div class="inv-total-box">
+              <div>
+                <div class="total-label">Final Settlement</div>
+                <div class="total-amount">
+                  ${booking.status === 'Completed' 
+                    ? `₹${(booking.settlement?.finalCollection || booking.settlement?.depositReturned || 0).toLocaleString()}`
+                    : 'Pending'}
+                </div>
+              </div>
+              <span class="total-status ${booking.status === 'Completed' 
+                ? (booking.settlement?.depositReturned > 0 ? 'status-refund' : 'status-collect') 
+                : 'status-pending'}">
+                ${booking.status === 'Completed' 
+                  ? (booking.settlement?.depositReturned > 0 ? 'REFUNDED' : 'COLLECTED') 
+                  : 'PENDING'}
+              </span>
+            </div>
+
+            <!-- Footer -->
+            <div class="inv-footer">
+              <div class="thanks">Thank you for riding with Ride Your Bike! 🏍️</div>
+              <div class="sub">Operator: ${booking.workerId || 'System'}</div>
+              <div class="terms">
+                <strong>Terms & Conditions:</strong> This invoice is system-generated. Rental charges are calculated based on the selected plan. 
+                Extra charges apply for late returns, damages, and excess kilometers as per the rental agreement. 
+                Security deposit is refundable subject to vehicle condition at the time of return.
+              </div>
+            </div>
+
           </div>
         </body>
       </html>
@@ -4966,10 +5049,10 @@ export default function BookedVehicles({
                 </div>
 
                 {/* Section 2 – Current Booking Financial Snapshot (Read Only) */}
-                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Booking Financial Details
-                  </h3>
+                  </summary>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
@@ -5021,7 +5104,7 @@ export default function BookedVehicles({
                       <strong style={{ color: 'var(--status-available)' }}>₹{calc.depositHeld || 0}</strong>
                     </div>
                   </div>
-                </div>
+                </details>
 
                 {/* Booking Journey & Modification Summary */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '20px', marginTop: '10px', marginBottom: '10px' }}>
@@ -5048,10 +5131,10 @@ export default function BookedVehicles({
 
                   {/* Card 2: Duration & Extension Summary */}
                   {hasExtensions && (
-                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: '0 0 12px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                      <summary style={{ cursor: "pointer",  fontSize: '0.9rem', margin: '0 0 12px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Duration & Extension Summary
-                      </h3>
+                      </summary>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Original Duration</span>
@@ -5083,10 +5166,10 @@ export default function BookedVehicles({
                         </div>
 
                         {/* Subsection: Current Active Booking Rules */}
-                        <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-light)' }}>
-                          <h4 style={{ fontSize: '0.8rem', color: 'var(--secondary)', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
+                        <details style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-light)' }}>
+                          <summary style={{ cursor: "pointer",  fontSize: '0.8rem', color: '#000', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
                             Current Active Booking Rules
-                          </h4>
+                          </summary>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
                               <span style={{ color: 'var(--text-secondary)' }}>Current Active Duration</span>
@@ -5107,9 +5190,9 @@ export default function BookedVehicles({
                               <strong style={{ color: 'var(--status-available)' }}>₹{calc.depositHeld || 0}</strong>
                             </div>
                           </div>
-                        </div>
+                        </details>
                       </div>
-                    </div>
+                    </details>
                   )}
 
                   {/* Card 3: Vehicle Replacement Summary */}
@@ -5163,10 +5246,10 @@ export default function BookedVehicles({
 
                   {/* Card 4: Payment & Deposit Timeline */}
                   <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 16px 0' }}>
-                      <h3 style={{ fontSize: '0.9rem', margin: 0, color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <details style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 16px 0' }}>
+                      <summary style={{ cursor: "pointer",  fontSize: '0.9rem', margin: 0, color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Payment & Deposit Timeline
-                      </h3>
+                      </summary>
                       <button
                         type="button"
                         className="btn btn-secondary"
@@ -5175,7 +5258,7 @@ export default function BookedVehicles({
                       >
                         {timelineExpanded ? 'Hide' : 'Expand'}
                       </button>
-                    </div>
+                    </details>
 
                     {timelineExpanded && (
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
@@ -5281,10 +5364,10 @@ export default function BookedVehicles({
                 {(() => {
                   const isEV = selectedBooking.vehicleDetails?.category?.toLowerCase() === 'ev';
                   return (
-                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                      <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                         Vehicle Inspection & Damage Report
-                      </h3>
+                      </summary>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {calc.helmetExpected > 0 && (
@@ -5407,15 +5490,15 @@ export default function BookedVehicles({
                           />
                         </div>
                       </div>
-                    </div>
+                    </details>
                   );
                 })()}
 
                 {/* Section 5 – Adjustments (Editable) */}
-                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Adjustments & Waivers
-                  </h3>
+                  </summary>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div className="form-group" style={{ marginBottom: 0 }}>
@@ -5459,7 +5542,7 @@ export default function BookedVehicles({
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Deduct directly from the grand total bill</span>
                     </div>
                   </div>
-                </div>
+                </details>
 
               </div>
 
@@ -5467,10 +5550,10 @@ export default function BookedVehicles({
               <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
                 {/* Section 6 – Usage Summary (Auto Calculated) */}
-                <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Trip Usage Summary
-                  </h3>
+                  </summary>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
@@ -5536,7 +5619,7 @@ export default function BookedVehicles({
                       </>
                     )}
                   </div>
-                </div>
+                </details>
 
                 {/* Section 7 – Charges Breakdown (Auto Calculated) */}
                 <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
@@ -5644,10 +5727,10 @@ export default function BookedVehicles({
                 {(() => {
                   const snapshot = getBookingFinancialSnapshot(selectedBooking);
                   return (
-                    <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <h3 style={{ fontSize: '1rem', margin: '0 0 16px 0', color: 'var(--secondary)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
+                      <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                         Payment & Deposit Summary
-                      </h3>
+                      </summary>
 
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.85rem' }}>
                         <div>
@@ -5690,7 +5773,7 @@ export default function BookedVehicles({
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </details>
                   );
                 })()}
 
@@ -5818,7 +5901,7 @@ export default function BookedVehicles({
                           <label>Payment Mode *</label>
                           <select
                             className="form-control"
-                            value={['Cash', 'UPI', 'Card', 'Mixed'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
+                            value={['Cash', 'UPI', 'Card', 'Mixed', 'Vikas'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
                             style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
@@ -5827,6 +5910,7 @@ export default function BookedVehicles({
                             <option value="Cash">Cash</option>
                             <option value="UPI">UPI</option>
                             <option value="Card">Card</option>
+                            <option value="Vikas">Vikas</option>
                             <option value="Mixed">Mixed Split</option>
                           </select>
                         </div>
@@ -5909,7 +5993,7 @@ export default function BookedVehicles({
                           <label>Refund Mode *</label>
                           <select
                             className="form-control"
-                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund', 'Card Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
+                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund', 'Card Refund', 'Vikas Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
                             style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
@@ -5918,6 +6002,7 @@ export default function BookedVehicles({
                             <option value="Cash Refund">Cash</option>
                             <option value="UPI Refund">UPI</option>
                             <option value="Card Refund">Card</option>
+                            <option value="Vikas Refund">Vikas</option>
                             <option value="Mixed Refund">Mixed Split</option>
                           </select>
                         </div>

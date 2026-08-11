@@ -896,10 +896,12 @@ export default function DailyHisab({
     let totalBookings = 0;
     let totalRevenue = 0;
     let totalCashHandledByWorker = 0;
+    let totalOnlineHandledByWorker = 0;
+    let totalVikasHandledByWorker = 0;
 
-    const rentalCollections = { cash: 0, upi: 0, card: 0, total: 0 };
-    const depositCollections = { cash: 0, upi: 0, card: 0, total: 0 };
-    const depositRefunds = { cash: 0, upi: 0, card: 0, total: 0 };
+    const rentalCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
+    const depositCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
+    const depositRefunds = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
 
     const matchedBookingsList = [];
 
@@ -960,7 +962,8 @@ export default function DailyHisab({
         rentalCollections.cash += cash;
         rentalCollections.upi += upi;
         rentalCollections.card += card;
-        rentalCollections.total += (cash + upi + card);
+        rentalCollections.vikas += vikas;
+        rentalCollections.total += (cash + upi + card + vikas);
 
         if (op === workerFilter || workerFilter === 'All') {
           totalCashHandledByWorker += cash;
@@ -1002,7 +1005,8 @@ export default function DailyHisab({
           depositCollections.cash += cash;
           depositCollections.upi += upi;
           depositCollections.card += card;
-          depositCollections.total += (cash + upi + card);
+          depositCollections.vikas += vikas;
+          depositCollections.total += (cash + upi + card + vikas);
 
           if (op === workerFilter || workerFilter === 'All') {
             totalCashHandledByWorker += cash;
@@ -1037,7 +1041,8 @@ export default function DailyHisab({
           depositRefunds.cash += cash;
           depositRefunds.upi += upi;
           depositRefunds.card += card;
-          depositRefunds.total += (cash + upi + card);
+          depositRefunds.vikas += vikas;
+          depositRefunds.total += (cash + upi + card + vikas);
 
           if (op === workerFilter || workerFilter === 'All') {
             totalCashHandledByWorker -= cash;
@@ -1652,6 +1657,10 @@ export default function DailyHisab({
 
   // Calculate worker cash outstanding balance
   const cashInTotal = (hisabData.summary.rentalCollections?.cash || 0) + (hisabData.summary.depositCollections?.cash || 0);
+  const onlineInTotal = (hisabData.summary.rentalCollections?.upi || 0) + (hisabData.summary.rentalCollections?.card || 0) + (hisabData.summary.depositCollections?.upi || 0) + (hisabData.summary.depositCollections?.card || 0);
+  const vikasInTotal = (hisabData.summary.rentalCollections?.vikas || 0) + (hisabData.summary.depositCollections?.vikas || 0);
+  const onlineOutTotal = (hisabData.summary.depositRefunds?.upi || 0) + (hisabData.summary.depositRefunds?.card || 0);
+  const vikasOutTotal = hisabData.summary.depositRefunds?.vikas || 0;
   const cashOutTotal = hisabData.summary.depositRefunds?.cash || 0;
   const outstandingHandover = hisabData.workerSettlement?.balance || 0;
 
@@ -2047,25 +2056,15 @@ export default function DailyHisab({
                 </div>
 
                 <div className="hisab-item-right-grid">
-                  {/* Column 1: Security Deposit */}
-                  <div className="hisab-item-right-col">
-                    <span className="hisab-item-right-label">Security Deposit</span>
-                    <span className="hisab-item-right-val" style={{ color: '#f59e0b' }}>
-                      ₹{depAmt.toLocaleString()}
+                  {/* Column 1: Total Advanced Collected */}
+                  <div className="hisab-item-right-col" style={{flex: "1.5"}}>
+                    <span className="hisab-item-right-label">Total Advanced Collected</span>
+                    <span className="hisab-item-right-val" style={{ color: "#000", display: "flex", gap: "8px", fontSize: "0.85rem" }}>
+                      <span title="Deposit">D: ₹{depAmt.toLocaleString()}</span>
+                      <span title="Rental">R: ₹{rentalTotal.toLocaleString()}</span>
                     </span>
-                    <span className="hisab-item-right-subval">
-                      C: {depCash.toLocaleString()} | O: {depOnline.toLocaleString()} | Cd: {depCard.toLocaleString()}
-                    </span>
-                  </div>
-
-                  {/* Column 2: Rental Collection */}
-                  <div className="hisab-item-right-col">
-                    <span className="hisab-item-right-label">Rental Collection</span>
-                    <span className="hisab-item-right-val" style={{ color: '#10b981' }}>
-                      ₹{rentalTotal.toLocaleString()}
-                    </span>
-                    <span className="hisab-item-right-subval">
-                      C: {rentalCash.toLocaleString()} | O: {rentalOnline.toLocaleString()} | Cd: {rentalCard.toLocaleString()}
+                    <span className="hisab-item-right-subval" style={{ whiteSpace: "nowrap" }}>
+                      C: {(depCash + rentalCash).toLocaleString()} | O: {(depOnline + rentalOnline).toLocaleString()} | Cd: {(depCard + rentalCard).toLocaleString()} | V: 0
                     </span>
                   </div>
 
@@ -2103,7 +2102,6 @@ export default function DailyHisab({
                       </>
                     )}
                   </div>
-
                   {/* Column 4: Actual Rent Bill */}
                   <div className="hisab-item-right-col">
                     <span className="hisab-item-right-label">{b.status === 'Completed' ? 'Actual Rent Bill' : 'Estimated Rent Bill'}</span>
@@ -2630,9 +2628,10 @@ export default function DailyHisab({
           <span className="hisab-footer-title" style={{ color: outstandingHandover >= 0 ? '#060606ff' : '#ef4444' }}>
             Amount to collect from worker: ₹{outstandingHandover.toLocaleString()}
           </span>
-          <span className="hisab-footer-desc">
-            Cash In (₹{cashInTotal.toLocaleString()}) - Cash Out (₹{cashOutTotal.toLocaleString()}) - Deposited (₹{(hisabData.workerSettlement?.depositToAdmin || 0).toLocaleString()})
-          </span>
+          <div className="hisab-footer-desc" style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+            <div>Cash In (₹{cashInTotal.toLocaleString()}) - Cash Out (₹{cashOutTotal.toLocaleString()}) - Deposited (₹{(hisabData.workerSettlement?.depositToAdmin || 0).toLocaleString()})</div>
+            <div>Online In (₹{onlineInTotal.toLocaleString()}) - Online Out (₹{onlineOutTotal.toLocaleString()}) &nbsp; | &nbsp; Vikas In (₹{vikasInTotal.toLocaleString()}) - Vikas Out (₹{vikasOutTotal.toLocaleString()})</div>
+          </div>
         </div>
       </div>
 

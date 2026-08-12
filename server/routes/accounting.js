@@ -23,15 +23,17 @@ const safeDateStr = (dateVal) => {
   }
 };
 
-/** Parse mixed payment reference string → { cash, online, card } */
+/** Parse mixed payment reference string → { cash, online, card, vikas } */
 const parseMixedRef = (refStr = '') => {
   const cashMatch = refStr.match(/Cash:\s*([\d.]+)/i);
   const onlineMatch = refStr.match(/Online:\s*([\d.]+)/i);
   const cardMatch = refStr.match(/Card:\s*([\d.]+)/i);
+  const vikasMatch = refStr.match(/Vikas:\s*([\d.]+)/i);
   return {
     cash: parseFloat(cashMatch?.[1]) || 0,
     online: parseFloat(onlineMatch?.[1]) || 0,
-    card: parseFloat(cardMatch?.[1]) || 0
+    card: parseFloat(cardMatch?.[1]) || 0,
+    vikas: parseFloat(vikasMatch?.[1]) || 0
   };
 };
 
@@ -41,35 +43,40 @@ const parseMixedRef = (refStr = '') => {
  * falls back to parsing Mixed reference string.
  */
 const getPaymentSplit = (p) => {
-  let cash = 0, online = 0, card = 0;
+  let cash = 0, online = 0, card = 0, vikas = 0;
 
   if (p.mode === 'Cash') {
     cash = p.cashAmount || p.amount || 0;
   } else if (p.mode === 'Card') {
     card = p.cardAmount || p.amount || 0;
+  } else if (p.mode === 'Vikas') {
+    vikas = p.vikasAmount || p.amount || 0;
   } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
     online = p.onlineAmount || p.amount || 0;
   } else if (p.mode === 'Mixed') {
     // Use stored splits if available (set during normalization)
-    if (p.cashAmount || p.onlineAmount || p.cardAmount) {
+    if (p.cashAmount || p.onlineAmount || p.cardAmount || p.vikasAmount) {
       cash = p.cashAmount || 0;
       online = p.onlineAmount || 0;
       card = p.cardAmount || 0;
+      vikas = p.vikasAmount || 0;
     } else {
       // Fallback to parsing reference string
       const split = parseMixedRef(p.reference || '');
       cash = split.cash;
       online = split.online;
       card = split.card;
+      vikas = split.vikas;
     }
   } else if (p.mode?.includes('Refund')) {
     // Refund modes — treated as negative cash/online
     cash = -(p.cashAmount || 0);
     online = -(p.onlineAmount || 0);
     card = -(p.cardAmount || 0);
+    vikas = -(p.vikasAmount || 0);
   }
 
-  return { cash, online, card };
+  return { cash, online, card, vikas };
 };
 
 // ─── GET daily accounting summary ─────────────────────────────────────────────
@@ -87,9 +94,9 @@ router.get('/', async (req, res) => {
     let totalRevenue = 0;
     let totalOutstanding = 0;
 
-    const rentalCollections = { cash: 0, online: 0, card: 0, total: 0 };
-    const depositCollections = { cash: 0, online: 0, card: 0, total: 0 };
-    const depositRefunds = { cash: 0, online: 0, card: 0, total: 0 };
+    const rentalCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositRefunds = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
     let totalCashHandledByWorker = 0;
 
     const matchedBookingsList = [];
@@ -149,11 +156,12 @@ router.get('/', async (req, res) => {
       for (const p of todayPayments) {
         if (workerFilter && p.workerId !== workerId) continue;
 
-        const { cash, online, card } = getPaymentSplit(p);
+        const { cash, online, card, vikas } = getPaymentSplit(p);
         rentalCollections.cash += cash;
         rentalCollections.online += online;
         rentalCollections.card += card;
-        rentalCollections.total += cash + online + card;
+        rentalCollections.vikas += vikas;
+        rentalCollections.total += cash + online + card + vikas;
 
         if (!workerFilter || p.workerId === workerId) {
           totalCashHandledByWorker += cash;
@@ -167,12 +175,14 @@ router.get('/', async (req, res) => {
 
         const diff = rev.depositDetails.difference || 0;
         const mode = rev.depositDetails.mode || '';
-        let cash = 0, online = 0, card = 0;
+        let cash = 0, online = 0, card = 0, vikas = 0;
 
         if (mode === 'Cash') {
           cash = diff;
         } else if (mode === 'Card') {
           card = diff;
+        } else if (mode === 'Vikas') {
+          vikas = diff;
         } else if (['UPI', 'Online'].includes(mode)) {
           online = diff;
         } else if (mode === 'Mixed') {
@@ -183,12 +193,14 @@ router.get('/', async (req, res) => {
           cash = Math.max(0, (snapshot.depositCash || 0) - (prevSnapshot.depositCash || 0));
           online = Math.max(0, (snapshot.depositOnline || 0) - (prevSnapshot.depositOnline || 0));
           card = Math.max(0, (snapshot.depositCard || 0) - (prevSnapshot.depositCard || 0));
+          vikas = Math.max(0, (snapshot.depositVikas || 0) - (prevSnapshot.depositVikas || 0));
         }
 
         depositCollections.cash += cash;
         depositCollections.online += online;
         depositCollections.card += card;
-        depositCollections.total += cash + online + card;
+        depositCollections.vikas += vikas;
+        depositCollections.total += cash + online + card + vikas;
         totalCashHandledByWorker += cash;
       }
 
@@ -201,20 +213,22 @@ router.get('/', async (req, res) => {
         if (!workerFilter || refundOp === workerId) {
           const refundAmt = Number(b.refundDetails?.amount) || 0;
           const method = b.refundDetails?.method || '';
-          let cash = 0, online = 0, card = 0;
+          let cash = 0, online = 0, card = 0, vikas = 0;
 
           if (method === 'Cash') cash = refundAmt;
           else if (method === 'Card') card = refundAmt;
+          else if (method === 'Vikas') vikas = refundAmt;
           else if (['UPI', 'Online'].includes(method)) online = refundAmt;
           else if (method === 'Mixed') {
             const split = parseMixedRef(b.refundDetails?.notes || '');
-            cash = split.cash; online = split.online; card = split.card;
+            cash = split.cash; online = split.online; card = split.card; vikas = split.vikas;
           }
 
           depositRefunds.cash += cash;
           depositRefunds.online += online;
           depositRefunds.card += card;
-          depositRefunds.total += cash + online + card;
+          depositRefunds.vikas += vikas;
+          depositRefunds.total += cash + online + card + vikas;
           totalCashHandledByWorker -= cash; // refund is outgoing cash
         }
       }

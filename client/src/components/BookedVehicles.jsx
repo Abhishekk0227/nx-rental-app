@@ -3278,7 +3278,7 @@ export default function BookedVehicles({
                           </div>
 
                           {/* Row 3: Timing details with Calendar icon */}
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                             <Calendar size={13} color="#94a3b8" />
                             <span>
                               {(() => {
@@ -3290,6 +3290,10 @@ export default function BookedVehicles({
                                 const dDate = new Date(b.expectedDropDate || b.rentalPeriod?.expectedEndDate);
                                 return isNaN(dDate.getTime()) ? 'N/A' : dDate.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
                               })()}
+                            </span>
+                            <span style={{ color: 'var(--text-muted)', margin: '0 2px' }}>•</span>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#6366f1', fontWeight: 600 }}>
+                              <User size={12} /> {b.workerId || 'System'}
                             </span>
                           </div>
                         </div>

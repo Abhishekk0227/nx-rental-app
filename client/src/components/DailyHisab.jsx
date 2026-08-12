@@ -857,19 +857,22 @@ export default function DailyHisab({
     return 'System';
   };
 
-  // Helper to parse mixed payments split (e.g., "Cash: 100, Online: 200, Card: 300")
+  // Helper to parse mixed payments split (e.g., "Cash: 100, Online: 200, Card: 300, Vikas: 400")
   const parseMixedRef = (refStr) => {
     let cash = 0;
     let online = 0;
     let card = 0;
-    if (!refStr) return { cash, online, card };
+    let vikas = 0;
+    if (!refStr) return { cash, online, card, vikas };
     const cashMatch = refStr.match(/Cash:\s*([\d.]+)/i);
     if (cashMatch) cash = parseFloat(cashMatch[1]) || 0;
     const onlineMatch = refStr.match(/Online:\s*([\d.]+)/i);
     if (onlineMatch) online = parseFloat(onlineMatch[1]) || 0;
     const cardMatch = refStr.match(/Card:\s*([\d.]+)/i);
     if (cardMatch) card = parseFloat(cardMatch[1]) || 0;
-    return { cash, online, card };
+    const vikasMatch = refStr.match(/Vikas:\s*([\d.]+)/i);
+    if (vikasMatch) vikas = parseFloat(vikasMatch[1]) || 0;
+    return { cash, online, card, vikas };
   };
 
   const fetchHisabData = async () => {
@@ -948,15 +951,18 @@ export default function DailyHisab({
         let cash = 0;
         let upi = 0;
         let card = 0;
+        let vikas = 0;
 
         if (p.mode === 'Cash') cash = p.amount;
         else if (p.mode === 'Card') card = p.amount;
+        else if (p.mode === 'Vikas') vikas = p.amount;
         else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) upi = p.amount;
         else if (p.mode === 'Mixed') {
           const split = parseMixedRef(p.reference);
           cash = split.cash;
           upi = split.online;
           card = split.card;
+          vikas = split.vikas;
         }
 
         rentalCollections.cash += cash;
@@ -980,11 +986,14 @@ export default function DailyHisab({
           let cash = 0;
           let upi = 0;
           let card = 0;
+          let vikas = 0;
 
           if (rev.depositDetails.mode === 'Cash') {
             cash = diff;
           } else if (rev.depositDetails.mode === 'Card') {
             card = diff;
+          } else if (rev.depositDetails.mode === 'Vikas') {
+            vikas = diff;
           } else if (['UPI', 'Online'].includes(rev.depositDetails.mode)) {
             upi = diff;
           } else if (rev.depositDetails.mode === 'Mixed') {
@@ -1000,6 +1009,10 @@ export default function DailyHisab({
             const curCard = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositCard || 0;
             const prevCard = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositCard || 0) : 0;
             card = Math.max(0, curCard - prevCard);
+
+            const curVikas = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0;
+            const prevVikas = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0) : 0;
+            vikas = Math.max(0, curVikas - prevVikas);
           }
 
           depositCollections.cash += cash;
@@ -1023,12 +1036,15 @@ export default function DailyHisab({
           let cash = 0;
           let upi = 0;
           let card = 0;
+          let vikas = 0;
           const amt = b.refundDetails.amount || 0;
 
           if (b.refundDetails.method === 'Cash') {
             cash = amt;
           } else if (b.refundDetails.method === 'Card') {
             card = amt;
+          } else if (b.refundDetails.method === 'Vikas') {
+            vikas = amt;
           } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
             upi = amt;
           } else if (b.refundDetails.method === 'Mixed') {
@@ -1036,6 +1052,7 @@ export default function DailyHisab({
             cash = split.cash;
             upi = split.online;
             card = split.card;
+            vikas = split.vikas;
           }
 
           depositRefunds.cash += cash;
@@ -1441,15 +1458,17 @@ export default function DailyHisab({
 
     b.paymentCollection?.forEach(p => {
       if (safeDateStr(p.timestamp) === dateFilter) {
-        let cash = 0, upi = 0, card = 0;
+        let cash = 0, upi = 0, card = 0, vikas = 0;
         if (p.mode === 'Cash') cash = p.amount;
         else if (p.mode === 'Card') card = p.amount;
+        else if (p.mode === 'Vikas') vikas = p.amount;
         else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) upi = p.amount;
         else if (p.mode === 'Mixed') {
           const split = parseMixedRef(p.reference);
           cash = split.cash;
           upi = split.online;
           card = split.card;
+          vikas = split.vikas;
         }
 
         rentals.push({
@@ -1468,12 +1487,14 @@ export default function DailyHisab({
     b.revisions?.forEach(rev => {
       if (safeDateStr(rev.timestamp) === dateFilter && rev.depositDetails && rev.depositDetails.difference > 0) {
         const diff = rev.depositDetails.difference;
-        let cash = 0, upi = 0, card = 0;
+        let cash = 0, upi = 0, card = 0, vikas = 0;
 
         if (rev.depositDetails.mode === 'Cash') {
           cash = diff;
         } else if (rev.depositDetails.mode === 'Card') {
           card = diff;
+        } else if (rev.depositDetails.mode === 'Vikas') {
+          vikas = diff;
         } else if (['UPI', 'Online'].includes(rev.depositDetails.mode)) {
           upi = diff;
         } else if (rev.depositDetails.mode === 'Mixed') {
@@ -1489,6 +1510,10 @@ export default function DailyHisab({
           const curCard = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositCard || 0;
           const prevCard = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositCard || 0) : 0;
           card = Math.max(0, curCard - prevCard);
+
+          const curVikas = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0;
+          const prevVikas = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0) : 0;
+          vikas = Math.max(0, curVikas - prevVikas);
         }
 
         deposits.push({
@@ -1507,11 +1532,13 @@ export default function DailyHisab({
     const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
     if (isRefundToday) {
       const amt = b.refundDetails.amount || 0;
-      let cash = 0, upi = 0, card = 0;
+      let cash = 0, upi = 0, card = 0, vikas = 0;
       if (b.refundDetails.method === 'Cash') {
         cash = amt;
       } else if (b.refundDetails.method === 'Card') {
         card = amt;
+      } else if (b.refundDetails.method === 'Vikas') {
+        vikas = amt;
       } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
         upi = amt;
       } else if (b.refundDetails.method === 'Mixed') {
@@ -1519,6 +1546,7 @@ export default function DailyHisab({
         cash = split.cash;
         upi = split.online;
         card = split.card;
+        vikas = split.vikas;
       }
 
       refunds.push({

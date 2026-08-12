@@ -709,7 +709,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                 </div>
                 {userRole === 'admin' ? (
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Users size={12} style={{ marginRight: 2 }} /> {v.seats || 4} Seats
+                    <Users size={12} style={{ marginRight: 2 }} /> {v.seatingCapacity || 2} Seats
                     <select 
                       value={v.zoneId || ''} 
                       onChange={(e) => handleDirectZoneChange(v, e.target.value)}

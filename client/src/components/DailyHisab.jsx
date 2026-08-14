@@ -1880,7 +1880,7 @@ export default function DailyHisab({
       </div>
 
       {/* 5. Sleek Collapsible Transaction Cards List */}
-      <div className="hisab-list">
+      <div className="hisab-list responsive-table-slider" style={{ width: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         {filteredBookings.map(b => {
           const vehicle = vehicles.find(v => v.vehicleId === b.vehicleId);
           const category = vehicle?.category || b.vehicleDetails?.category || vehicle?.type || 'Car';
@@ -1907,7 +1907,12 @@ export default function DailyHisab({
           let depCash = b.depositDetails?.cashAmount || 0;
           let depOnline = b.depositDetails?.onlineAmount || 0;
           let depCard = b.depositDetails?.cardAmount || 0;
-          const depBreakdownSum = depCash + depOnline + depCard;
+          let depVikas = b.depositDetails?.vikasAmount || 0;
+          if (b.depositDetails?.mode === 'Vikas') {
+            depVikas = depCash || depOnline || b.securityDeposit || 0;
+            depCash = 0; depOnline = 0;
+          }
+          const depBreakdownSum = depCash + depOnline + depCard + depVikas;
           // If breakdown sums to something, use it; else fall back to securityDeposit field
           const depAmt = depBreakdownSum > 0 ? depBreakdownSum : (b.securityDeposit || 0);
           // If breakdown was zero but depAmt > 0, distribute by mode
@@ -1915,6 +1920,8 @@ export default function DailyHisab({
             const mode = b.depositDetails?.mode || 'Cash';
             if (mode === 'Card') {
               depCard = depAmt;
+            } else if (mode === 'Vikas') {
+              depVikas = depAmt;
             } else if (['Online', 'UPI', 'Bank Transfer'].includes(mode)) {
               depOnline = depAmt;
             } else {
@@ -1927,6 +1934,7 @@ export default function DailyHisab({
           let additionalCash = 0;
           let additionalOnline = 0;
           let additionalCard = 0;
+          let additionalVikas = 0;
           if (collectAmount > 0 && b.paymentCollection && b.paymentCollection.length > 0) {
             // Find corresponding payment matching collectAmount
             const matchingPayment = [...b.paymentCollection].reverse().find(p => p.amount === collectAmount);
@@ -1935,6 +1943,8 @@ export default function DailyHisab({
                 additionalCash = collectAmount;
               } else if (matchingPayment.mode === 'Card') {
                 additionalCard = collectAmount;
+              } else if (matchingPayment.mode === 'Vikas') {
+                additionalVikas = collectAmount;
               } else if (matchingPayment.mode === 'Mixed') {
                 const split = parseMixedRef(matchingPayment.reference || matchingPayment.notes);
                 additionalCash = split.cash;
@@ -1953,6 +1963,7 @@ export default function DailyHisab({
           let totalRentalCash = 0;
           let totalRentalOnline = 0;
           let totalRentalCard = 0;
+          let totalRentalVikas = 0;
           b.paymentCollection?.forEach(p => {
             const amt = p.amount || 0;
             totalRentalCollected += amt;
@@ -1960,6 +1971,8 @@ export default function DailyHisab({
               totalRentalCash += amt;
             } else if (p.mode === 'Card') {
               totalRentalCard += amt;
+            } else if (p.mode === 'Vikas') {
+              totalRentalVikas += amt;
             } else if (p.mode === 'Mixed') {
               const split = parseMixedRef(p.reference || p.notes);
               totalRentalCash += split.cash;
@@ -1994,6 +2007,7 @@ export default function DailyHisab({
           const rentalCash = Math.max(0, totalRentalCash - additionalCash);
           const rentalOnline = Math.max(0, totalRentalOnline - additionalOnline);
           const rentalCard = Math.max(0, totalRentalCard - additionalCard);
+          const rentalVikas = Math.max(0, totalRentalVikas - additionalVikas);
 
           // 4. Cumulative refunds paid to the customer (supports multiple refund objects/arrays)
           let totalRefundAmt = 0;
@@ -2037,8 +2051,14 @@ export default function DailyHisab({
 
                 {/* Left Side: Vehicle Info & Pills */}
                 <div className="hisab-item-left">
-                  <div className="hisab-item-icon">
-                    {category === 'Car' ? <Car size={22} color="#6366f1" /> : <Bike size={22} color="#6366f1" />}
+                  <div className="hisab-item-icon" style={{ overflow: 'hidden', borderRadius: '8px', width: '42px', height: '42px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.04)', flexShrink: 0 }}>
+                    {(() => {
+                      const vImg = vehicle?.images?.front || b.vehicleDetails?.images?.front;
+                      if (vImg) {
+                        return <img src={vImg} alt="Vehicle" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />;
+                      }
+                      return category === 'Car' ? <Car size={22} color="#6366f1" /> : <Bike size={22} color="#6366f1" />;
+                    })()}
                   </div>
                   <div className="hisab-item-info">
                     <div className="hisab-item-title-row">
@@ -2086,13 +2106,15 @@ export default function DailyHisab({
                 <div className="hisab-item-right-grid">
                   {/* Column 1: Total Advanced Collected */}
                   <div className="hisab-item-right-col" style={{flex: "1.5"}}>
-                    <span className="hisab-item-right-label">Total Advanced Collected</span>
-                    <span className="hisab-item-right-val" style={{ color: "#000", display: "flex", gap: "8px", fontSize: "0.85rem" }}>
-                      <span title="Deposit">D: ₹{depAmt.toLocaleString()}</span>
-                      <span title="Rental">R: ₹{rentalTotal.toLocaleString()}</span>
+                    <span className="hisab-item-right-label" style={{ fontSize: '0.85rem' }}>Total Amount Collected</span>
+                    <span className="hisab-item-right-val" style={{ color: "#000", fontWeight: 'bold', fontSize: "1.05rem", marginBottom: '4px' }}>
+                      ₹{(Math.round((depAmt + rentalTotal) * 100) / 100).toLocaleString('en-IN')}
                     </span>
-                    <span className="hisab-item-right-subval" style={{ whiteSpace: "nowrap" }}>
-                      C: {(depCash + rentalCash).toLocaleString()} | O: {(depOnline + rentalOnline).toLocaleString()} | Cd: {(depCard + rentalCard).toLocaleString()} | V: 0
+                    <span className="hisab-item-right-subval" style={{ color: "#64748b" }}>
+                      <span title="Deposit">D: ₹{(Math.round(depAmt * 100) / 100).toLocaleString('en-IN')}</span> &bull; <span title="Rental">R: ₹{(Math.round(rentalTotal * 100) / 100).toLocaleString('en-IN')}</span>
+                    </span>
+                    <span className="hisab-item-right-subval" style={{ whiteSpace: "nowrap", marginTop: '2px' }}>
+                      C: {(Math.round((depCash + rentalCash) * 100) / 100).toLocaleString('en-IN')} | O: {(Math.round((depOnline + rentalOnline) * 100) / 100).toLocaleString('en-IN')} | Cd: {(Math.round((depCard + rentalCard) * 100) / 100).toLocaleString('en-IN')} | V: {(Math.round((depVikas + rentalVikas) * 100) / 100).toLocaleString('en-IN')}
                     </span>
                   </div>
 
@@ -2102,20 +2124,20 @@ export default function DailyHisab({
                       <>
                         <span className="hisab-item-right-label" style={{ color: '#ef4444' }}>Refund</span>
                         <span className="hisab-item-right-val" style={{ color: '#ef4444' }}>
-                          ₹{totalRefundAmt.toLocaleString()}
+                          ₹{(Math.round(totalRefundAmt * 100) / 100).toLocaleString('en-IN')}
                         </span>
                         <span className="hisab-item-right-subval">
-                          C: {refundCash.toLocaleString()} | O: {refundOnline.toLocaleString()} | Cd: {refundCard.toLocaleString()}
+                          C: {(Math.round(refundCash * 100) / 100).toLocaleString('en-IN')} | O: {(Math.round(refundOnline * 100) / 100).toLocaleString('en-IN')} | Cd: {(Math.round(refundCard * 100) / 100).toLocaleString('en-IN')}
                         </span>
                       </>
                     ) : collectAmount > 0 ? (
                       <>
                         <span className="hisab-item-right-label" style={{ color: '#10b981' }}>Additional Collection</span>
                         <span className="hisab-item-right-val" style={{ color: '#10b981' }}>
-                          ₹{collectAmount.toLocaleString()}
+                          ₹{(Math.round(collectAmount * 100) / 100).toLocaleString('en-IN')}
                         </span>
                         <span className="hisab-item-right-subval">
-                          C: {additionalCash.toLocaleString()} | O: {additionalOnline.toLocaleString()} | Cd: {additionalCard.toLocaleString()}
+                          C: {(Math.round(additionalCash * 100) / 100).toLocaleString('en-IN')} | O: {(Math.round(additionalOnline * 100) / 100).toLocaleString('en-IN')} | Cd: {(Math.round(additionalCard * 100) / 100).toLocaleString('en-IN')}
                         </span>
                       </>
                     ) : (
@@ -2657,7 +2679,7 @@ export default function DailyHisab({
             Amount to collect from worker: ₹{outstandingHandover.toLocaleString()}
           </span>
           <div className="hisab-footer-desc" style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
-            <div>Cash In (₹{cashInTotal.toLocaleString()}) - Cash Out (₹{cashOutTotal.toLocaleString()}) - Deposited (₹{(hisabData.workerSettlement?.depositToAdmin || 0).toLocaleString()})</div>
+            <div>Cash In (₹{cashInTotal.toLocaleString()}) - Cash Out (₹{cashOutTotal.toLocaleString()})</div>
             <div>Online In (₹{onlineInTotal.toLocaleString()}) - Online Out (₹{onlineOutTotal.toLocaleString()}) &nbsp; | &nbsp; Vikas In (₹{vikasInTotal.toLocaleString()}) - Vikas Out (₹{vikasOutTotal.toLocaleString()})</div>
           </div>
         </div>

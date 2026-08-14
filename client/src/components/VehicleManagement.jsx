@@ -28,6 +28,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
 
   // Selected vehicle object for modals
   const [selectedVehicle, setSelectedVehicle] = useState(null);
+  const [selectedHistoryBooking, setSelectedHistoryBooking] = useState(null);
 
   // Active sub-tab in Details / Edit modal (1 to 5)
   const [activeSubTab, setActiveSubTab] = useState(1);
@@ -267,9 +268,9 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
       description: v.description || '',
       status: v.status || 'Active',
       assignedWorker: v.assignedWorker || 'Unassigned',
-      maintenanceIntervalKm: v.maintenanceIntervalKm || 5000,
-      lastServiceKm: v.lastServiceKm || 0,
-      nextServiceKm: v.nextServiceKm || 5000,
+      maintenanceIntervalKm: v.maintenanceIntervalKm || ((v.category || v.type || '').toLowerCase() === 'scooty' ? 2000 : ['bike', 'ev'].includes((v.category || v.type || '').toLowerCase()) ? 3000 : 5000),
+      lastServiceKm: v.lastServiceKm !== undefined ? v.lastServiceKm : (v.meterReading || 0),
+      nextServiceKm: v.nextServiceKm || ((v.meterReading || 0) + (v.maintenanceIntervalKm || ((v.category || v.type || '').toLowerCase() === 'scooty' ? 2000 : ['bike', 'ev'].includes((v.category || v.type || '').toLowerCase()) ? 3000 : 5000))),
       pricingPlans: {
         hourly: {
           rate: v.pricingPlans?.hourly?.rate ?? v.perHourRate ?? 50,
@@ -1757,7 +1758,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                 </div>
 
                 {/* Booking Logs Table */}
-                <div className="table-responsive" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                <div className="table-responsive responsive-table-slider" style={{ maxHeight: '250px', overflowY: 'auto', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                   <table className="custom-table" style={{ fontSize: '0.85rem' }}>
                     <thead>
                       <tr>
@@ -1768,6 +1769,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                         <th>Status</th>
                         <th>Amount</th>
                         <th>KM Used</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1776,6 +1778,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                         const endM = b.dropDetails?.endMeter || 0;
                         const kmUsed = endM > startM ? (endM - startM) : 0;
                         const finalAmt = b.settlement?.totalBill || b.finalAmount || b.baseFare || 0;
+                        const fmtAmt = (Math.round(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
                         const pickupDate = new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleDateString();
                         const dropDate = b.dropDetails?.actualTime
                           ? new Date(b.dropDetails.actualTime).toLocaleDateString()
@@ -1790,14 +1793,24 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                             <td>
                               <span className={`badge badge-${b.status.toLowerCase()}`}>{b.status}</span>
                             </td>
-                            <td>₹{finalAmt}</td>
+                            <td>₹{fmtAmt}</td>
                             <td>{b.status === 'Completed' ? `${kmUsed} KM` : 'N/A'}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                style={{ padding: '3px 8px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                onClick={() => setSelectedHistoryBooking(b)}
+                              >
+                                <Eye size={12} /> View
+                              </button>
+                            </td>
                           </tr>
                         );
                       })}
                       {filteredHistory.length === 0 && (
                         <tr>
-                          <td colSpan="7" style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
+                          <td colSpan="8" style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
                             No operations logs found matching criteria.
                           </td>
                         </tr>
@@ -1807,6 +1820,93 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                 </div>
 
               </div>
+
+              {/* Full Booking Profile View Popup Modal */}
+              {selectedHistoryBooking && (() => {
+                const b = selectedHistoryBooking;
+                const base = b.baseFare || 0;
+                const deposit = b.securityDeposit || 0;
+                const advance = b.advancePaid || 0;
+                const ext = b.extensions?.reduce((s, e) => s + (e.extraCharges || 0), 0) || 0;
+                const drop = b.dropDetails;
+                const extra = drop ? ((drop.damageCharges || 0) + (drop.cleaningCharges || 0) + (drop.otherCharges || 0) + (drop.lateCharges || 0)) : 0;
+                const gross = base + ext + extra - (b.discount || 0);
+                const due = b.status === 'Completed' ? 0 : Math.max(0, gross - advance);
+
+                return (
+                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px' }}>
+                    <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-glass)', padding: '24px', borderRadius: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px', marginBottom: '16px' }}>
+                        <div>
+                          <h2 style={{ margin: 0, fontSize: '1.3rem' }}>Booking Profile: #{b.bookingId}</h2>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--primary)' }}>{b.status}</strong></span>
+                        </div>
+                        <button type="button" className="fo-btn-outline" onClick={() => setSelectedHistoryBooking(null)}><X size={18} /></button>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.85rem' }}>
+                        {/* Section 1: Customer Details */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>👤 Customer Information</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Name: <strong>{b.customerName || b.customer?.name}</strong></div>
+                            <div>Phone: <strong>{b.customerPhone || b.customer?.phone}</strong></div>
+                            <div>Alt Phone: <strong>{b.customer?.alternatePhone || b.altPhoneNumber || 'N/A'}</strong></div>
+                            <div>Email: <strong>{b.customer?.email || 'N/A'}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 2: Vehicle & Handover */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>🏍️ Vehicle & Handover Details</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Vehicle: <strong>{b.vehicleName || b.vehicleDetails?.name}</strong></div>
+                            <div>Reg. Number: <code>{b.vehicleRegNumber || b.vehicleDetails?.regNumber}</code></div>
+                            <div>Pickup Time: <strong>{new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleString()}</strong></div>
+                            <div>Expected Return: <strong>{new Date(b.expectedDropDate || b.rentalPeriod?.expectedEndDate).toLocaleString()}</strong></div>
+                            <div>Start Odometer: <strong>{b.handover?.startMeter || b.pickupDetails?.odometerStart || 0} KM</strong></div>
+                            <div>End Odometer: <strong>{drop?.endMeter ? `${drop.endMeter} KM` : 'N/A'}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 3: Financial Summary */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>💳 Financial Breakdown</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Base Fare: <strong>₹{(Math.round(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extensions Total: <strong>₹{(Math.round(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extra Charges: <strong>₹{(Math.round(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(Math.round((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(Math.round(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(Math.round(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Security Deposit: <strong>₹{(Math.round(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(Math.round(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 4: Payment Collections Log */}
+                        {b.paymentCollection && b.paymentCollection.length > 0 && (
+                          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>📜 Payment Collection Log</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {b.paymentCollection.map((p, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', fontSize: '0.8rem' }}>
+                                  <span>{p.reference || 'Payment Received'} ({p.mode})</span>
+                                  <strong>₹{(Math.round((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedHistoryBooking(null)}>Close</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Zone Change History Table (Admin Only) */}
               {userRole === 'admin' && (

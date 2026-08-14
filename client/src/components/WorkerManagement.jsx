@@ -178,7 +178,7 @@ export default function WorkerManagement() {
       {/* Modal Overlay */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-content glass-panel responsive-modal-container" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="modal-header">
               <h2>{editMode ? 'Edit Worker' : 'Add New Worker'}</h2>
               <button className="fo-btn-outline" onClick={handleCloseModal} style={{ padding: '4px' }}>

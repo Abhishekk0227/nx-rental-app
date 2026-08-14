@@ -280,7 +280,7 @@ router.post('/:bookingId/extend', async (req, res) => {
 
     const updates = {
       extensions: exts,
-      'rentalPeriod.expectedEndDate': newExpectedEndDate,
+      expectedDropDate: newExpectedEndDate,
       expectedReturnDate: newExpectedEndDate,
       baseFare: newRentalCost,
       rentalCost: newRentalCost,
@@ -309,6 +309,10 @@ router.post('/:bookingId/extend', async (req, res) => {
 
     if (isDbConnected()) {
       Object.assign(booking, updates);
+      if (booking.rentalPeriod) {
+        booking.rentalPeriod.expectedEndDate = newExpectedEndDate;
+        booking.markModified('rentalPeriod');
+      }
       if (req.body.selectedPlan) booking.markModified('selectedPlan');
       if (req.body.depositDetails) booking.markModified('depositDetails');
       if (req.body.revisions) booking.markModified('revisions');

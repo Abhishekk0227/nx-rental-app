@@ -281,4 +281,75 @@ router.post('/:vehicleId/:recordId/complete', async (req, res) => {
   }
 });
 
+// Edit Maintenance History Record
+router.put('/:vehicleId/:recordId', async (req, res) => {
+  try {
+    const { workDone, vendor, cost, serviceKm, notes, serviceDate } = req.body;
+    const vehicle = isDbConnected() 
+      ? await Vehicle.findOne({ vehicleId: req.params.vehicleId })
+      : getVehicles().find(v => v.vehicleId === req.params.vehicleId);
+
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+
+    if (isDbConnected()) {
+      let record = vehicle.maintenanceRecords.id(req.params.recordId);
+      if (!record) {
+        record = vehicle.maintenanceRecords.find(r => String(r._id) === String(req.params.recordId));
+      }
+      if (record) {
+        if (workDone !== undefined) record.workDone = workDone;
+        if (vendor !== undefined) record.vendor = vendor;
+        if (cost !== undefined) record.cost = Number(cost) || 0;
+        if (serviceKm !== undefined) record.serviceKm = Number(serviceKm) || 0;
+        if (notes !== undefined) record.notes = notes;
+        if (serviceDate !== undefined) record.serviceDate = new Date(serviceDate);
+      }
+      await vehicle.save();
+      return res.json(vehicle);
+    } else {
+      let records = [...(vehicle.maintenanceRecords || [])];
+      let record = records.find(r => String(r._id || r.id) === String(req.params.recordId));
+      if (record) {
+        if (workDone !== undefined) record.workDone = workDone;
+        if (vendor !== undefined) record.vendor = vendor;
+        if (cost !== undefined) record.cost = Number(cost) || 0;
+        if (serviceKm !== undefined) record.serviceKm = Number(serviceKm) || 0;
+        if (notes !== undefined) record.notes = notes;
+        if (serviceDate !== undefined) record.serviceDate = new Date(serviceDate);
+      }
+      const updated = updateVehicle(vehicle.vehicleId, { maintenanceRecords: records });
+      res.json(updated);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Delete Maintenance History Record
+router.delete('/:vehicleId/:recordId', async (req, res) => {
+  try {
+    const vehicle = isDbConnected() 
+      ? await Vehicle.findOne({ vehicleId: req.params.vehicleId })
+      : getVehicles().find(v => v.vehicleId === req.params.vehicleId);
+
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+
+    if (isDbConnected()) {
+      vehicle.maintenanceRecords = vehicle.maintenanceRecords.filter(
+        r => String(r._id) !== String(req.params.recordId)
+      );
+      await vehicle.save();
+      return res.json(vehicle);
+    } else {
+      let records = (vehicle.maintenanceRecords || []).filter(
+        r => String(r._id || r.id) !== String(req.params.recordId)
+      );
+      const updated = updateVehicle(vehicle.vehicleId, { maintenanceRecords: records });
+      res.json(updated);
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
 export default router;

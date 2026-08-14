@@ -117,7 +117,7 @@ export default function ZoneManagement({ refreshGlobalData }) {
       {loading ? (
         <p>Loading zones...</p>
       ) : (
-        <div className="fo-table-wrap glass-panel" style={{ padding: 0 }}>
+        <div className="fo-table-wrap glass-panel responsive-table-slider" style={{ padding: 0, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
           <table className="fo-table custom-table">
             <thead>
               <tr>
@@ -174,7 +174,7 @@ export default function ZoneManagement({ refreshGlobalData }) {
       {/* Modal Overlay */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={handleCloseModal}>
-          <div className="modal-content glass-panel" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-content glass-panel responsive-modal-container" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="modal-header">
               <h2>{editMode ? 'Edit Zone' : 'Add New Zone'}</h2>
               <button className="fo-btn-outline" onClick={handleCloseModal} style={{ padding: '4px' }}>

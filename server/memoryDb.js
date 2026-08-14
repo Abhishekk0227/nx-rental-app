@@ -151,7 +151,7 @@ export const deleteZone = (id) => {
 
 // ─── User CRUD ────────────────────────────────────────────────────────────────
 export let users = [
-  { _id: 'u1', name: 'Admin User', username: 'admin', role: 'admin', status: 'Active' },
+  { _id: 'u1', name: 'Super Admin', username: 'Rideyourbike@gmail.com', role: 'admin', status: 'Active' },
   { _id: 'u2', name: 'Ramesh Kumar', username: '9876543210', role: 'worker', status: 'Active', zoneId: 'z1' },
   { _id: 'u3', name: 'Suresh Singh', username: '9123456789', role: 'worker', status: 'Active', zoneId: 'z2' }
 ];

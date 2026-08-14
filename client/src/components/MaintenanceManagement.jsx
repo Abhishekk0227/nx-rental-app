@@ -3,7 +3,7 @@ import {
   Wrench, AlertTriangle, CheckCircle, Clock, Plus, X, RefreshCw,
   Car, Bike, AlertCircle, ChevronRight, Search, Filter,
   Calendar, Gauge, DollarSign, User, ClipboardList, FileText,
-  ArrowRight, Eye, StopCircle, CheckSquare, Activity, Zap
+  ArrowRight, Eye, StopCircle, CheckSquare, Activity, Zap, Pencil, Trash2
 } from 'lucide-react';
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || '') + '/api';
@@ -157,6 +157,35 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
   const [statusForm,   setStatusForm]   = useState({ statusNotes: '' });
   const [histSearch,   setHistSearch]   = useState('');
 
+  // History Edit & Delete state
+  const [showEditHistoryModal, setShowEditHistoryModal] = useState(false);
+  const [showDeleteHistoryModal, setShowDeleteHistoryModal] = useState(false);
+  const [editHistoryForm, setEditHistoryForm] = useState({ vehicleId: '', recordId: '', workDone: '', vendor: '', cost: 0, serviceKm: 0, notes: '', serviceDate: '' });
+  
+  const [editActiveForm, setEditActiveForm] = useState(null);
+
+  const handleEditActiveSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) };
+      const res = await fetch(`${API_BASE}/maintenance/${editActiveForm.vehicleId}/${editActiveForm.recordId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ issue: editActiveForm.issue, notes: editActiveForm.notes, priority: editActiveForm.priority })
+      });
+      if (res.ok) {
+        setEditActiveForm(null);
+        fetchAll();
+      } else {
+        alert('Failed to update maintenance record');
+      }
+    } catch (err) {
+      alert('Error updating record');
+    }
+  };
+  const [deleteHistoryItem, setDeleteHistoryItem] = useState(null);
+
   // ── Fetch ──────────────────────────────────────────────────────────────────
   const fetchAll = async () => {
     setLoading(true);
@@ -175,6 +204,66 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
       console.error('Maintenance fetch error', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Edit / Delete history handlers
+  const openEditHistory = (h) => {
+    setEditHistoryForm({
+      vehicleId: h.vehicleId,
+      recordId: h.record?._id || h.record?.id,
+      workDone: h.record?.workDone || '',
+      vendor: h.record?.vendor || '',
+      cost: h.record?.cost || 0,
+      serviceKm: h.record?.serviceKm || h.meterReading || 0,
+      notes: h.record?.notes || '',
+      serviceDate: h.record?.serviceDate ? new Date(h.record.serviceDate).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10)
+    });
+    setShowEditHistoryModal(true);
+  };
+
+  const handleEditHistorySubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { 'Content-Type': 'application/json', ...(token && { Authorization: `Bearer ${token}` }) };
+      const res = await fetch(`${API_BASE}/maintenance/${editHistoryForm.vehicleId}/${editHistoryForm.recordId}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify(editHistoryForm)
+      });
+      if (res.ok) {
+        setShowEditHistoryModal(false);
+        fetchAll();
+      } else {
+        alert('Failed to update maintenance record');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error updating record');
+    }
+  };
+
+  const handleDeleteHistorySubmit = async () => {
+    if (!deleteHistoryItem) return;
+    try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const recId = deleteHistoryItem.record?._id || deleteHistoryItem.record?.id;
+      const res = await fetch(`${API_BASE}/maintenance/${deleteHistoryItem.vehicleId}/${recId}`, {
+        method: 'DELETE',
+        headers
+      });
+      if (res.ok) {
+        setShowDeleteHistoryModal(false);
+        setDeleteHistoryItem(null);
+        fetchAll();
+      } else {
+        alert('Failed to delete maintenance record');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Error deleting record');
     }
   };
 
@@ -326,7 +415,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
       </div>
 
       {/* ── Tab Nav ── */}
-      <div style={{ display: 'flex', gap: 4, background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 12, padding: 4, marginBottom: 20, width: 'fit-content' }}>
+      <div className="horizontal-slider" style={{ display: 'flex', gap: 4, background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: 12, padding: 4, marginBottom: 20, maxWidth: '100%', overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
         <TabBtn id="needed" label="Service Needed"    icon={<AlertTriangle />} count={serviceNeeded.length} />
         <TabBtn id="under"  label="Under Maintenance" icon={<Wrench />}        count={underMaintenance.length} />
         <TabBtn id="history" label="Service History"  icon={<ClipboardList />} />
@@ -350,7 +439,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                   <p style={{ color: '#64748b', fontSize: '0.875rem' }}>No vehicles currently require maintenance service.</p>
                 </div>
               ) : (
-                <div style={{ overflowX: 'auto', paddingBottom: '8px' }}>
+                <div className="responsive-table-slider" style={{ overflowX: 'auto', paddingBottom: '8px', WebkitOverflowScrolling: 'touch' }}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: '800px' }}>
                   {serviceNeeded.map(v => {
                     const reason = v.pendingRecord ? REASON_STYLE.manual : REASON_STYLE.km;
@@ -404,6 +493,25 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                           >
                             <StopCircle size={15} /> Stop Vehicle
                           </button>
+                          
+                          {v.pendingRecord && (
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <button
+                                onClick={() => setEditActiveForm({ vehicleId: v.vehicleId, recordId: v.pendingRecord._id, issue: v.pendingRecord.issue, priority: v.pendingRecord.priority || 'Medium', notes: v.pendingRecord.notes || '' })}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#f8fafc', color: '#3b82f6', border: '1px solid #e2e8f0', borderRadius: 8, cursor: 'pointer' }}
+                                title="Edit Request"
+                              >
+                                <Pencil size={14} />
+                              </button>
+                              <button
+                                onClick={() => setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.pendingRecord })}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, cursor: 'pointer' }}
+                                title="Delete Request"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
@@ -471,6 +579,22 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                         >
                           <FileText size={14} /> Add Note
                         </button>
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <button
+                            onClick={() => setEditActiveForm({ vehicleId: v.vehicleId, recordId: v.activeRecord._id, issue: v.activeRecord.issue, priority: v.activeRecord.priority || 'Medium', notes: v.activeRecord.notes || '' })}
+                            style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 14px', background: '#f8fafc', color: '#3b82f6', border: '1px solid #e2e8f0', borderRadius: 9, cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}
+                            title="Edit Record"
+                          >
+                            <Pencil size={14} /> Edit
+                          </button>
+                          <button
+                            onClick={() => setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.activeRecord })}
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 12px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 9, cursor: 'pointer' }}
+                            title="Delete Record"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
                         <button
                           onClick={() => openCompleteModal(v)}
                           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '8px 14px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: 9, cursor: 'pointer', fontWeight: 700, fontSize: '0.8rem', transition: 'all 0.15s' }}
@@ -514,11 +638,11 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                   <p style={{ color: '#64748b', fontSize: '0.875rem' }}>{histSearch ? 'Try a different search term.' : 'Completed services will appear here.'}</p>
                 </div>
               ) : (
-                <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflowX: 'auto' }}>
+                <div className="responsive-table-slider" style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px' }}>
                     <thead>
                       <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e5e7eb' }}>
-                        {['Date', 'Vehicle', 'Service KM', 'Work Done', 'Vendor', 'Cost', 'Notes'].map(h => (
+                        {['Date', 'Vehicle', 'Service KM', 'Work Done', 'Vendor', 'Cost', 'Notes', 'Actions'].map(h => (
                           <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '0.72rem', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap' }}>{h}</th>
                         ))}
                       </tr>
@@ -554,6 +678,24 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                           <td style={{ padding: '14px 16px', maxWidth: 180 }}>
                             <span style={{ fontSize: '0.78rem', color: '#64748b' }}>{h.record.notes || '—'}</span>
                           </td>
+                          <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                            <div style={{ display: 'flex', gap: 6 }}>
+                              <button
+                                style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: 6, border: '1px solid #cbd5e1', background: '#f8fafc', color: '#475569', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}
+                                onClick={() => openEditHistory(h)}
+                                title="Edit Record"
+                              >
+                                <Pencil size={12} /> Edit
+                              </button>
+                              <button
+                                style={{ padding: '4px 8px', fontSize: '0.75rem', borderRadius: 6, border: '1px solid #fca5a5', background: '#fef2f2', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontWeight: 600 }}
+                                onClick={() => { setDeleteHistoryItem(h); setShowDeleteHistoryModal(true); }}
+                                title="Delete Record"
+                              >
+                                <Trash2 size={12} /> Delete
+                              </button>
+                            </div>
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -565,7 +707,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                         <td style={{ padding: '12px 16px', fontWeight: 800, color: '#10b981', fontSize: '0.95rem' }}>
                           {fmtRs(filteredHistory.reduce((s, h) => s + (h.record?.cost || 0), 0))}
                         </td>
-                        <td />
+                        <td colSpan={2} />
                       </tr>
                     </tfoot>
                   </table>
@@ -629,6 +771,48 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
               <button type="submit"
                 style={{ padding: '9px 20px', background: '#1e293b', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 7 }}
               ><Plus size={15} /> Add Requirement</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Edit Active/Pending Modal ── */}
+      {editActiveForm && (
+        <Modal title="Edit Maintenance Request" subtitle="Update issue or priority" onClose={() => setEditActiveForm(null)} maxWidth={500}>
+          <form onSubmit={handleEditActiveSubmit}>
+            <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr', gap: 14 }}>
+              <FormField label="Priority" required>
+                <select value={editActiveForm.priority} onChange={e => setEditActiveForm({ ...editActiveForm, priority: e.target.value })}
+                  style={inputSt}
+                  onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                >
+                  <option value="Low">🟢 Low</option>
+                  <option value="Medium">🟡 Medium</option>
+                  <option value="High">🔴 High</option>
+                </select>
+              </FormField>
+
+              <FormField label="Issue / Description" required>
+                <textarea required rows={3} value={editActiveForm.issue} onChange={e => setEditActiveForm({ ...editActiveForm, issue: e.target.value })}
+                  style={{ ...inputSt, resize: 'vertical' }}
+                  onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Notes">
+                <textarea rows={3} value={editActiveForm.notes} onChange={e => setEditActiveForm({ ...editActiveForm, notes: e.target.value })}
+                  style={{ ...inputSt, resize: 'vertical' }}
+                  onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+            </div>
+            <div style={{ padding: '14px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button type="button" onClick={() => setEditActiveForm(null)}
+                style={{ padding: '9px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+              >Cancel</button>
+              <button type="submit"
+                style={{ padding: '9px 20px', background: '#3b82f6', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 7 }}
+              ><CheckCircle size={15} /> Save Changes</button>
             </div>
           </form>
         </Modal>
@@ -759,6 +943,84 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
               ><FileText size={15} /> Save Note</button>
             </div>
           </form>
+        </Modal>
+      )}
+
+      {/* ── Edit Service History Record Modal ── */}
+      {showEditHistoryModal && (
+        <Modal title="Edit Maintenance Record" subtitle="Update service details" onClose={() => setShowEditHistoryModal(false)} maxWidth={520}>
+          <form onSubmit={handleEditHistorySubmit}>
+            <div style={{ padding: '20px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <FormField label="Service Date" required half>
+                <input type="date" required value={editHistoryForm.serviceDate}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, serviceDate: e.target.value })}
+                  style={inputSt} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Service Odometer (KM)" required half>
+                <input type="number" required min="0" value={editHistoryForm.serviceKm}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, serviceKm: e.target.value })}
+                  style={inputSt} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Work Done / Details" required>
+                <textarea required rows={3} value={editHistoryForm.workDone}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, workDone: e.target.value })}
+                  style={{ ...inputSt, resize: 'vertical' }} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Vendor / Garage" half>
+                <input type="text" value={editHistoryForm.vendor}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, vendor: e.target.value })}
+                  style={inputSt} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Service Cost (₹)" required half>
+                <input type="number" required min="0" value={editHistoryForm.cost}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, cost: e.target.value })}
+                  style={inputSt} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+
+              <FormField label="Notes">
+                <textarea rows={2} value={editHistoryForm.notes}
+                  onChange={e => setEditHistoryForm({ ...editHistoryForm, notes: e.target.value })}
+                  style={{ ...inputSt, resize: 'vertical' }} onFocus={e => e.target.style.borderColor = '#6366f1'} onBlur={e => e.target.style.borderColor = '#d1d5db'}
+                />
+              </FormField>
+            </div>
+            <div style={{ padding: '14px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+              <button type="button" onClick={() => setShowEditHistoryModal(false)}
+                style={{ padding: '9px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+              >Cancel</button>
+              <button type="submit"
+                style={{ padding: '9px 20px', background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 7 }}
+              ><Pencil size={14} /> Update Record</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* ── Delete Confirmation Modal ── */}
+      {showDeleteHistoryModal && deleteHistoryItem && (
+        <Modal title="Delete Maintenance Record" subtitle="Are you sure you want to delete this record?" onClose={() => setShowDeleteHistoryModal(false)} maxWidth={440}>
+          <div style={{ padding: '20px 24px' }}>
+            <p style={{ fontSize: '0.88rem', color: '#374151', margin: 0 }}>
+              This will permanently delete the maintenance log for <strong>{deleteHistoryItem.name || deleteHistoryItem.vehicleId}</strong> ({deleteHistoryItem.record?.workDone || 'Service'}).
+            </p>
+          </div>
+          <div style={{ padding: '14px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+            <button type="button" onClick={() => setShowDeleteHistoryModal(false)}
+              style={{ padding: '9px 16px', border: '1px solid #e2e8f0', borderRadius: 8, background: '#fff', color: '#374151', cursor: 'pointer', fontWeight: 600, fontSize: '0.85rem' }}
+            >Cancel</button>
+            <button type="button" onClick={handleDeleteHistorySubmit}
+              style={{ padding: '9px 20px', background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: 7 }}
+            ><Trash2 size={14} /> Yes, Delete</button>
+          </div>
         </Modal>
       )}
     </div>

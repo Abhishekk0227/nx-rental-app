@@ -51,6 +51,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
   const [historySearch, setHistorySearch] = useState('');
   const [historyStatus, setHistoryStatus] = useState('All');
   const [historyDate, setHistoryDate] = useState('');
+  const [selectedHistoryBooking, setSelectedHistoryBooking] = useState(null);
 
   // Camera integration state variables
   const [cameraActive, setCameraActive] = useState(false);
@@ -104,7 +105,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
       const ctx = canvas.getContext('2d');
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
       const base64Str = canvas.toDataURL('image/jpeg');
-      
+
       setFormData(prev => ({
         ...prev,
         images: { ...prev.images, [selectedImageType]: base64Str }
@@ -389,282 +390,243 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
   return (
     <div className="animate-slide-up">
       {avViewState === 'list' && (<>
-      {/* PAGE HEADER */}
-      <div className="fo-page-header">
-        <div>
-          <h1 className="fo-page-title">Available Vehicles</h1>
-          <p className="fo-breadcrumb">FleetOps / <span style={{ color: 'var(--secondary)' }}>Available Vehicles</span></p>
+        {/* PAGE HEADER */}
+        <div className="fo-page-header">
+          <div>
+            <h1 className="fo-page-title">Available Vehicles</h1>
+            <p className="fo-breadcrumb">FleetOps / <span style={{ color: 'var(--secondary)' }}>Available Vehicles</span></p>
+          </div>
         </div>
-      </div>
 
-      {/* KPI SUMMARY GRID */}
-      <div className="fo-stat-grid">
-        <div className="fo-stat-card">
-          <div className="fo-stat-content">
-            <p className="fo-stat-label">Total Vehicles</p>
-            <h3 className="fo-stat-value">{totalFleet}</h3>
-            <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
-              <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Bike size={12} style={{marginRight:2}}/> {countScooty}</span>
-              <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Car size={12} style={{marginRight:2}}/> {countCar}</span>
-              <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Bike size={12} style={{marginRight:2}}/> {countBike}</span>
+        {/* KPI SUMMARY GRID */}
+        <div className="fo-stat-grid">
+          <div className="fo-stat-card">
+            <div className="fo-stat-content">
+              <p className="fo-stat-label">Total Vehicles</p>
+              <h3 className="fo-stat-value">{totalFleet}</h3>
+              <div style={{ display: 'flex', gap: '6px', marginTop: '8px' }}>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Bike size={12} style={{ marginRight: 2 }} /> {countScooty}</span>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Car size={12} style={{ marginRight: 2 }} /> {countCar}</span>
+                <span style={{ fontSize: '0.72rem', padding: '2px 8px', borderRadius: '6px', background: '#f1f5f9', color: '#64748b' }}><Bike size={12} style={{ marginRight: 2 }} /> {countBike}</span>
+              </div>
             </div>
+            <div className="fo-stat-icon" style={{ background: '#eef2ff' }}><Car size={22} color="#6366f1" /></div>
           </div>
-          <div className="fo-stat-icon" style={{ background: '#eef2ff' }}><Car size={22} color="#6366f1"/></div>
-        </div>
-        <div className="fo-stat-card" style={{ borderLeft: '3px solid #10b981' }}>
-          <div className="fo-stat-content">
-            <p className="fo-stat-label" style={{ color: '#10b981' }}>Available</p>
-            <h3 className="fo-stat-value" style={{ color: '#10b981', WebkitTextFillColor: '#10b981' }}>{countAvailable}</h3>
-          </div>
-          <div className="fo-stat-icon" style={{ background: '#ecfdf5' }}><Car size={22} color="#10b981"/></div>
-        </div>
-        <div className="fo-stat-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-          <div className="fo-stat-content">
-            <p className="fo-stat-label" style={{ color: '#f59e0b' }}>Reserved</p>
-            <h3 className="fo-stat-value" style={{ color: '#f59e0b', WebkitTextFillColor: '#f59e0b' }}>{countReserved}</h3>
-          </div>
-          <div className="fo-stat-icon" style={{ background: '#fffbeb' }}><Calendar size={22} color="#f59e0b"/></div>
-        </div>
-        <div className="fo-stat-card" style={{ borderLeft: '3px solid #6366f1' }}>
-          <div className="fo-stat-content">
-            <p className="fo-stat-label" style={{ color: '#6366f1' }}>Ongoing</p>
-            <h3 className="fo-stat-value" style={{ color: '#6366f1', WebkitTextFillColor: '#6366f1' }}>{countPrebooked}</h3>
-          </div>
-          <div className="fo-stat-icon" style={{ background: '#eef2ff' }}><Gauge size={22} color="#6366f1"/></div>
-        </div>
-      </div>
-
-      {/* COLLAPSIBLE FILTER & SEARCH BAR */}
-      <div className="glass-panel" style={{ padding: '16px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}/>
-            <input 
-              type="text" 
-              className="form-control" 
-              placeholder="Search vehicles by name, number, or brand..." 
-              value={searchTerm} 
-              onChange={e => setSearchTerm(e.target.value)} 
-              style={{ paddingLeft: '36px' }}
-            />
-          </div>
-          <button 
-            type="button" 
-            className="fo-btn-outline" 
-            onClick={() => setShowFilters(!showFilters)}
-          >
-            <SlidersHorizontal size={16}/> {showFilters ? 'Hide Filters' : 'Show Filters'}
-          </button>
-        </div>
-
-        {showFilters && (
-          <div className="av-filter-grid animate-fade">
-            <div>
-              <select className="form-control" value={selectedZone} onChange={e => setSelectedZone(e.target.value)}>
-                <option value="All">All Zones</option>
-                {zones.map(z => (
-                  <option key={z._id} value={z.name}>{z.name}</option>
-                ))}
-              </select>
+          <div className="fo-stat-card" style={{ borderLeft: '3px solid #10b981' }}>
+            <div className="fo-stat-content">
+              <p className="fo-stat-label" style={{ color: '#10b981' }}>Available</p>
+              <h3 className="fo-stat-value" style={{ color: '#10b981', WebkitTextFillColor: '#10b981' }}>{countAvailable}</h3>
             </div>
-            <div>
-              <select className="form-control" value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
-                <option value="All">All Statuses</option>
-                <option value="Available">Available</option>
-                <option value="Reserved">Reserved</option>
-                <option value="Ongoing">Ongoing</option>
-                <option value="Maintenance">Maintenance</option>
-                <option value="Out Of Service">Out Of Service</option>
-              </select>
-            </div>
-            <div>
-              <select className="form-control" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
-                <option value="All">All Categories</option>
-                <option value="Bike">Bike</option>
-                <option value="Scooty">Scooty</option>
-                <option value="Car">Car</option>
-                <option value="EV">EV</option>
-              </select>
-            </div>
-            <div>
-              <select className="form-control" value={sortBy} onChange={e => setSortBy(e.target.value)}>
-                <option value="Newest First">Newest First</option>
-                <option value="Oldest First">Oldest First</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="name-asc">Name: A to Z</option>
-              </select>
-            </div>
+            <div className="fo-stat-icon" style={{ background: '#ecfdf5' }}><Car size={22} color="#10b981" /></div>
           </div>
-        )}
-      </div>
+          <div className="fo-stat-card" style={{ borderLeft: '3px solid #f59e0b' }}>
+            <div className="fo-stat-content">
+              <p className="fo-stat-label" style={{ color: '#f59e0b' }}>Reserved</p>
+              <h3 className="fo-stat-value" style={{ color: '#f59e0b', WebkitTextFillColor: '#f59e0b' }}>{countReserved}</h3>
+            </div>
+            <div className="fo-stat-icon" style={{ background: '#fffbeb' }}><Calendar size={22} color="#f59e0b" /></div>
+          </div>
+          <div className="fo-stat-card" style={{ borderLeft: '3px solid #6366f1' }}>
+            <div className="fo-stat-content">
+              <p className="fo-stat-label" style={{ color: '#6366f1' }}>Ongoing</p>
+              <h3 className="fo-stat-value" style={{ color: '#6366f1', WebkitTextFillColor: '#6366f1' }}>{countPrebooked}</h3>
+            </div>
+            <div className="fo-stat-icon" style={{ background: '#eef2ff' }}><Gauge size={22} color="#6366f1" /></div>
+          </div>
+        </div>
 
-      {/* 📋 VEHICLES DATA TABLE — Horizontal scroll on all small screens, full row always visible */}
-      <div className="glass-panel" style={{ padding: 0, overflow: 'hidden' }}>
-        <div className="table-responsive" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
-          <table className="custom-table av-vehicle-table">
-            <thead>
-              <tr>
-                <th>VEHICLE</th>
-                <th>ACTIONS</th>
-                <th>STATUS</th>
-                <th>RATE</th>
-                <th>SPECS</th>
-                <th>LOCATION</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredVehicles.map(v => {
-                const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
-                const category = v.category || v.type || 'Car';
-                const rate24h = v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0;
-                const rate12h = v.pricingPlans?.twelveHour?.baseRate || 500;
-                const ratePerHour = v.pricingPlans?.hourly?.rate || v.perHourRate || 0;
-                const isUsable = v.status === 'Active' || v.status === 'Available';
-                
-                const meter = v.meterReading || 0;
-                const nextService = v.nextServiceKm || 5000;
-                const isMaintenanceDue = meter >= nextService;
-                const isServiceDueSoon = !isMaintenanceDue && (nextService - meter <= 500);
+        {/* COLLAPSIBLE FILTER & SEARCH BAR */}
+        <div className="glass-panel" style={{ padding: '16px', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{ flex: 1, position: 'relative' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Search vehicles by name, number, or brand..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                style={{ paddingLeft: '36px' }}
+              />
+            </div>
+            <button
+              type="button"
+              className="fo-btn-outline"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <SlidersHorizontal size={16} /> {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </button>
+          </div>
 
-                return (
-                  <tr key={v.vehicleId}>
-                    {/* Column 1: VEHICLE (Icon, Name, Number, fuel label) */}
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '42px', borderRadius: '8px', background: '#f1f5f9', overflow: 'hidden', flexShrink: 0 }}>
-                          {v.images?.front ? (
-                            <img src={v.images.front?.replace(/\s+/g, '')} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }} />
-                          ) : (
-                            category === 'Car' ? <Car size={20} color="#6366f1"/> : <Bike size={20} color="#6366f1"/>
-                          )}
-                        </span>
-                        <div>
-                          <strong style={{ color: '#1e293b', display: 'block' }}>{v.name}</strong>
-                          <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>
-                            <code>{v.regNumber}</code>
-                          </span>
-                          <span className="badge badge-secondary" style={{ fontSize: '0.65rem', padding: '2px 6px', marginTop: '3px', background: 'rgba(99,102,241,0.08)', color: 'var(--primary)', textTransform: 'none' }}>
-                            {v.fuelType}
-                          </span>
-                        </div>
-                      </div>
-                    </td>
+          {showFilters && (
+            <div className="av-filter-grid animate-fade">
+              <div>
+                <select className="form-control" value={selectedZone} onChange={e => setSelectedZone(e.target.value)}>
+                  <option value="All">All Zones</option>
+                  {zones.map(z => (
+                    <option key={z._id} value={z.name}>{z.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <select className="form-control" value={selectedStatus} onChange={e => setSelectedStatus(e.target.value)}>
+                  <option value="All">All Statuses</option>
+                  <option value="Available">Available</option>
+                  <option value="Reserved">Reserved</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Maintenance">Maintenance</option>
+                  <option value="Out Of Service">Out Of Service</option>
+                </select>
+              </div>
+              <div>
+                <select className="form-control" value={selectedCategory} onChange={e => setSelectedCategory(e.target.value)}>
+                  <option value="All">All Categories</option>
+                  <option value="Bike">Bike</option>
+                  <option value="Scooty">Scooty</option>
+                  <option value="Car">Car</option>
+                  <option value="EV">EV</option>
+                </select>
+              </div>
+              <div>
+                <select className="form-control" value={sortBy} onChange={e => setSortBy(e.target.value)}>
+                  <option value="Newest First">Newest First</option>
+                  <option value="Oldest First">Oldest First</option>
+                  <option value="price-asc">Price: Low to High</option>
+                  <option value="price-desc">Price: High to Low</option>
+                  <option value="name-asc">Name: A to Z</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
 
-                    {/* Column 2: ACTIONS (status badge) */}
-                    <td>
-                      {isUsable ? (
-                        <span className="badge badge-available" style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                          <span style={{ display: 'inline-block', width: '6px', height: '6px', borderRadius: '50%', background: 'var(--status-available)' }}></span>
-                          Available
-                        </span>
-                      ) : (
-                        <span className={`badge badge-${v.status === 'Booked' ? 'ongoing' : v.status.toLowerCase()}`} style={{ padding: '6px 12px', fontSize: '0.75rem' }}>
-                          {v.status === 'Booked' ? 'Ongoing' : v.status}
-                        </span>
-                      )}
-                      
-                      {/* Maintenance Alerts */}
-                      {isMaintenanceDue && (
-                        <span className="badge" style={{ display: 'block', marginTop: '6px', background: '#fee2e2', color: '#b91c1c', border: '1px solid #fecaca', fontSize: '0.7rem', padding: '4px 8px' }}>
-                          🔴 Maintenance Due
-                        </span>
-                      )}
-                      {isServiceDueSoon && (
-                        <span className="badge" style={{ display: 'block', marginTop: '6px', background: '#ffedd5', color: '#c2410c', border: '1px solid #fed7aa', fontSize: '0.7rem', padding: '4px 8px' }}>
-                          🟠 Service Due Soon ({nextService - meter} KM)
-                        </span>
-                      )}
-                    </td>
+        {/* 📋 VEHICLES DATA CARDS — Responsive Grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
+          {filteredVehicles.map(v => {
+            const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
+            const category = v.category || v.type || 'Car';
+            const rate24h = v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0;
+            const rate12h = v.pricingPlans?.twelveHour?.baseRate || 500;
+            const ratePerHour = v.pricingPlans?.hourly?.rate || v.perHourRate || 0;
+            const isUsable = v.status === 'Active' || v.status === 'Available';
 
-                    {/* Column 3: STATUS (4 Buttons) */}
-                    <td>
-                      <div style={{ display: 'flex', gap: '6px' }}>
+            const meter = v.meterReading || 0;
+            const catLower = category.toLowerCase();
+            const defaultInterval = catLower === 'scooty' ? 2000 : ['bike', 'ev'].includes(catLower) ? 3000 : 5000;
+            const nextService = v.nextServiceKm || (meter + defaultInterval);
+            const hasManualMaintenance = v.maintenanceRecords?.some(r => r.status === 'Pending' || r.status === 'Under Maintenance');
+            const isMaintenanceDue = meter >= nextService || hasManualMaintenance;
+            const isServiceDueSoon = !isMaintenanceDue && (nextService - meter <= 500);
+
+            let cardBg = '';
+            let cardBorder = '';
+            if (v.status === 'Maintenance' || isMaintenanceDue) {
+              cardBg = '#fef2f2'; // Light red
+              cardBorder = '1px solid #fecaca';
+            } else if (isServiceDueSoon) {
+              cardBg = '#fff7ed'; // Light orange
+              cardBorder = '1px solid #fed7aa';
+            }
+
+            return (
+              <div key={v.vehicleId} className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '16px', position: 'relative', background: cardBg || undefined, border: cardBorder || undefined }}>
+
+                {/* Header: Image & Basics */}
+                <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+                  <div style={{ width: '60px', height: '60px', borderRadius: '8px', background: '#f8fafc', overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border-light)' }}>
+                    {v.images?.front ? (
+                      <img src={v.images.front?.replace(/\s+/g, '')} alt={v.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    ) : (
+                      category === 'Car' ? <Car size={24} color="#6366f1" /> : <Bike size={24} color="#6366f1" />
+                    )}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <strong style={{ color: '#1e293b', fontSize: '1.05rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{v.name}</strong>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px', flexShrink: 0 }}>
                         {isUsable ? (
-                          <button 
-                            className="fo-btn-primary" 
-                            style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-                            onClick={() => onBookVehicle(v)}
-                          >
-                            <Calendar size={13}/> Book
-                          </button>
+                          <span className="badge badge-available" style={{ padding: '2px 8px', fontSize: '0.65rem' }}>AVAILABLE</span>
                         ) : (
-                          <button 
-                            className="fo-btn-outline" 
-                            style={{ padding: '6px 12px', fontSize: '0.75rem', opacity: 0.4, cursor: 'not-allowed' }}
-                            disabled
-                          >
-                            <Calendar size={13}/> Book
-                          </button>
+                          <span className={`badge badge-${v.status === 'Booked' ? 'ongoing' : v.status.toLowerCase()}`} style={{ padding: '2px 8px', fontSize: '0.65rem' }}>
+                            {v.status === 'Booked' ? 'ONGOING' : v.status.toUpperCase()}
+                          </span>
                         )}
-                        
-                        <button 
-                          className="circle-action-btn view" 
-                          style={{ width: '28px', height: '28px', background: '#2563eb' }}
-                          title="History Log"
-                          onClick={() => openHistoryModal(v)}
-                        >
-                          <Eye size={14}/>
-                        </button>
-                        
-                        <button 
-                          className="circle-action-btn history" 
-                          style={{ width: '28px', height: '28px', background: '#7c3aed' }}
-                          title="Edit Details"
-                          onClick={() => openEditModal(v)}
-                        >
-                          <Pencil size={14}/>
-                        </button>
-
-                        <button 
-                          className="circle-action-btn delete" 
-                          style={{ width: '28px', height: '28px', background: '#dc2626' }}
-                          title="Maintenance Status"
-                          onClick={() => openAvailabilityModal(v)}
-                        >
-                          <Wrench size={14}/>
-                        </button>
                       </div>
-                    </td>
+                    </div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', marginTop: '2px' }}>
+                      <code>{v.regNumber}</code>
+                    </div>
+                    <div style={{ display: 'flex', gap: '6px', marginTop: '6px', flexWrap: 'wrap' }}>
+                      <span className="badge badge-secondary" style={{ fontSize: '0.75rem', padding: '2px 6px', background: 'rgba(99,102,241,0.08)', color: '#000' }}>
+                        {v.fuelType}
+                      </span>
+                      <span className="badge badge-secondary" style={{ fontSize: '0.75rem', padding: '2px 6px', background: 'rgba(99,102,241,0.08)', color: '#000' }}>
+                        {v.seatingCapacity || 2} Seats
+                      </span>
+                      {(isMaintenanceDue || isServiceDueSoon) && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
+                          {isMaintenanceDue && (
+                            <span style={{ display: 'block', background: '#fee2e2', color: '#b91c1c', borderRadius: '4px', fontSize: '0.75rem', padding: '4px 8px', textAlign: 'center', fontWeight: 600 }}>
+                              🔴 Due
+                            </span>
+                          )}
+                          {isServiceDueSoon && (
+                            <span style={{ display: 'block', background: '#ffedd5', color: '#c2410c', borderRadius: '4px', fontSize: '0.75rem', padding: '4px 8px', textAlign: 'center', fontWeight: 600 }}>
+                              🟠 Due  ({nextService - meter} KM)
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
 
-                    {/* Column 4: RATE */}
-                    <td>
-                      <div>
-                        <strong style={{ color: 'var(--status-available)', fontSize: '0.85rem', display: 'block' }}>₹{rate24h}/24h</strong>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>₹{rate12h}/12h</span>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block' }}>₹{ratePerHour}/hr</span>
-                      </div>
-                    </td>
+                {/* Details Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', background: '#f8fafc', padding: '12px', borderRadius: '8px', border: '1px solid #f1f5f9' }}>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Rate (24h)</span>
+                    <strong style={{ color: 'var(--status-available)', fontSize: '0.95rem' }}>₹{rate24h}</strong>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginLeft: '4px' }}>/24h</span>
+                  </div>
+                  <div>
+                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Zone</span>
+                    <strong style={{ color: '#334155', fontSize: '0.9rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>{zone}</strong>
+                  </div>
+                </div>
 
-                    {/* Column 5: SPECS */}
-                    <td style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                      <div>Seats: <strong>{v.seatingCapacity || 2}</strong></div>
-                      <div>Color: <strong>{v.color || 'Black'}</strong></div>
-                      <div>Fuel: <strong>{v.fuelCapacity || 5}L</strong></div>
-                      <div>Mileage: <strong>{v.mileage || 40}kpl</strong></div>
-                    </td>
+                {/* Action Buttons */}
+                <div style={{ display: 'flex', gap: '8px', marginTop: 'auto', paddingTop: '4px' }}>
+                  {isUsable ? (
+                    <button className="fo-btn-primary" style={{ flex: 1, padding: '8px' }} onClick={() => onBookVehicle(v)}>
+                      <Calendar size={14} /> Book
+                    </button>
+                  ) : (
+                    <button className="fo-btn-outline" style={{ flex: 1, padding: '8px', opacity: 0.5, cursor: 'not-allowed' }} disabled>
+                      Not Available
+                    </button>
+                  )}
+                  <div style={{ display: 'flex', gap: '4px' }}>
+                    <button className="circle-action-btn view" style={{ width: '36px', height: '36px', background: 'rgba(37, 99, 235, 0.1)', color: '#2563eb', border: 'none' }} onClick={() => openHistoryModal(v)} title="History Log">
+                      <Eye size={16} />
+                    </button>
+                    <button className="circle-action-btn history" style={{ width: '36px', height: '36px', background: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed', border: 'none' }} onClick={() => openEditModal(v)} title="Edit Details">
+                      <Pencil size={16} />
+                    </button>
+                    <button className="circle-action-btn delete" style={{ width: '36px', height: '36px', background: 'rgba(220, 38, 38, 0.1)', color: '#dc2626', border: 'none' }} onClick={() => openAvailabilityModal(v)} title="Maintenance Status">
+                      <Wrench size={16} />
+                    </button>
+                  </div>
+                </div>
 
-                    {/* Column 6: LOCATION */}
-                    <td>
-                      <div>
-                        <strong style={{ color: '#1e293b', display: 'block', fontSize: '0.85rem' }}>{zone}</strong>
-                        <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block' }}>Indore MP</span>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {filteredVehicles.length === 0 && (
-                <tr>
-                  <td colSpan="6" style={{ textAlign: 'center', padding: '36px', color: 'var(--text-muted)' }}>
-                    No fleet vehicles registered matching current filters.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+              </div>
+            );
+          })}
+          {filteredVehicles.length === 0 && (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '48px', color: 'var(--text-muted)', background: '#fff', borderRadius: '12px' }}>
+              No fleet vehicles registered matching current filters.
+            </div>
+          )}
         </div>
-      </div>
 
       </>)}
 
@@ -688,10 +650,10 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                   { id: 4, label: 'Settings' },
                   { id: 5, label: 'Vehicle Images' }
                 ].map(t => (
-                  <button 
+                  <button
                     key={t.id}
                     type="button"
-                    style={{ 
+                    style={{
                       textAlign: 'left',
                       padding: '14px 18px',
                       fontSize: '0.85rem',
@@ -786,7 +748,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                     {activeSubTab === 2 && (
                       <div className="animate-fade">
                         <h3 style={{ fontSize: '1rem', color: 'var(--secondary)', marginBottom: '16px' }}>Pricing Plans</h3>
-                        
+
                         <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border-light)', padding: '12px', borderRadius: '6px', marginBottom: '12px' }}>
                           <h4 style={{ fontSize: '0.85rem', color: 'var(--primary)', marginBottom: '8px' }}>Hourly Plan (6 fields)</h4>
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -939,17 +901,17 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                                 <option value="interior">Interior View</option>
                               </select>
                             </div>
-                            
-                            <div 
+
+                            <div
                               style={{ border: '2px dashed var(--border-light)', padding: '20px', borderRadius: '8px', textAlign: 'center', cursor: 'pointer', background: 'rgba(255,255,255,0.01)', marginBottom: '12px' }}
                               onClick={() => document.getElementById('edit-file-picker').click()}
                             >
-                              <span style={{display:'flex',alignItems:'center',gap:'6px',justifyContent:'center'}}><Upload size={14}/> Click to browse image file</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}><Upload size={14} /> Click to browse image file</span>
                               <input id="edit-file-picker" type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleFileChange(e, selectedImageType)} />
                             </div>
 
                             <button type="button" className="btn btn-secondary" style={{ width: '100%' }} onClick={cameraActive ? stopCamera : startCamera}>
-                              <Camera size={13} style={{marginRight:4}}/>{cameraActive ? 'Turn Off Camera' : 'Webcam Capture'}
+                              <Camera size={13} style={{ marginRight: 4 }} />{cameraActive ? 'Turn Off Camera' : 'Webcam Capture'}
                             </button>
                           </div>
 
@@ -1073,6 +1035,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         <th>Status</th>
                         <th>Amount</th>
                         <th>KM Driven</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1080,6 +1043,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         const start = b.handover?.startMeter || 0;
                         const end = b.dropDetails?.endMeter || 0;
                         const finalAmt = b.settlement?.totalBill || b.finalAmount || b.baseFare || 0;
+                        const fmtAmt = (Math.round(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
                         return (
                           <tr key={b.bookingId}>
                             <td><code>{b.bookingId}</code></td>
@@ -1087,8 +1051,18 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                             <td>{new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleDateString()}</td>
                             <td>{new Date(b.expectedDropDate || b.rentalPeriod?.expectedEndDate).toLocaleDateString()}</td>
                             <td><span className={`badge badge-${b.status.toLowerCase()}`}>{b.status}</span></td>
-                            <td>₹{finalAmt}</td>
+                            <td>₹{fmtAmt}</td>
                             <td>{b.status === 'Completed' ? `${end - start} KM` : 'N/A'}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn btn-secondary"
+                                style={{ padding: '3px 8px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                                onClick={() => setSelectedHistoryBooking(b)}
+                              >
+                                <Eye size={12} /> View
+                              </button>
+                            </td>
                           </tr>
                         );
                       })}
@@ -1096,6 +1070,93 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                   </table>
                 </div>
               </div>
+
+              {/* Full Booking Profile View Popup Modal */}
+              {selectedHistoryBooking && (() => {
+                const b = selectedHistoryBooking;
+                const base = b.baseFare || 0;
+                const deposit = b.securityDeposit || 0;
+                const advance = b.advancePaid || 0;
+                const ext = b.extensions?.reduce((s, e) => s + (e.extraCharges || 0), 0) || 0;
+                const drop = b.dropDetails;
+                const extra = drop ? ((drop.damageCharges || 0) + (drop.cleaningCharges || 0) + (drop.otherCharges || 0) + (drop.lateCharges || 0)) : 0;
+                const gross = base + ext + extra - (b.discount || 0);
+                const due = b.status === 'Completed' ? 0 : Math.max(0, gross - advance);
+
+                return (
+                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100, padding: '20px' }}>
+                    <div className="glass-panel animate-slide-up" style={{ width: '100%', maxWidth: '750px', maxHeight: '90vh', overflowY: 'auto', background: 'var(--bg-glass)', padding: '24px', borderRadius: '12px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px', marginBottom: '16px' }}>
+                        <div>
+                          <h2 style={{ margin: 0, fontSize: '1.3rem' }}>Booking Profile: #{b.bookingId}</h2>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Status: <strong style={{ color: 'var(--primary)' }}>{b.status}</strong></span>
+                        </div>
+                        <button type="button" className="fo-btn-outline" onClick={() => setSelectedHistoryBooking(null)}><X size={18} /></button>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', fontSize: '0.85rem' }}>
+                        {/* Section 1: Customer Details */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>👤 Customer Information</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Name: <strong>{b.customerName || b.customer?.name}</strong></div>
+                            <div>Phone: <strong>{b.customerPhone || b.customer?.phone}</strong></div>
+                            <div>Alt Phone: <strong>{b.customer?.alternatePhone || b.altPhoneNumber || 'N/A'}</strong></div>
+                            <div>Email: <strong>{b.customer?.email || 'N/A'}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 2: Vehicle & Handover */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>🏍️ Vehicle & Handover Details</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Vehicle: <strong>{b.vehicleName || b.vehicleDetails?.name}</strong></div>
+                            <div>Reg. Number: <code>{b.vehicleRegNumber || b.vehicleDetails?.regNumber}</code></div>
+                            <div>Pickup Time: <strong>{new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleString()}</strong></div>
+                            <div>Expected Return: <strong>{new Date(b.expectedDropDate || b.rentalPeriod?.expectedEndDate).toLocaleString()}</strong></div>
+                            <div>Start Odometer: <strong>{b.handover?.startMeter || b.pickupDetails?.odometerStart || 0} KM</strong></div>
+                            <div>End Odometer: <strong>{drop?.endMeter ? `${drop.endMeter} KM` : 'N/A'}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 3: Financial Summary */}
+                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                          <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>💳 Financial Breakdown</h4>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                            <div>Base Fare: <strong>₹{(Math.round(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extensions Total: <strong>₹{(Math.round(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extra Charges: <strong>₹{(Math.round(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(Math.round((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(Math.round(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(Math.round(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Security Deposit: <strong>₹{(Math.round(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(Math.round(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                          </div>
+                        </div>
+
+                        {/* Section 4: Payment Collections Log */}
+                        {b.paymentCollection && b.paymentCollection.length > 0 && (
+                          <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
+                            <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>📜 Payment Collection Log</h4>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                              {b.paymentCollection.map((p, idx) => (
+                                <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', fontSize: '0.8rem' }}>
+                                  <span>{p.reference || 'Payment Received'} ({p.mode})</span>
+                                  <strong>₹{(Math.round((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+                        <button type="button" className="btn btn-secondary" onClick={() => setSelectedHistoryBooking(null)}>Close</button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')}>← Back to Vehicles</button>
@@ -1115,7 +1176,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
               <button type="button" className="btn btn-secondary" onClick={() => setAvViewState('list')} style={{ borderRadius: '50%', width: '36px', height: '36px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>←</button>
               <div><h2 style={{ margin: 0 }}>Availability / Maintenance</h2><span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{selectedVehicle.name} ({selectedVehicle.vehicleId})</span></div>
             </div>
-            
+
             <form onSubmit={handleAvailabilitySubmit}>
               <div className="modal-body">
                 <div className="form-group">

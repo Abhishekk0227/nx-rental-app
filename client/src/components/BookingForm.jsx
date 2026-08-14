@@ -15,7 +15,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const [pincode, setPincode] = useState('');
 
   // Section 2: Vehicle Handover
-  const [startMeter, setStartMeter] = useState(vehicle.meterReading || 0);
+  const v = vehicle || {};
+  const [startMeter, setStartMeter] = useState(v.meterReading || 0);
   const [includeFuel, setIncludeFuel] = useState(false);
 
   // Section 3: Rental Period
@@ -38,13 +39,14 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   const [pickupDate, setPickupDate] = useState(dates.pickup);
   const [expectedDropDate, setExpectedDropDate] = useState(dates.drop);
 
-  const isScooty = vehicle.category?.toLowerCase() === 'scooty';
-  const isCar = vehicle.category?.toLowerCase() === 'car';
-  const isBike = vehicle.category?.toLowerCase() === 'bike';
+  const vehicleCat = (v.category || v.type || '').toLowerCase();
+  const isScooty = vehicleCat === 'scooty';
+  const isCar = vehicleCat === 'car';
+  const isBike = vehicleCat === 'bike' || vehicleCat === 'ev';
 
   // Vehicle-level minimum booking hours (set in Vehicle Management → Settings tab)
   // 0 means no minimum enforced
-  const minBookingHours = vehicle.bookingConfig?.minBookingHours || 0;
+  const minBookingHours = v.bookingConfig?.minBookingHours || 0;
 
   // Bike Hourly: user-entered hours (starts at minBookingHours or 1)
   const [bikeHourlyDuration, setBikeHourlyDuration] = useState(Math.max(1, minBookingHours));
@@ -189,10 +191,10 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
   // Sync plan parameters when plan type or vehicle changes
   useEffect(() => {
-    const plans = vehicle.pricingPlans || {};
+    const plans = v.pricingPlans || {};
     if (isBike) {
       if (selectedPlanType === 'Hourly') {
-        const rateField = plans.hourly?.rate || vehicle.perHourRate || 100;
+        const rateField = plans.hourly?.rate || v.perHourRate || 100;
         setPlanRate(rateField);
         setPlanExtraKm(plans.hourly?.extraKmCharge || 8);
         setPlanExtraHour(rateField);
@@ -203,7 +205,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         setPlanExtraHour(p.extraHourCharge || plans.hourly?.rate || 100);
       } else if (selectedPlanType === '24-Hour') {
         const p = plans.twentyFourHour || {};
-        setPlanRate(p.baseRate || vehicle.perDayRate || 2400);
+        setPlanRate(p.baseRate || v.perDayRate || 2400);
         setPlanExtraKm(p.extraKmCharge || 8);
         setPlanExtraHour(p.extraHourCharge || plans.hourly?.rate || 100);
       }
@@ -215,7 +217,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         setPlanExtraHour(p.extraHourCharge || 200);
       } else if (selectedPlanType === '24-Hour') {
         const p = plans.twentyFourHour || {};
-        setPlanRate(p.baseRate || vehicle.perDayRate || 4500);
+        setPlanRate(p.baseRate || v.perDayRate || 4500);
         setPlanExtraKm(p.extraKmCharge || 12);
         setPlanExtraHour(p.extraHourCharge || 200);
       }
@@ -224,8 +226,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       if (selectedPlanType === 'Hourly') {
         const isScootyFuel = isScooty && includeFuel;
         const rateField = isScootyFuel
-          ? (plans.hourly?.withFuel || vehicle.perHourRate || 60)
-          : (plans.hourly?.rate || vehicle.perHourRate || 40);
+          ? (plans.hourly?.withFuel || v.perHourRate || 60)
+          : (plans.hourly?.rate || v.perHourRate || 40);
 
         setPlanRate(rateField);
         setPlanExtraKm(plans.hourly?.extraKmCharge || 5);
@@ -239,23 +241,23 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         setPlanExtraHour(p.extraHourCharge || 40);
       } else if (selectedPlanType === '24-Hour') {
         const p = plans.twentyFourHour || {};
-        setPlanRate(p.baseRate || vehicle.perDayRate || 500);
+        setPlanRate(p.baseRate || v.perDayRate || 500);
         setPlanExtraKm(p.extraKmCharge || 5);
         setPlanExtraHour(p.extraHourCharge || 30);
       }
     }
-  }, [selectedPlanType, vehicle, includeFuel, isScooty, isBike, isCar]);
+  }, [selectedPlanType, v, includeFuel, isScooty, isBike, isCar]);
 
   // Section 5: Add-ons
   const [helmetsCount, setHelmetsCount] = useState(0);
   const helmetsPrice = 50;
 
   const getDefaultDeposit = () => {
-    const isB = vehicle.category?.toLowerCase() === 'bike';
-    const isC = vehicle.category?.toLowerCase() === 'car';
-    if (isC) return vehicle.depositSettings?.amount ?? vehicle.securityDeposit ?? 5000;
-    if (isB) return vehicle.depositSettings?.amount ?? vehicle.securityDeposit ?? 3000;
-    return vehicle.depositSettings?.amount ?? vehicle.securityDeposit ?? 1000;
+    const isB = vehicleCat === 'bike';
+    const isC = vehicleCat === 'car';
+    if (isC) return v.depositSettings?.amount ?? v.securityDeposit ?? 5000;
+    if (isB) return v.depositSettings?.amount ?? v.securityDeposit ?? 3000;
+    return v.depositSettings?.amount ?? v.securityDeposit ?? 1000;
   };
 
   const [securityDeposit, setSecurityDeposit] = useState(getDefaultDeposit());
@@ -338,15 +340,18 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
   // ----------------------------------------------------
   // WEBCAM LOGIC FOR DOCS
   // ----------------------------------------------------
+  useEffect(() => {
+    if (cameraActive && cameraStream && videoRef.current) {
+      videoRef.current.srcObject = cameraStream;
+    }
+  }, [cameraActive, cameraStream]);
+
   const startCamera = async (docType) => {
     setActiveDocType(docType);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       setCameraStream(stream);
       setCameraActive(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
     } catch (err) {
       console.warn("Camera hardware access denied. Running simulation.", err);
       setCameraActive(true);
@@ -368,7 +373,19 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       canvas.height = videoRef.current.videoHeight || 480;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-      const base64Str = canvas.toDataURL('image/jpeg');
+
+      let width = canvas.width;
+      let height = canvas.height;
+      if (width > 1200) { height = Math.round((height * 1200) / width); width = 1200; }
+      if (height > 1200) { width = Math.round((width * 1200) / height); height = 1200; }
+
+      const compCanvas = document.createElement('canvas');
+      compCanvas.width = width;
+      compCanvas.height = height;
+      const compCtx = compCanvas.getContext('2d');
+      compCtx.drawImage(canvas, 0, 0, width, height);
+
+      const base64Str = compCanvas.toDataURL('image/jpeg', 0.7);
       saveDocImage(base64Str);
       stopCamera();
     } else {
@@ -385,13 +402,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
       ctx.fillStyle = '#38bdf8';
       ctx.font = 'bold 20px sans-serif';
-      ctx.fillText(`${activeDocType.toUpperCase()} DOCUMENT MOCK SCAN`, 50, 80);
+      ctx.fillText(`${(activeDocType || 'Doc').toUpperCase()} DOCUMENT MOCK SCAN`, 50, 80);
       ctx.fillStyle = '#94a3b8';
       ctx.font = '14px sans-serif';
       ctx.fillText(`Customer Name: ${fullName || 'Guest'}`, 50, 130);
       ctx.fillText(`Timestamp: ${new Date().toLocaleString()}`, 50, 160);
 
-      // Draw signature or card details
       ctx.fillStyle = '#334155';
       ctx.fillRect(400, 200, 180, 120);
       ctx.strokeStyle = '#64748b';
@@ -399,10 +415,9 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       ctx.fillStyle = '#f8fafc';
       ctx.fillText("PHOTO ID", 450, 260);
 
-      const base64Str = canvas.toDataURL('image/jpeg');
+      const base64Str = canvas.toDataURL('image/jpeg', 0.7);
       saveDocImage(base64Str);
       setCameraActive(false);
-      alert(`Simulation document scan saved for: ${activeDocType}`);
     }
   };
 
@@ -413,15 +428,41 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
     if (activeDocType === 'registration') setDocRegistration(base64Str);
   };
 
+  const clearDocImage = (docType) => {
+    if (docType === 'aadhaarFront') setDocAadhaarFront('');
+    if (docType === 'aadhaarBack') setDocAadhaarBack('');
+    if (docType === 'dl') setDocLicense('');
+    if (docType === 'registration') setDocRegistration('');
+  };
+
   const handleDocFileChange = (e, docType) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('File size exceeds 5MB limit. Please upload a smaller image.');
+        return;
+      }
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (docType === 'aadhaarFront') setDocAadhaarFront(reader.result);
-        if (docType === 'aadhaarBack') setDocAadhaarBack(reader.result);
-        if (docType === 'dl') setDocLicense(reader.result);
-        if (docType === 'registration') setDocRegistration(reader.result);
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          if (width > 1200) { height = Math.round((height * 1200) / width); width = 1200; }
+          if (height > 1200) { width = Math.round((width * 1200) / height); height = 1200; }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, width, height);
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          
+          if (docType === 'aadhaarFront') setDocAadhaarFront(compressedBase64);
+          if (docType === 'aadhaarBack') setDocAadhaarBack(compressedBase64);
+          if (docType === 'dl') setDocLicense(compressedBase64);
+          if (docType === 'registration') setDocRegistration(compressedBase64);
+        };
+        img.src = reader.result;
       };
       reader.readAsDataURL(file);
     }
@@ -1204,37 +1245,21 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                     {doc.stateVal ? (
                       <div style={{ position: 'relative', height: '70px', borderRadius: '4px', overflow: 'hidden', marginBottom: '6px', background: '#000' }}>
                         <img src={doc.stateVal} alt={doc.label} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
-                        <button type="button" style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: '50%', width: '18px', height: '18px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => saveDocImage('')}><X size={9} /></button>
+                        <button type="button" style={{ position: 'absolute', top: '2px', right: '2px', background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: '50%', width: '18px', height: '18px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => clearDocImage(doc.id)}><X size={9} /></button>
                       </div>
                     ) : (
                       <div style={{ height: '70px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px dashed #d1d5db', borderRadius: '4px', color: '#94a3b8', fontSize: '0.68rem', marginBottom: '6px' }}>No Scan</div>
                     )}
                     <div style={{ display: 'flex', gap: '4px' }}>
-                      <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px' }} onClick={() => document.getElementById(`doc-pick-${doc.id}`).click()}>Browse</button>
-                      <input id={`doc-pick-${doc.id}`} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleDocFileChange(e, doc.id)} />
-                      <button type="button" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#059669', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }} onClick={() => startCamera(doc.id)}><Camera size={11} /></button>
+                      <button type="button" className="btn btn-secondary" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px' }} onClick={() => document.getElementById(`doc-file-${doc.id}`).click()}>Browse File</button>
+                      <input id={`doc-file-${doc.id}`} type="file" accept="image/*" style={{ display: 'none' }} onChange={e => handleDocFileChange(e, doc.id)} />
+                      
+                      <button type="button" style={{ flex: 1, padding: '3px 5px', fontSize: '0.68rem', height: '24px', background: 'rgba(16,185,129,0.1)', border: '1px solid rgba(16,185,129,0.3)', color: '#059669', borderRadius: '5px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }} onClick={() => document.getElementById(`doc-cam-${doc.id}`).click()}><Camera size={11} /> Take Photo</button>
+                      <input id={`doc-cam-${doc.id}`} type="file" accept="image/*" capture="environment" style={{ display: 'none' }} onChange={e => handleDocFileChange(e, doc.id)} />
                     </div>
                   </div>
                 ))}
               </div>
-
-              {cameraActive && (
-                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 300 }}>
-                  <div className="glass-panel" style={{ width: '90%', maxWidth: '480px', padding: '16px', background: 'var(--bg-glass)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <h4 style={{ margin: 0, fontSize: '0.9rem' }}>Scan: {activeDocType.toUpperCase()}</h4>
-                      <button type="button" className="fo-btn-outline" style={{ borderRadius: '50%', width: '28px', height: '28px', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={stopCamera}><X size={14} /></button>
-                    </div>
-                    <div style={{ background: '#000', borderRadius: '8px', overflow: 'hidden', height: '260px', position: 'relative' }}>
-                      {cameraStream ? <video ref={videoRef} autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#94a3b8', padding: '20px', textAlign: 'center', fontSize: '0.8rem' }}>Simulation active. Click "Capture" to save.</div>}
-                    </div>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '10px' }}>
-                      <button type="button" className="btn btn-secondary" onClick={stopCamera}>Cancel</button>
-                      <button type="button" className="btn btn-accent" onClick={captureDocSnapshot}>Capture</button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </div>

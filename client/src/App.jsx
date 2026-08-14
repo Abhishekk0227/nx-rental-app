@@ -21,6 +21,7 @@ export default function App() {
   const [backendActive, setBackendActive] = useState(false);
   const [dbStatus, setDbStatus] = useState({ connected: false, mode: 'Checking...', host: '' });
   const [zones, setZones] = useState([]);
+  const [users, setUsers] = useState([]);
   
   const [pendingAddVehicle, setPendingAddVehicle] = useState(false);
   const [bookingVehicle, setBookingVehicle] = useState(null);
@@ -55,10 +56,11 @@ export default function App() {
       const headers = { 'Authorization': `Bearer ${token}` };
       const apiBase = import.meta.env.VITE_API_BASE_URL || '';
 
-      const [vRes, bRes, zRes] = await Promise.all([
+      const [vRes, bRes, zRes, uRes] = await Promise.all([
         fetch(`${apiBase}/api/vehicles`, { headers }),
         fetch(`${apiBase}/api/bookings`, { headers }),
-        fetch(`${apiBase}/api/zones`,    { headers })
+        fetch(`${apiBase}/api/zones`,    { headers }),
+        fetch(`${apiBase}/api/users`,    { headers })
       ]);
 
       // Handle auth errors — token is bad, force logout
@@ -82,6 +84,11 @@ export default function App() {
       if (zRes.ok) {
         const zData = await zRes.json();
         setZones(zData);
+      }
+
+      if (uRes.ok) {
+        const uData = await uRes.json();
+        setUsers(uData);
       }
 
       setBackendActive(true);
@@ -316,6 +323,7 @@ export default function App() {
             bookings={bookings} vehicles={vehicles}
             zones={zones} userRole={currentUser?.role || 'worker'}
             currentWorker={currentUser?.name || ''}
+            users={users}
             onPickup={handlePickup} onExtend={handleExtend}
             onReplace={handleReplaceVehicle} onDropOff={handleDropOff}
             onCancelBooking={handleCancelBooking} onAdminOverride={handleAdminOverride}

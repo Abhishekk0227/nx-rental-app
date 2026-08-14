@@ -84,6 +84,7 @@ const bookingSchema = new mongoose.Schema({
   durationHours: { type: Number, default: 0 },
   durationDays: { type: Number, default: 0 },
   expectedReturnDate: { type: Date },   // = rentalPeriod.expectedEndDate
+  expectedDropDate: { type: Date },
   actualPickupDate: { type: Date },     // = rentalPeriod.actualPickupDate
   actualReturnDate: { type: Date },     // = rentalPeriod.actualReturnDate
 

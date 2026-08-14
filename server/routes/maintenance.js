@@ -1,8 +1,17 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import Vehicle from '../models/Vehicle.js';
 import { isDbConnected, getVehicles, updateVehicle } from '../memoryDb.js';
 
 const router = express.Router();
+
+const findRecord = (records, recordId) => {
+  if (!records || !recordId || recordId === 'new') return null;
+  if (mongoose.Types.ObjectId.isValid(recordId) && typeof records.id === 'function') {
+    return records.id(recordId);
+  }
+  return records.find(r => String(r._id || r.id) === String(recordId));
+};
 
 // Get all maintenance records or vehicles needing service
 router.get('/', async (req, res) => {
@@ -106,7 +115,7 @@ router.patch('/:vehicleId/:recordId/stop', async (req, res) => {
         reason: 'Maintenance'
       };
       
-      let record = vehicle.maintenanceRecords.id(req.params.recordId);
+      let record = findRecord(vehicle.maintenanceRecords, req.params.recordId);
       if (record && record.status === 'Pending') {
         record.status = 'In Progress';
       } else if (!record && req.params.recordId === 'new') {
@@ -174,7 +183,7 @@ router.patch('/:vehicleId/:recordId/status', async (req, res) => {
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
     if (isDbConnected()) {
-      let record = vehicle.maintenanceRecords.id(req.params.recordId);
+      let record = findRecord(vehicle.maintenanceRecords, req.params.recordId);
       if (record) {
         if (statusNotes) record.notes = (record.notes ? record.notes + '\n' : '') + `[${new Date().toLocaleDateString()}] ${statusNotes}`;
         await vehicle.save();
@@ -221,7 +230,7 @@ router.post('/:vehicleId/:recordId/complete', async (req, res) => {
         vehicle.meterReading = sKm;
       }
 
-      let record = vehicle.maintenanceRecords.id(req.params.recordId);
+      let record = findRecord(vehicle.maintenanceRecords, req.params.recordId);
       if (record) {
         record.status = 'Completed';
         record.serviceDate = serviceDate || new Date();
@@ -292,10 +301,7 @@ router.put('/:vehicleId/:recordId', async (req, res) => {
     if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
     if (isDbConnected()) {
-      let record = vehicle.maintenanceRecords.id(req.params.recordId);
-      if (!record) {
-        record = vehicle.maintenanceRecords.find(r => String(r._id) === String(req.params.recordId));
-      }
+      let record = findRecord(vehicle.maintenanceRecords, req.params.recordId);
       if (record) {
         if (workDone !== undefined) record.workDone = workDone;
         if (vendor !== undefined) record.vendor = vendor;

@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { customRound } from '../utils/billingEngine.js';
+
 
 const bookingSchema = new mongoose.Schema({
   bookingId: {
@@ -102,11 +104,11 @@ const bookingSchema = new mongoose.Schema({
   // ─── Payment ───────────────────────────────────────────────────────────────
   paymentMode: { type: String, default: 'Cash' },
   paymentCollection: [{
-    mode: { type: String, enum: ['Cash', 'UPI', 'Card', 'Bank Transfer', 'Mixed', 'UPI Refund', 'Cash Refund', 'Mixed Refund'] },
+    mode: { type: String, enum: ['Cash', 'UPI', 'Bank Transfer', 'Mixed', 'online Refund', 'Cash Refund', 'Vikas', 'Vikas Refund'] },
     amount: { type: Number, default: 0 },
     cashAmount: { type: Number, default: 0 },
     onlineAmount: { type: Number, default: 0 },
-    cardAmount: { type: Number, default: 0 },
+    vikasAmount: { type: Number, default: 0 },
     workerId: { type: String, default: 'System' },
     transactionId: { type: String, default: '' },
     reference: { type: String, default: '' },
@@ -114,15 +116,16 @@ const bookingSchema = new mongoose.Schema({
   }],
 
   depositDetails: {
-    mode: { type: String, enum: ['Cash', 'Online', 'Mixed'], default: 'Cash' },
+    mode: { type: String, enum: ['Cash', 'Online', 'Mixed', 'Vikas'], default: 'Cash' },
     cashAmount: { type: Number, default: 0 },
-    onlineAmount: { type: Number, default: 0 }
+    onlineAmount: { type: Number, default: 0 },
+    vikasAmount: { type: Number, default: 0 }
   },
 
-  // ─── Payment split totals (derived from paymentCollection) ─────────────────
+  // ─── Payment mixed totals (derived from paymentCollection) ─────────────────
   cashAmount: { type: Number, default: 0 },
   onlineAmount: { type: Number, default: 0 },
-  cardAmount: { type: Number, default: 0 },
+  vikasAmount: { type: Number, default: 0 },
 
   // ─── Drop-Off ──────────────────────────────────────────────────────────────
   dropDetails: {
@@ -225,8 +228,7 @@ const bookingSchema = new mongoose.Schema({
         rentalOnline: { type: Number, default: 0 },
         rentalCard: { type: Number, default: 0 },
         depositCash: { type: Number, default: 0 },
-        depositOnline: { type: Number, default: 0 },
-        depositCard: { type: Number, default: 0 }
+        depositOnline: { type: Number, default: 0 }
       }
     },
 
@@ -329,20 +331,16 @@ bookingSchema.pre('save', async function (next) {
     this.paymentCollection.forEach(p => {
       if (p.mode === 'Cash') {
         cash += p.cashAmount || p.amount || 0;
-      } else if (p.mode === 'Card') {
-        card += p.cardAmount || p.amount || 0;
       } else if (p.mode === 'Mixed') {
         cash += p.cashAmount || 0;
         online += p.onlineAmount || 0;
-        card += p.cardAmount || 0;
       } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
         online += p.onlineAmount || p.amount || 0;
       }
     });
   }
-  this.cashAmount = Math.round(cash);
-  this.onlineAmount = Math.round(online);
-  this.cardAmount = Math.round(card);
+  this.cashAmount = customRound(cash);
+  this.onlineAmount = customRound(online);
 
   next();
 });

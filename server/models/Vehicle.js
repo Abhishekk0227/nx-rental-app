@@ -119,7 +119,7 @@ const vehicleSchema = new mongoose.Schema({
   paymentSettings: {
     advanceRequired: { type: Boolean, default: false },
     percentage: { type: Number, default: 50 },
-    acceptedModes: [{ type: String }] // Cash, UPI, Card, Bank Transfer
+    acceptedModes: [{ type: String }] // Cash, UPI, Bank Transfer
   },
 
   // Booking settings

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { customRound } from '../utils/billingEngine';
 import { Search, SlidersHorizontal, Car, Bike, Calendar, Eye, Pencil, Wrench, X, Camera, Upload, MapPin, Fuel, Gauge, Users, ChevronDown } from 'lucide-react';
 
 export default function AvailableVehicles({ vehicles, bookings = [], zones = [], userRole = 'worker', onBookVehicle, onUpdateVehicle, onToggleStatus }) {
@@ -714,7 +715,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                           </div>
                           <div className="form-group">
                             <label>Seating Capacity</label>
-                            <input type="number" className="form-control" value={formData.seatingCapacity} onChange={e => setFormData({ ...formData, seatingCapacity: Number(e.target.value) })} min="1" />
+                            <input type="number" className="form-control" value={formData.seatingCapacity} onChange={e => setFormData({ ...formData, seatingCapacity: (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))) })} min="1" />
                           </div>
                           <div className="form-group">
                             <label>Color</label>
@@ -722,15 +723,15 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                           </div>
                           <div className="form-group">
                             <label>Meter Reading (KM)</label>
-                            <input type="number" className="form-control" value={formData.meterReading} onChange={e => setFormData({ ...formData, meterReading: Number(e.target.value) })} />
+                            <input type="number" className="form-control" value={formData.meterReading} onChange={e => setFormData({ ...formData, meterReading: (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))) })} />
                           </div>
                           <div className="form-group">
                             <label>Fuel Capacity (Liters or %)</label>
-                            <input type="number" className="form-control" value={formData.fuelCapacity} onChange={e => setFormData({ ...formData, fuelCapacity: Number(e.target.value) })} />
+                            <input type="number" className="form-control" value={formData.fuelCapacity} onChange={e => setFormData({ ...formData, fuelCapacity: (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))) })} />
                           </div>
                           <div className="form-group">
                             <label>Mileage (KM/L or KM/Charge)</label>
-                            <input type="number" className="form-control" value={formData.mileage} onChange={e => setFormData({ ...formData, mileage: Number(e.target.value) })} />
+                            <input type="number" className="form-control" value={formData.mileage} onChange={e => setFormData({ ...formData, mileage: (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))) })} />
                           </div>
                           <div className="form-group">
                             <label>Operation Zone</label>
@@ -824,7 +825,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                             {formData.depositSettings.requireDeposit && (
                               <div className="form-group">
                                 <label>Deposit Amount (₹)</label>
-                                <input type="number" className="form-control" value={formData.depositSettings.amount} onChange={e => handleNestedChange('depositSettings', 'amount', Number(e.target.value))} />
+                                <input type="number" className="form-control" value={formData.depositSettings.amount} onChange={e => handleNestedChange('depositSettings', 'amount', (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))))} />
                               </div>
                             )}
                           </div>
@@ -837,7 +838,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                             {formData.paymentSettings.advanceRequired && (
                               <div className="form-group">
                                 <label>Percentage Required (%)</label>
-                                <input type="number" className="form-control" value={formData.paymentSettings.percentage} onChange={e => handleNestedChange('paymentSettings', 'percentage', Number(e.target.value))} />
+                                <input type="number" className="form-control" value={formData.paymentSettings.percentage} onChange={e => handleNestedChange('paymentSettings', 'percentage', (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))))} />
                               </div>
                             )}
                           </div>
@@ -846,7 +847,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         <div className="form-group">
                           <label style={{ fontWeight: 'bold' }}>Accepted Payment Modes</label>
                           <div style={{ display: 'flex', gap: '20px', marginTop: '6px' }}>
-                            {['Cash', 'UPI', 'Card', 'Bank Transfer'].map(mode => (
+                            {['Cash', 'UPI', 'Bank Transfer'].map(mode => (
                               <label key={mode} style={{ display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontSize: '0.85rem' }}>
                                 <input type="checkbox" checked={formData.paymentSettings.acceptedModes.includes(mode)} onChange={() => handlePaymentModeToggle(mode)} />
                                 {mode}
@@ -863,7 +864,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                           <div className="form-group">
                             <label>Minimum Buffer Time (Minutes)</label>
-                            <input type="number" className="form-control" value={formData.bookingConfig.bufferTime} onChange={e => handleNestedChange('bookingConfig', 'bufferTime', Number(e.target.value))} />
+                            <input type="number" className="form-control" value={formData.bookingConfig.bufferTime} onChange={e => handleNestedChange('bookingConfig', 'bufferTime', (e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''))))} />
                           </div>
                           <div className="form-group">
                             <label>Vehicle Status</label>
@@ -1043,7 +1044,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         const start = b.handover?.startMeter || 0;
                         const end = b.dropDetails?.endMeter || 0;
                         const finalAmt = b.settlement?.totalBill || b.finalAmount || b.baseFare || 0;
-                        const fmtAmt = (Math.round(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                        const fmtAmt = (customRound(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
                         return (
                           <tr key={b.bookingId}>
                             <td><code>{b.bookingId}</code></td>
@@ -1123,14 +1124,14 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
                           <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>💳 Financial Breakdown</h4>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                            <div>Base Fare: <strong>₹{(Math.round(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extensions Total: <strong>₹{(Math.round(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extra Charges: <strong>₹{(Math.round(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(Math.round((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(Math.round(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(Math.round(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Security Deposit: <strong>₹{(Math.round(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(Math.round(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Base Fare: <strong>₹{(customRound(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extensions Total: <strong>₹{(customRound(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extra Charges: <strong>₹{(customRound(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(customRound((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(customRound(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(customRound(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Security Deposit: <strong>₹{(customRound(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(customRound(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
                           </div>
                         </div>
 
@@ -1142,7 +1143,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                               {b.paymentCollection.map((p, idx) => (
                                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', fontSize: '0.8rem' }}>
                                   <span>{p.reference || 'Payment Received'} ({p.mode})</span>
-                                  <strong>₹{(Math.round((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                                  <strong>₹{(customRound((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
                                 </div>
                               ))}
                             </div>

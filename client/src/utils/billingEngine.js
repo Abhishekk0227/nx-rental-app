@@ -6,6 +6,17 @@
  */
 
 /**
+ * Custom rounding logic as per requirement:
+ * decimal <= 0.50 -> rounds down
+ * decimal > 0.50 -> rounds up
+ */
+export function customRound(num) {
+  const n = Number(num);
+  if (isNaN(n)) return 0;
+  return Math.round(n);
+}
+
+/**
  * Calculate extension charge for additional hours.
  * Returns ONLY the delta cost for the extension period.
  *
@@ -16,8 +27,8 @@
 export function calculateExtensionCharge(selectedPlan, extensionHours = 0) {
   if (!selectedPlan || extensionHours <= 0) return 0;
   const extraHourCharge = Number(selectedPlan.extraHourCharge) || 0;
-  if (extraHourCharge > 0) return extraHourCharge * Math.ceil(extensionHours);
-  return (Number(selectedPlan.rate) || 0) * Math.ceil(extensionHours);
+  if (extraHourCharge > 0) return extraHourCharge * customRound(extensionHours);
+  return (Number(selectedPlan.rate) || 0) * customRound(extensionHours);
 }
 
 /**
@@ -45,12 +56,12 @@ export function calculateActualBill({
   const overHours = Math.max(0, actualHours - bookedHours);
   const overKm = Math.max(0, actualKm - kmLimit);
 
-  const extraHourTotal = extraHourCharge > 0 ? extraHourCharge * Math.ceil(overHours) : 0;
-  const extraKmTotal = extraKmCharge > 0 ? extraKmCharge * Math.ceil(overKm) : 0;
+  const extraHourTotal = extraHourCharge > 0 ? extraHourCharge * customRound(overHours) : 0;
+  const extraKmTotal = extraKmCharge > 0 ? extraKmCharge * customRound(overKm) : 0;
 
   return Math.max(
     0,
-    Math.round(
+    customRound(
       Number(rentalCost) +
         extraHourTotal +
         extraKmTotal +
@@ -81,10 +92,10 @@ export function calculateSettlement({ actualBill = 0, rentalPaid = 0, depositHel
   const finalCollection = Math.max(0, netDue - depositAdjustment);
 
   return {
-    netDue: Math.round(netDue),
-    depositAdjustment: Math.round(depositAdjustment),
-    finalRefund: Math.round(finalRefund),
-    finalCollection: Math.round(finalCollection),
+    netDue: customRound(netDue),
+    depositAdjustment: customRound(depositAdjustment),
+    finalRefund: customRound(finalRefund),
+    finalCollection: customRound(finalCollection),
   };
 }
 

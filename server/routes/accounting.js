@@ -1,6 +1,7 @@
 import express from 'express';
 import Booking from '../models/Booking.js';
 import Settlement from '../models/Settlement.js';
+import { customRound } from '../utils/billingEngine.js';
 import {
   isDbConnected,
   getBookings,
@@ -17,66 +18,63 @@ const safeDateStr = (dateVal) => {
   if (!dateVal) return '';
   try {
     const d = new Date(dateVal);
-    return isNaN(d.getTime()) ? '' : d.toISOString().slice(0, 10);
+    if (isNaN(d.getTime())) return '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   } catch {
     return '';
   }
 };
 
-/** Parse mixed payment reference string → { cash, online, card, vikas } */
+/** Parse mixed payment reference string → { cash, online, vikas } */
 const parseMixedRef = (refStr = '') => {
   const cashMatch = refStr.match(/Cash:\s*([\d.]+)/i);
   const onlineMatch = refStr.match(/Online:\s*([\d.]+)/i);
-  const cardMatch = refStr.match(/Card:\s*([\d.]+)/i);
   const vikasMatch = refStr.match(/Vikas:\s*([\d.]+)/i);
   return {
     cash: parseFloat(cashMatch?.[1]) || 0,
     online: parseFloat(onlineMatch?.[1]) || 0,
-    card: parseFloat(cardMatch?.[1]) || 0,
     vikas: parseFloat(vikasMatch?.[1]) || 0
   };
 };
 
 /**
- * Get cash/online/card split for a single payment entry.
- * Uses stored cashAmount/onlineAmount/cardAmount first (reliable),
+ * Get cash/online/vikas mixed for a single payment entry.
+ * Uses stored cashAmount/onlineAmount/vikasAmount first (reliable),
  * falls back to parsing Mixed reference string.
  */
 const getPaymentSplit = (p) => {
-  let cash = 0, online = 0, card = 0, vikas = 0;
+  let cash = 0, online = 0, vikas = 0;
 
   if (p.mode === 'Cash') {
     cash = p.cashAmount || p.amount || 0;
-  } else if (p.mode === 'Card') {
-    card = p.cardAmount || p.amount || 0;
   } else if (p.mode === 'Vikas') {
     vikas = p.vikasAmount || p.amount || 0;
   } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
     online = p.onlineAmount || p.amount || 0;
   } else if (p.mode === 'Mixed') {
     // Use stored splits if available (set during normalization)
-    if (p.cashAmount || p.onlineAmount || p.cardAmount || p.vikasAmount) {
+    if (p.cashAmount || p.onlineAmount || p.vikasAmount) {
       cash = p.cashAmount || 0;
       online = p.onlineAmount || 0;
-      card = p.cardAmount || 0;
       vikas = p.vikasAmount || 0;
     } else {
       // Fallback to parsing reference string
       const split = parseMixedRef(p.reference || '');
       cash = split.cash;
       online = split.online;
-      card = split.card;
       vikas = split.vikas;
     }
   } else if (p.mode?.includes('Refund')) {
     // Refund modes — treated as negative cash/online
     cash = -(p.cashAmount || 0);
     online = -(p.onlineAmount || 0);
-    card = -(p.cardAmount || 0);
     vikas = -(p.vikasAmount || 0);
   }
 
-  return { cash, online, card, vikas };
+  return { cash, online, vikas };
 };
 
 // ─── GET daily accounting summary ─────────────────────────────────────────────
@@ -94,9 +92,9 @@ router.get('/', async (req, res) => {
     let totalRevenue = 0;
     let totalOutstanding = 0;
 
-    const rentalCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
-    const depositCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
-    const depositRefunds = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const rentalCollections = { cash: 0, online: 0, vikas: 0, total: 0 };
+    const depositCollections = { cash: 0, online: 0, vikas: 0, total: 0 };
+    const depositRefunds = { cash: 0, online: 0, vikas: 0, total: 0 };
     let totalCashHandledByWorker = 0;
 
     const matchedBookingsList = [];
@@ -156,12 +154,11 @@ router.get('/', async (req, res) => {
       for (const p of todayPayments) {
         if (workerFilter && p.workerId !== workerId) continue;
 
-        const { cash, online, card, vikas } = getPaymentSplit(p);
+        const { cash, online, vikas } = getPaymentSplit(p);
         rentalCollections.cash += cash;
         rentalCollections.online += online;
-        rentalCollections.card += card;
         rentalCollections.vikas += vikas;
-        rentalCollections.total += cash + online + card + vikas;
+        rentalCollections.total += cash + online + vikas;
 
         if (!workerFilter || p.workerId === workerId) {
           totalCashHandledByWorker += cash;
@@ -175,12 +172,10 @@ router.get('/', async (req, res) => {
 
         const diff = rev.depositDetails.difference || 0;
         const mode = rev.depositDetails.mode || '';
-        let cash = 0, online = 0, card = 0, vikas = 0;
+        let cash = 0, online = 0, vikas = 0;
 
         if (mode === 'Cash') {
           cash = diff;
-        } else if (mode === 'Card') {
-          card = diff;
         } else if (mode === 'Vikas') {
           vikas = diff;
         } else if (['UPI', 'Online'].includes(mode)) {
@@ -192,15 +187,13 @@ router.get('/', async (req, res) => {
           const prevSnapshot = prevRev?.financialSnapshotAfterChange?.paymentBreakdown || {};
           cash = Math.max(0, (snapshot.depositCash || 0) - (prevSnapshot.depositCash || 0));
           online = Math.max(0, (snapshot.depositOnline || 0) - (prevSnapshot.depositOnline || 0));
-          card = Math.max(0, (snapshot.depositCard || 0) - (prevSnapshot.depositCard || 0));
           vikas = Math.max(0, (snapshot.depositVikas || 0) - (prevSnapshot.depositVikas || 0));
         }
 
         depositCollections.cash += cash;
         depositCollections.online += online;
-        depositCollections.card += card;
         depositCollections.vikas += vikas;
-        depositCollections.total += cash + online + card + vikas;
+        depositCollections.total += cash + online + vikas;
         totalCashHandledByWorker += cash;
       }
 
@@ -213,22 +206,20 @@ router.get('/', async (req, res) => {
         if (!workerFilter || refundOp === workerId) {
           const refundAmt = Number(b.refundDetails?.amount) || 0;
           const method = b.refundDetails?.method || '';
-          let cash = 0, online = 0, card = 0, vikas = 0;
+          let cash = 0, online = 0, vikas = 0;
 
           if (method === 'Cash') cash = refundAmt;
-          else if (method === 'Card') card = refundAmt;
           else if (method === 'Vikas') vikas = refundAmt;
           else if (['UPI', 'Online'].includes(method)) online = refundAmt;
           else if (method === 'Mixed') {
             const split = parseMixedRef(b.refundDetails?.notes || '');
-            cash = split.cash; online = split.online; card = split.card; vikas = split.vikas;
+            cash = split.cash; online = split.online; vikas = split.vikas;
           }
 
           depositRefunds.cash += cash;
           depositRefunds.online += online;
-          depositRefunds.card += card;
           depositRefunds.vikas += vikas;
-          depositRefunds.total += cash + online + card + vikas;
+          depositRefunds.total += cash + online + vikas;
           totalCashHandledByWorker -= cash; // refund is outgoing cash
         }
       }
@@ -279,9 +270,9 @@ router.get('/', async (req, res) => {
       workerSettlement: {
         workerId: workerId || 'All',
         date: date || '',
-        totalCashHandled: Math.round(totalCashHandledByWorker),
+        totalCashHandled: customRound(totalCashHandledByWorker),
         depositToAdmin,
-        balance: Math.round(workerBalance)
+        balance: customRound(workerBalance)
       }
     });
   } catch (error) {
@@ -322,8 +313,8 @@ router.post('/settle', async (req, res) => {
       // Rental cash payments by this worker today
       for (const p of b.paymentCollection || []) {
         if (safeDateStr(p.timestamp) === date && p.workerId === workerId) {
-          const { cash } = getPaymentSplit(p);
-          totalCashCollected += cash;
+          const { cash, vikas } = getPaymentSplit(p);
+          totalCashCollected += cash + vikas;
         }
       }
 
@@ -332,23 +323,33 @@ router.post('/settle', async (req, res) => {
         if (
           safeDateStr(rev.timestamp) === date &&
           rev.operator === workerId &&
-          rev.depositDetails?.difference > 0 &&
-          rev.depositDetails?.mode === 'Cash'
+          rev.depositDetails?.difference > 0
         ) {
-          totalCashCollected += rev.depositDetails.difference;
+          if (rev.depositDetails?.mode === 'Cash' || rev.depositDetails?.mode === 'Vikas') {
+            totalCashCollected += rev.depositDetails.difference;
+          } else if (rev.depositDetails?.mode === 'Mixed') {
+            const split = parseMixedRef(rev.depositDetails?.reference || '');
+            totalCashCollected += (split.cash || 0) + (split.vikas || 0);
+          }
         }
       }
 
       // Deduct cash refunds processed by this worker today
       const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
       const isRefundToday = b.refundDetails?.status === 'Completed' && returnDateStr === date;
-      if (isRefundToday && b.refundDetails?.method === 'Cash') {
+
+      if (isRefundToday) {
         const dropOffRev = (b.revisions || []).find(
           r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === date
         );
         const refundOp = dropOffRev?.operator || b.workerId || 'System';
         if (refundOp === workerId) {
-          totalCashCollected -= Number(b.refundDetails.amount) || 0;
+          if (b.refundDetails?.method === 'Cash' || b.refundDetails?.method === 'Vikas') {
+            totalCashCollected -= Number(b.refundDetails.amount) || 0;
+          } else if (b.refundDetails?.method === 'Mixed') {
+            const split = parseMixedRef(b.refundDetails?.notes || '');
+            totalCashCollected -= (split.cash || 0) + (split.vikas || 0);
+          }
         }
       }
     }
@@ -358,7 +359,7 @@ router.post('/settle', async (req, res) => {
       if (!settlement) {
         settlement = new Settlement({ date, workerId, cashCollected: 0, depositToAdmin: 0 });
       }
-      settlement.cashCollected = Math.round(totalCashCollected);
+      settlement.cashCollected = customRound(totalCashCollected);
       settlement.depositToAdmin += Number(depositAmount);
       if (remarks) settlement.remarks = remarks;
       const saved = await settlement.save();
@@ -368,7 +369,7 @@ router.post('/settle', async (req, res) => {
     const saved = addSettlement({
       date,
       workerId,
-      cashCollected: Math.round(totalCashCollected),
+      cashCollected: customRound(totalCashCollected),
       depositAmount: Number(depositAmount),
       remarks
     });

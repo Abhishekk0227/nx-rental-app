@@ -23,20 +23,20 @@ function normalizePayment(p, workerId) {
   if (obj.mode === 'Cash') {
     obj.cashAmount = obj.cashAmount ?? obj.amount ?? 0;
     obj.onlineAmount = obj.onlineAmount ?? 0;
-    obj.cardAmount = obj.cardAmount ?? 0;
-  } else if (obj.mode === 'Card') {
-    obj.cardAmount = obj.cardAmount ?? obj.amount ?? 0;
-    obj.cashAmount = obj.cashAmount ?? 0;
-    obj.onlineAmount = obj.onlineAmount ?? 0;
+    obj.vikasAmount = obj.vikasAmount ?? 0;
   } else if (['UPI', 'Online', 'Bank Transfer'].includes(obj.mode)) {
     obj.onlineAmount = obj.onlineAmount ?? obj.amount ?? 0;
     obj.cashAmount = obj.cashAmount ?? 0;
-    obj.cardAmount = obj.cardAmount ?? 0;
+    obj.vikasAmount = obj.vikasAmount ?? 0;
+  } else if (obj.mode === 'Vikas') {
+    obj.vikasAmount = obj.vikasAmount ?? obj.amount ?? 0;
+    obj.cashAmount = obj.cashAmount ?? 0;
+    obj.onlineAmount = obj.onlineAmount ?? 0;
   } else if (obj.mode === 'Mixed') {
     // Keep existing splits if already set
     obj.cashAmount = obj.cashAmount ?? 0;
     obj.onlineAmount = obj.onlineAmount ?? 0;
-    obj.cardAmount = obj.cardAmount ?? 0;
+    obj.vikasAmount = obj.vikasAmount ?? 0;
   }
 
   return obj;
@@ -594,12 +594,18 @@ router.patch('/:bookingId/override', async (req, res) => {
       Object.assign(booking, req.body);
       const updated = await booking.save();
 
-      if (req.body.status) {
-        const vStatus = ['Completed', 'Cancelled'].includes(req.body.status)
+      if (req.body.status || req.body.handover?.startMeter !== undefined) {
+        const vStatus = req.body.status ? (['Completed', 'Cancelled'].includes(req.body.status)
           ? 'Available'
-          : req.body.status === 'Ongoing' ? 'Ongoing' : 'Reserved';
+          : req.body.status === 'Ongoing' ? 'Ongoing' : 'Reserved') : booking.status;
         const vehicle = await Vehicle.findOne({ vehicleId: booking.vehicleId });
-        if (vehicle) { vehicle.status = vStatus; await vehicle.save(); }
+        if (vehicle) {
+          if (req.body.status) vehicle.status = vStatus;
+          if (req.body.handover?.startMeter !== undefined && booking.status === 'Ongoing') {
+            vehicle.meterReading = req.body.handover.startMeter;
+          }
+          await vehicle.save();
+        }
       }
       return res.json(updated);
     }

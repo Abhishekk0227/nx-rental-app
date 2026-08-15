@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { customRound } from '../utils/billingEngine';
 import { Car, Users, DollarSign, Calendar, Clock, Bike, Truck, Zap, Banknote, Monitor, CreditCard, Wallet, Phone, MapPin, User, Eye } from 'lucide-react';
 
 const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
@@ -98,7 +99,7 @@ function CategoryUtilization({ vehicles }) {
     const colors = { Scooty: '#6366f1', Car: '#3b82f6', Bike: '#10b981', EV: '#f59e0b', Other: '#94a3b8' };
     return Object.entries(cats).map(([name, d]) => ({
       name, total: d.total, active: d.active,
-      percent: d.total > 0 ? Math.round((d.active / d.total) * 100) : 0,
+      percent: d.total > 0 ? customRound((d.active / d.total) * 100) : 0,
       color: colors[name] || '#6366f1'
     }));
   }, [vehicles]);
@@ -132,7 +133,7 @@ const getCardFlow = (b) => {
 
   if (b.depositDetails) {
     if (b.depositDetails.mode === 'Cash') cashIn += Number(b.depositDetails.cashAmount || b.securityDeposit || 0);
-    else if (['Online', 'UPI', 'Card'].includes(b.depositDetails.mode)) onlineIn += Number(b.depositDetails.onlineAmount || b.securityDeposit || 0);
+    else if (['Online', 'UPI'].includes(b.depositDetails.mode)) onlineIn += Number(b.depositDetails.onlineAmount || b.securityDeposit || 0);
     else if (b.depositDetails.mode === 'Vikas') vikasIn += Number(b.depositDetails.cashAmount || b.depositDetails.onlineAmount || b.securityDeposit || 0);
     else if (b.depositDetails.mode === 'Mixed') {
       cashIn += Number(b.depositDetails.cashAmount || 0);
@@ -145,7 +146,7 @@ const getCardFlow = (b) => {
   if (b.paymentCollection && b.paymentCollection.length > 0) {
     b.paymentCollection.forEach(p => {
       if (p.mode === 'Cash') cashIn += p.amount;
-      else if (['UPI', 'Card', 'Online'].includes(p.mode)) onlineIn += p.amount;
+      else if (['UPI', 'Online'].includes(p.mode)) onlineIn += p.amount;
       else if (p.mode === 'Vikas') vikasIn += p.amount;
       else if (p.mode === 'Mixed') {
         if (p.reference && p.reference.includes('Cash:')) {
@@ -194,13 +195,13 @@ const getCardFlow = (b) => {
         cashOut += cashP;
         onlineOut += onlineP;
       } else {
-        cashOut += Math.round(refundAmt / 2);
-        onlineOut += refundAmt - Math.round(refundAmt / 2);
+        cashOut += customRound(refundAmt / 2);
+        onlineOut += refundAmt - customRound(refundAmt / 2);
       }
     } else onlineOut += refundAmt;
   }
 
-  const r2 = (val) => Math.round((Number(val) || 0) * 100) / 100;
+  const r2 = (val) => customRound((Number(val) || 0) * 100) / 100;
   return {
     cashIn: r2(cashIn),
     onlineIn: r2(onlineIn),
@@ -259,7 +260,7 @@ function RecentBookings({ bookings, vehicles = [], setCurrentTab }) {
             const vName = resolvedV?.name || b.vehicleDetails?.name || b.vehicleName || 'Vehicle';
             const vReg = resolvedV?.regNumber || b.vehicleDetails?.regNumber || b.vehicleRegNumber || '';
             const frontImg = resolvedV?.images?.front;
-            const amt = (Math.round((Number(b.amount || b.finalAmount || b.baseFare || 0)) * 100) / 100).toLocaleString('en-IN');
+            const amt = (customRound((Number(b.amount || b.finalAmount || b.baseFare || 0)) * 100) / 100).toLocaleString('en-IN');
             const custName = b.customer?.name || b.customerName || 'Customer';
             const custPhone = b.customer?.phone || b.customerPhone || '';
 
@@ -366,7 +367,7 @@ function RecentBookings({ bookings, vehicles = [], setCurrentTab }) {
                   </div>
                 </div>
 
-                {/* Bottom Strip Cash flow matching BookedVehicles list card design */}
+                {/* Bottom Strip Cash flow */}
                 <div style={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
@@ -388,7 +389,7 @@ function RecentBookings({ bookings, vehicles = [], setCurrentTab }) {
                     <Wallet size={13} /> Cash Out: <strong>₹{flow.cashOut.toLocaleString('en-IN')}</strong>
                   </div>
                   <div style={{ padding: '7px 4px', color: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                    <CreditCard size={13} /> Online Out: <strong>₹{flow.onlineOut.toLocaleString('en-IN')}</strong>
+                    <Monitor size={13} /> Online Out: <strong>₹{flow.onlineOut.toLocaleString('en-IN')}</strong>
                   </div>
                   <div style={{ padding: '7px 4px', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                     <User size={13} /> Vikas Out: <strong>₹{flow.vikasOut.toLocaleString('en-IN')}</strong>
@@ -431,7 +432,7 @@ export default function DashboardHome({ vehicles, bookings, userRole, setCurrent
   }, [bookings]);
 
   const utilization = vehicles.length > 0
-    ? Math.round(((fleetStats.ongoing + fleetStats.reserved) / vehicles.length) * 100)
+    ? customRound(((fleetStats.ongoing + fleetStats.reserved) / vehicles.length) * 100)
     : 0;
 
   return (

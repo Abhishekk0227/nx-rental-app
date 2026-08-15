@@ -369,6 +369,7 @@ export default function BookedVehicles({
   const [dropPaymentMethod, setDropPaymentMethod] = useState(''); // '' | 'Cash' | 'UPI' | 'Card' | 'Mixed' | etc
   const [dropCashReceived, setDropCashReceived] = useState(0);
   const [dropOnlineReceived, setDropOnlineReceived] = useState(0);
+  const [dropVikasReceived, setDropVikasReceived] = useState(0);
   const [dropCollectTxnId, setDropCollectTxnId] = useState('');
   const [dropCollectNotes, setDropCollectNotes] = useState('Collected at return handover');
 
@@ -601,7 +602,7 @@ export default function BookedVehicles({
     if (b.depositDetails) {
       if (b.depositDetails.mode === 'Cash') {
         cashIn += Number(b.depositDetails.cashAmount || b.securityDeposit || 0);
-      } else if (['Online', 'UPI', 'Card'].includes(b.depositDetails.mode)) {
+      } else if (['Online', 'UPI'].includes(b.depositDetails.mode)) {
         onlineIn += Number(b.depositDetails.onlineAmount || b.securityDeposit || 0);
       } else if (b.depositDetails.mode === 'Vikas') {
         vikasIn += Number(b.depositDetails.cashAmount || b.depositDetails.onlineAmount || b.securityDeposit || 0);
@@ -618,7 +619,7 @@ export default function BookedVehicles({
       b.paymentCollection.forEach(p => {
         if (p.mode === 'Cash') {
           cashIn += p.amount;
-        } else if (['UPI', 'Card', 'Online'].includes(p.mode)) {
+        } else if (['UPI', 'Online'].includes(p.mode)) {
           onlineIn += p.amount;
         } else if (p.mode === 'Vikas') {
           vikasIn += p.amount;
@@ -642,7 +643,7 @@ export default function BookedVehicles({
       }
     }
 
-    // Settlements/Refunds Split (Outflows)
+    // Settlements/Refunds mixed (Outflows)
     let refundAmt = 0;
     let refundMethod = 'Cash';
 
@@ -1087,6 +1088,7 @@ export default function BookedVehicles({
     setDropPaymentMethod('');
     setDropCashReceived(0);
     setDropOnlineReceived(0);
+    setDropVikasReceived(0);
     setDropCollectTxnId('');
     setDropCollectNotes('Collected balance on drop-off return');
 
@@ -1346,7 +1348,7 @@ export default function BookedVehicles({
       } else if (extensionPaymentMode === 'Mixed') {
         const sum = Number(extensionMixedCash) + Number(extensionMixedOnline);
         if (sum !== Number(extensionAdditionalDeposit)) {
-          return alert(`Mixed Extension Deposit split error: Cash (₹${extensionMixedCash}) + Online (₹${extensionMixedOnline}) must equal Additional Deposit (₹${extensionAdditionalDeposit}).`);
+          return alert(`Mixed Extension Deposit mixed error: Cash (₹${extensionMixedCash}) + Online (₹${extensionMixedOnline}) must equal Additional Deposit (₹${extensionAdditionalDeposit}).`);
         }
         addCash = Number(extensionMixedCash);
         addOnline = Number(extensionMixedOnline);
@@ -1397,7 +1399,7 @@ export default function BookedVehicles({
         mode: addPayment.mode,
         cashSplit: addPayment.cashAmount,
         onlineSplit: addPayment.onlineAmount,
-        cardSplit: 0,
+        
         remarks: `Extension payment upfront`
       };
     }
@@ -1521,7 +1523,7 @@ export default function BookedVehicles({
         } else if (replacePaymentMode === 'Mixed') {
           const sum = Number(replaceMixedCash) + Number(replaceMixedOnline);
           if (sum !== Number(comp.depositDiff)) {
-            return alert(`Mixed Replace Deposit split error: Cash (₹${replaceMixedCash}) + Online (₹${replaceMixedOnline}) must equal Deposit difference (₹${comp.depositDiff}).`);
+            return alert(`Mixed Replace Deposit mixed error: Cash (₹${replaceMixedCash}) + Online (₹${replaceMixedOnline}) must equal Deposit difference (₹${comp.depositDiff}).`);
           }
           depCashAdd = Number(replaceMixedCash);
           depOnlineAdd = Number(replaceMixedOnline);
@@ -1640,7 +1642,7 @@ export default function BookedVehicles({
           mode: replacePaymentMode,
           cashSplit: replacePaymentMode === 'Cash' ? comp.rentDiff : 0,
           onlineSplit: ['UPI', 'Online', 'Card'].includes(replacePaymentMode) ? comp.rentDiff : 0,
-          cardSplit: 0,
+          
           vikasSplit: replacePaymentMode === 'Vikas' ? comp.rentDiff : 0,
           remarks: `Replacement Rent Difference Upfront`
         };
@@ -2091,7 +2093,7 @@ export default function BookedVehicles({
           mode: collectMode,
           cashSplit: Math.round(depCashAdd),
           onlineSplit: Math.round(depOnlineAdd),
-          cardSplit: 0,
+          
           remarks: `${collectNotes} (Deposit Part)`
         }
       };
@@ -2216,7 +2218,7 @@ export default function BookedVehicles({
   // PRINT DETAILS HTML GENERATOR
   const triggerPrintDetails = (booking) => {
     const printWindow = window.open('', '_blank', 'width=800,height=600');
-    
+
     const resolvedVObj = vehicles.find(v => v.vehicleId === booking.vehicleId);
     const resolvedV = {
       name: resolvedVObj?.name || booking.vehicleName || 'Unknown Vehicle',
@@ -2230,7 +2232,7 @@ export default function BookedVehicles({
     };
 
     const snapshot = getBookingFinancialSnapshot(booking);
-    
+
     const startPickup = new Date(
       booking.pickupDetails?.actualTime ||
       booking.rentalPeriod?.actualPickupDate ||
@@ -2346,9 +2348,9 @@ export default function BookedVehicles({
               </div>
               <div class="inv-section">
                 <div class="inv-section-title">Extensions Log</div>
-                ${(booking.extensions && booking.extensions.length > 0) 
-                  ? booking.extensions.map(ext => `<div class="inv-row"><span class="label">+${ext.extraHours || 0} hrs</span><span class="value">₹${fmtNum(ext.extraCharges)}</span></div>`).join('')
-                  : '<div class="inv-row"><span class="label" style="color:#94a3b8;">No extensions</span><span class="value">—</span></div>'}
+                ${(booking.extensions && booking.extensions.length > 0)
+        ? booking.extensions.map(ext => `<div class="inv-row"><span class="label">+${ext.extraHours || 0} hrs</span><span class="value">₹${fmtNum(ext.extraCharges)}</span></div>`).join('')
+        : '<div class="inv-row"><span class="label" style="color:#94a3b8;">No extensions</span><span class="value">—</span></div>'}
               </div>
             </div>
 
@@ -2384,17 +2386,17 @@ export default function BookedVehicles({
               <div>
                 <div class="total-label">Final Settlement</div>
                 <div class="total-amount">
-                  ${booking.status === 'Completed' 
-                    ? `₹${fmtNum(booking.settlement?.collectAmount || booking.settlement?.depositRefunded || booking.settlement?.refundAmount || booking.refundDetails?.amount || snapshot.outstandingRent)}`
-                    : `Outstanding: ₹${fmtNum(snapshot.outstandingRent)}`}
+                  ${booking.status === 'Completed'
+        ? `₹${fmtNum(booking.settlement?.collectAmount || booking.settlement?.depositRefunded || booking.settlement?.refundAmount || booking.refundDetails?.amount || snapshot.outstandingRent)}`
+        : `Outstanding: ₹${fmtNum(snapshot.outstandingRent)}`}
                 </div>
               </div>
-              <span class="total-status ${booking.status === 'Completed' 
-                ? ((booking.settlement?.refundAmount > 0 || booking.refundDetails?.amount > 0) ? 'status-refund' : 'status-collect') 
-                : 'status-pending'}">
-                ${booking.status === 'Completed' 
-                  ? ((booking.settlement?.refundAmount > 0 || booking.refundDetails?.amount > 0) ? 'REFUNDED' : 'SETTLED') 
-                  : 'PENDING'}
+              <span class="total-status ${booking.status === 'Completed'
+        ? ((booking.settlement?.refundAmount > 0 || booking.refundDetails?.amount > 0) ? 'status-refund' : 'status-collect')
+        : 'status-pending'}">
+                ${booking.status === 'Completed'
+        ? ((booking.settlement?.refundAmount > 0 || booking.refundDetails?.amount > 0) ? 'REFUNDED' : 'SETTLED')
+        : 'PENDING'}
               </span>
             </div>
 
@@ -2831,24 +2833,28 @@ export default function BookedVehicles({
       const isRefund = calc.depositRefund > 0;
       const reqVal = isRefund ? calc.depositRefund : calc.remainingCollection;
       if (reqVal > 0) {
-        if (dropPaymentMethod === 'UPI' || dropPaymentMethod === 'Online' || dropPaymentMethod === 'UPI Refund' || dropPaymentMethod === 'Online Refund') {
+        if (dropPaymentMethod === 'UPI' || dropPaymentMethod === 'Online' || dropPaymentMethod === 'online Refund' || dropPaymentMethod === 'Online Refund') {
           setDropOnlineReceived(reqVal);
+          setDropVikasReceived(0);
           setDropCashReceived(0);
         } else if (dropPaymentMethod === 'Mixed' || dropPaymentMethod === 'Mixed Refund') {
           const sum = Number(dropCashReceived) + Number(dropOnlineReceived);
           if (Math.abs(sum - reqVal) > 0.01) {
             setDropCashReceived(reqVal);
             setDropOnlineReceived(0);
+            setDropVikasReceived(0);
             setDropPaymentMethod('');
           }
         } else {
           setDropCashReceived(reqVal);
           setDropOnlineReceived(0);
+          setDropVikasReceived(0);
           setDropPaymentMethod('');
         }
       } else {
         setDropCashReceived(0);
         setDropOnlineReceived(0);
+        setDropVikasReceived(0);
       }
     }
   }, [calc.remainingCollection, calc.depositRefund, selectedBooking, viewState]);
@@ -2879,12 +2885,12 @@ export default function BookedVehicles({
       return alert('Please select a Payment Mode (Cash, UPI, Card, Mixed) before submitting.');
     }
 
-    // Mixed split details
+    // Mixed mixed details
     let mixedDetails = '';
     if (dropPaymentMethod === 'Mixed' || dropPaymentMethod === 'Mixed Refund') {
       const sum = Number(dropCashReceived) + Number(dropOnlineReceived);
       if (Math.abs(sum - reqVal) > 0.01) {
-        return alert(`Mixed Split error: Cash Amount (₹${dropCashReceived}) + Online Amount (₹${dropOnlineReceived}) must equal ${isRefund ? 'refund' : 'collect'} amount (₹${reqVal.toFixed(2)}).`);
+        return alert(`Mixed mixed error: Cash Amount (₹${dropCashReceived}) + Online Amount (₹${dropOnlineReceived}) must equal ${isRefund ? 'refund' : 'collect'} amount (₹${reqVal.toFixed(2)}).`);
       }
       mixedDetails = `Cash: ${dropCashReceived}, Online: ${dropOnlineReceived}`;
     }
@@ -2894,6 +2900,7 @@ export default function BookedVehicles({
       amount: reqVal,
       cashAmount: dropPaymentMethod === 'Mixed' ? Number(dropCashReceived) : dropPaymentMethod === 'Cash' ? reqVal : 0,
       onlineAmount: dropPaymentMethod === 'Mixed' ? Number(dropOnlineReceived) : ['UPI', 'Online', 'Card'].includes(dropPaymentMethod) ? reqVal : 0,
+      vikasAmount: ['Vikas'].includes(dropPaymentMethod) ? reqVal : 0,
       cardAmount: 0,
       transactionId: dropCollectTxnId || `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
       reference: dropPaymentMethod === 'Mixed' ? mixedDetails : dropCollectNotes,
@@ -2903,7 +2910,7 @@ export default function BookedVehicles({
     const refundDetailsObj = isRefund ? {
       amount: reqVal,
       status: 'Completed',
-      method: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'UPI Refund' ? 'UPI' : dropPaymentMethod === 'Card Refund' ? 'Card' : 'Cash'),
+      method: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'online Refund' ? 'UPI' : dropPaymentMethod === 'Card Refund' ? 'Card' : dropPaymentMethod === 'Vikas Refund' ? 'Vikas' : 'Cash'),
       notes: dropPaymentMethod === 'Mixed Refund' ? mixedDetails : (dropRefundReason || 'Refund processed')
     } : {
       amount: 0,
@@ -2959,7 +2966,8 @@ export default function BookedVehicles({
         mode: dropPaymentMethod === 'Mixed' ? 'Mixed' : dropPaymentMethod,
         cashSplit: dropPaymentMethod === 'Mixed' ? Number(dropCashReceived) : dropPaymentMethod === 'Cash' ? reqVal : 0,
         onlineSplit: dropPaymentMethod === 'Mixed' ? Number(dropOnlineReceived) : ['UPI', 'Online', 'Card'].includes(dropPaymentMethod) ? reqVal : 0,
-        cardSplit: 0,
+        vikasSplit: ['Vikas'].includes(dropPaymentMethod) ? reqVal : 0,
+        
         remarks: dropCollectNotes || 'Dropoff Collection'
       };
     }
@@ -3446,7 +3454,7 @@ export default function BookedVehicles({
                         <Wallet size={13} /> Cash Out: <strong>₹{(Math.round((flow.cashOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <CreditCard size={13} /> Online Out: <strong>₹{(Math.round((flow.onlineOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <Monitor size={13} /> Online Out: <strong>₹{(Math.round((flow.onlineOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#f43f5e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
                         <User size={13} /> Vikas Out: <strong>₹{(Math.round((flow.vikasOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
@@ -5096,7 +5104,7 @@ export default function BookedVehicles({
 
                 {/* Section 2 – Current Booking Financial Snapshot (Read Only) */}
                 <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
+                  <summary style={{ cursor: "pointer", fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Booking Financial Details
                   </summary>
 
@@ -5178,7 +5186,7 @@ export default function BookedVehicles({
                   {/* Card 2: Duration & Extension Summary */}
                   {hasExtensions && (
                     <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <summary style={{ cursor: "pointer",  fontSize: '0.9rem', margin: '0 0 12px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <summary style={{ cursor: "pointer", fontSize: '0.9rem', margin: '0 0 12px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Duration & Extension Summary
                       </summary>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
@@ -5213,7 +5221,7 @@ export default function BookedVehicles({
 
                         {/* Subsection: Current Active Booking Rules */}
                         <details style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed var(--border-light)' }}>
-                          <summary style={{ cursor: "pointer",  fontSize: '0.8rem', color: '#000', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
+                          <summary style={{ cursor: "pointer", fontSize: '0.8rem', color: '#000', textTransform: 'uppercase', marginBottom: '8px', letterSpacing: '0.03em' }}>
                             Current Active Booking Rules
                           </summary>
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -5293,7 +5301,7 @@ export default function BookedVehicles({
                   {/* Card 4: Payment & Deposit Timeline */}
                   <div style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
                     <details style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 16px 0' }}>
-                      <summary style={{ cursor: "pointer",  fontSize: '0.9rem', margin: 0, color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <summary style={{ cursor: "pointer", fontSize: '0.9rem', margin: 0, color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         Payment & Deposit Timeline
                       </summary>
                       <button
@@ -5411,7 +5419,7 @@ export default function BookedVehicles({
                   const isEV = selectedBooking.vehicleDetails?.category?.toLowerCase() === 'ev';
                   return (
                     <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
+                      <summary style={{ cursor: "pointer", fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                         Vehicle Inspection & Damage Report
                       </summary>
 
@@ -5542,7 +5550,7 @@ export default function BookedVehicles({
 
                 {/* Section 5 – Adjustments (Editable) */}
                 <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
+                  <summary style={{ cursor: "pointer", fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Adjustments & Waivers
                   </summary>
 
@@ -5553,7 +5561,7 @@ export default function BookedVehicles({
                         type="text" inputMode="numeric"
                         className="form-control"
                         value={dropFreeMinutes}
-                        onChange={e => setDropFreeMinutes(Number(e.target.value))}
+                        onChange={e => setDropFreeMinutes(e.target.value.replace(/,/g, ''))}
                       />
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Minutes to waive from extra hours calculations</span>
                     </div>
@@ -5565,7 +5573,7 @@ export default function BookedVehicles({
                           type="text" inputMode="numeric"
                           className="form-control"
                           value={dropAddFreeKm}
-                          onChange={e => setDropAddFreeKm(Number(e.target.value))}
+                          onChange={e => setDropAddFreeKm(e.target.value.replace(/,/g, ''))}
                         />
                         <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Extra free kilometers allowed for return</span>
                       </div>
@@ -5583,7 +5591,7 @@ export default function BookedVehicles({
                         type="text" inputMode="numeric"
                         className="form-control"
                         value={dropDiscountWaiver}
-                        onChange={e => setDropDiscountWaiver(Number(e.target.value))}
+                        onChange={e => setDropDiscountWaiver(e.target.value.replace(/,/g, ''))}
                       />
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Deduct directly from the grand total bill</span>
                     </div>
@@ -5597,7 +5605,7 @@ export default function BookedVehicles({
 
                 {/* Section 6 – Usage Summary (Auto Calculated) */}
                 <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                  <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
+                  <summary style={{ cursor: "pointer", fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                     Trip Usage Summary
                   </summary>
 
@@ -5774,7 +5782,7 @@ export default function BookedVehicles({
                   const snapshot = getBookingFinancialSnapshot(selectedBooking);
                   return (
                     <details style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '20px' }}>
-                      <summary style={{ cursor: "pointer",  fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
+                      <summary style={{ cursor: "pointer", fontSize: '1rem', margin: '0 0 16px 0', color: '#000', display: 'flex', alignItems: 'center', gap: '8px' }} >
                         Payment & Deposit Summary
                       </summary>
 
@@ -5875,7 +5883,7 @@ export default function BookedVehicles({
                             <span>₹{calc.depositRefund?.toFixed(2)}</span>
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                            Calculation: Deposit Held (₹{(calc.depositHeld - calc.depositAdjustment).toFixed(2)}) 
+                            Calculation: Deposit Held (₹{(calc.depositHeld - calc.depositAdjustment).toFixed(2)})
                             {calc.rentalDue < 0 && ` + Forwarded Swap Refund (₹${Math.abs(calc.rentalDue).toFixed(2)})`}
                           </div>
                         </div>
@@ -5981,7 +5989,11 @@ export default function BookedVehicles({
                                 type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropCashReceived}
-                                onChange={e => setDropCashReceived(Number(e.target.value))}
+                                onChange={e => {
+                                  const val = Number(e.target.value);
+                                  setDropCashReceived(val);
+                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                }}
                                 required
                               />
                             </div>
@@ -5991,7 +6003,11 @@ export default function BookedVehicles({
                                 type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropOnlineReceived}
-                                onChange={e => setDropOnlineReceived(Number(e.target.value))}
+                                onChange={e => {
+                                  const val = Number(e.target.value);
+                                  setDropOnlineReceived(val);
+                                  setDropCashReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                }}
                                 required
                               />
                             </div>
@@ -6006,7 +6022,7 @@ export default function BookedVehicles({
                               <input
                                 type="text"
                                 className="form-control"
-                                placeholder="e.g. UPI Ref Number"
+                                placeholder="e.g. online Ref Number"
                                 value={dropCollectTxnId}
                                 onChange={e => setDropCollectTxnId(e.target.value)}
                               />
@@ -6051,14 +6067,14 @@ export default function BookedVehicles({
                           <label>Refund Mode *</label>
                           <select
                             className="form-control"
-                            value={['Mixed Refund', 'Cash Refund', 'UPI Refund', 'Card Refund', 'Vikas Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
+                            value={['Mixed Refund', 'Cash Refund', 'online Refund', 'Card Refund', 'Vikas Refund'].includes(dropPaymentMethod) ? dropPaymentMethod : ''}
                             onChange={e => setDropPaymentMethod(e.target.value)}
                             required
                             style={!dropPaymentMethod ? { color: 'var(--text-secondary)' } : {}}
                           >
                             <option value="" disabled>-- Select Refund Mode --</option>
                             <option value="Cash Refund">Cash</option>
-                            <option value="UPI Refund">UPI</option>
+                            <option value="online Refund">UPI</option>
                             <option value="Card Refund">Card</option>
                             <option value="Vikas Refund">Vikas</option>
                             <option value="Mixed Refund">Mixed Split</option>
@@ -6073,7 +6089,11 @@ export default function BookedVehicles({
                                 type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropCashReceived}
-                                onChange={e => setDropCashReceived(Number(e.target.value))}
+                                onChange={e => {
+                                  const val = Number(e.target.value);
+                                  setDropCashReceived(val);
+                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                }}
                                 required
                               />
                             </div>
@@ -6083,7 +6103,11 @@ export default function BookedVehicles({
                                 type="text" inputMode="numeric"
                                 className="form-control"
                                 value={dropOnlineReceived}
-                                onChange={e => setDropOnlineReceived(Number(e.target.value))}
+                                onChange={e => {
+                                  const val = Number(e.target.value);
+                                  setDropOnlineReceived(val);
+                                  setDropCashReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                }}
                                 required
                               />
                             </div>
@@ -6402,7 +6426,7 @@ export default function BookedVehicles({
                       required
                     >
                       <option value="Cash">Cash</option>
-                      <option value="UPI">UPI / Online</option>
+                      <option value="UPI">online / Online</option>
                       <option value="Mixed">Mixed Split</option>
                     </select>
                   </div>
@@ -6700,12 +6724,12 @@ export default function BookedVehicles({
                               <>
                                 <option value="Defer">➡️ Forward to Drop-off (Adjust at Vehicle Return)</option>
                                 <option value="Cash">💵 Instant Cash Refund Now</option>
-                                <option value="UPI">📱 Instant UPI / Online Refund Now</option>
+                                <option value="UPI">📱 Instant online / Online Refund Now</option>
                               </>
                             ) : (
                               <>
                                 <option value="Cash">Cash</option>
-                                <option value="UPI">UPI / Online</option>
+                                <option value="UPI">online / Online</option>
                                 <option value="Vikas">Vikas</option>
                                 <option value="Mixed">Mixed Split</option>
                               </>
@@ -6857,7 +6881,7 @@ export default function BookedVehicles({
                         <label>Rental Payment Method</label>
                         <select className="form-control" value={editPaymentMethod} onChange={e => setEditPaymentMethod(e.target.value)}>
                           <option value="Cash">Cash</option>
-                          <option value="UPI">UPI / Online</option>
+                          <option value="UPI">online / Online</option>
                           <option value="Mixed">Mixed Split</option>
                         </select>
                       </div>
@@ -6867,11 +6891,19 @@ export default function BookedVehicles({
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '10px' }} className="animate-fade">
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Cash Portion (₹)</label>
-                          <input type="text" inputMode="numeric" className="form-control" value={editMixedCash} onChange={e => setEditMixedCash(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editMixedCash} onChange={e => {
+                              const val = Number(e.target.value);
+                              setEditMixedCash(val);
+                              setEditMixedOnline(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
+                            }} />
                         </div>
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Online Portion (₹)</label>
-                          <input type="text" inputMode="numeric" className="form-control" value={editMixedOnline} onChange={e => setEditMixedOnline(Number(e.target.value))} />
+                          <input type="text" inputMode="numeric" className="form-control" value={editMixedOnline} onChange={e => {
+                              const val = Number(e.target.value);
+                              setEditMixedOnline(val);
+                              setEditMixedCash(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
+                            }} />
                         </div>
                       </div>
                     )}

@@ -11,6 +11,17 @@
  */
 
 /**
+ * Custom rounding logic as per requirement:
+ * decimal <= 0.50 -> rounds down
+ * decimal > 0.50 -> rounds up
+ */
+export function customRound(num) {
+  const n = Number(num);
+  if (isNaN(n)) return 0;
+  return Math.round(n);
+}
+
+/**
  * Calculate the cumulative rental base cost from a plan type, duration, and extension history.
  *
  * @param {Object} selectedPlan  — { planType, rate, kmLimit, extraKmCharge, extraHourCharge }
@@ -25,26 +36,26 @@ export function calculateBaseFare(selectedPlan, durationHours = 0, durationDays 
   const planType = selectedPlan.planType;
 
   if (planType === 'Hourly') {
-    return rate * Math.ceil(durationHours);
+    return rate * customRound(durationHours);
   }
 
   if (planType === '12-Hour') {
-    const periods = Math.ceil(durationHours / 12);
+    const periods = customRound(durationHours / 12);
     return rate * periods;
   }
 
   if (planType === '24-Hour') {
-    const periods = Math.ceil(durationHours / 24);
+    const periods = customRound(durationHours / 24);
     return rate * periods;
   }
 
   if (planType === 'Weekly') {
-    const weeks = Math.ceil(durationDays / 7);
+    const weeks = customRound(durationDays / 7);
     return rate * weeks;
   }
 
   if (planType === 'Monthly') {
-    const months = Math.ceil(durationDays / 30);
+    const months = customRound(durationDays / 30);
     return rate * months;
   }
 
@@ -65,12 +76,12 @@ export function calculateExtensionCharge(selectedPlan, extensionHours = 0) {
 
   const extraHourCharge = Number(selectedPlan.extraHourCharge) || 0;
   if (extraHourCharge > 0) {
-    return extraHourCharge * Math.ceil(extensionHours);
+    return extraHourCharge * customRound(extensionHours);
   }
 
   // Fallback: use plan rate
   const rate = Number(selectedPlan.rate) || 0;
-  return rate * Math.ceil(extensionHours);
+  return rate * customRound(extensionHours);
 }
 
 /**
@@ -109,8 +120,8 @@ export function calculateActualBill({
   const overHours = Math.max(0, actualHours - bookedHours);
   const overKm = Math.max(0, actualKm - kmLimit);
 
-  const extraHourTotal = extraHourCharge > 0 ? extraHourCharge * Math.ceil(overHours) : 0;
-  const extraKmTotal = extraKmCharge > 0 ? extraKmCharge * Math.ceil(overKm) : 0;
+  const extraHourTotal = extraHourCharge > 0 ? extraHourCharge * customRound(overHours) : 0;
+  const extraKmTotal = extraKmCharge > 0 ? extraKmCharge * customRound(overKm) : 0;
 
   const actualBill =
     Number(rentalCost) +
@@ -121,7 +132,7 @@ export function calculateActualBill({
     Number(otherCharges) -
     Number(discount);
 
-  return Math.max(0, Math.round(actualBill));
+  return Math.max(0, customRound(actualBill));
 }
 
 /**
@@ -146,10 +157,10 @@ export function calculateSettlement({ actualBill = 0, rentalPaid = 0, depositHel
   const finalCollection = Math.max(0, netDue - depositAdjustment);
 
   return {
-    netDue: Math.round(netDue),
-    depositAdjustment: Math.round(depositAdjustment),
-    finalRefund: Math.round(finalRefund),
-    finalCollection: Math.round(finalCollection),
+    netDue: customRound(netDue),
+    depositAdjustment: customRound(depositAdjustment),
+    finalRefund: customRound(finalRefund),
+    finalCollection: customRound(finalCollection),
   };
 }
 

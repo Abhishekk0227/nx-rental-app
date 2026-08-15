@@ -1,0 +1,1 @@
+import jwt from 'jsonwebtoken'; import fs from 'fs'; const env = fs.readFileSync('./.env', 'utf8'); const secret = env.match(/JWT_SECRET=(.*)/)[1].trim(); console.log(jwt.sign({ id: 'admin' }, secret));

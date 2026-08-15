@@ -28,7 +28,7 @@ export const seedVehicles = [
       monthly: { baseRate: 35000, kmLimit: 5000, extraKmCharge: 8, extraDayCharge: 1500 }
     },
     depositSettings: { requireDeposit: true, amount: 5000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Vijay Nagar Branch', parkingLocation: 'Slot T-1' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -92,7 +92,7 @@ export const seedVehicles = [
       monthly: { baseRate: 18000, kmLimit: 4000, extraKmCharge: 5, extraDayCharge: 800 }
     },
     depositSettings: { requireDeposit: true, amount: 2000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Vijay Nagar Branch', parkingLocation: 'Slot B-7' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -124,7 +124,7 @@ export const seedVehicles = [
       monthly: { baseRate: 25000, kmLimit: 5000, extraKmCharge: 6, extraDayCharge: 1200 }
     },
     depositSettings: { requireDeposit: true, amount: 3000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Vijay Nagar Branch', parkingLocation: 'Slot T-2' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -156,7 +156,7 @@ export const seedVehicles = [
       monthly: { baseRate: 30000, kmLimit: 5000, extraKmCharge: 7, extraDayCharge: 1400 }
     },
     depositSettings: { requireDeposit: true, amount: 4000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Vijay Nagar Branch', parkingLocation: 'Slot T-3' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -188,7 +188,7 @@ export const seedVehicles = [
       monthly: { baseRate: 85000, kmLimit: 5000, extraKmCharge: 12, extraDayCharge: 3500 }
     },
     depositSettings: { requireDeposit: true, amount: 10000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['UPI', 'Cash'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Palasia', currentBranch: 'Palasia Branch', parkingLocation: 'Slot P-1' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -284,7 +284,7 @@ export const seedVehicles = [
       monthly: { baseRate: 22000, kmLimit: 4000, extraKmCharge: 5, extraDayCharge: 1000 }
     },
     depositSettings: { requireDeposit: true, amount: 3000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Vijay Nagar', currentBranch: 'Vijay Nagar Branch', parkingLocation: 'Slot B-8' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },
@@ -316,7 +316,7 @@ export const seedVehicles = [
       monthly: { baseRate: 28000, kmLimit: 4000, extraKmCharge: 7, extraDayCharge: 1200 }
     },
     depositSettings: { requireDeposit: true, amount: 5000 },
-    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI', 'Card'] },
+    paymentSettings: { advanceRequired: true, percentage: 50, acceptedModes: ['Cash', 'UPI'] },
     bookingConfig: { bufferTime: 30, status: 'Active', bookingEnabled: true, instantBooking: true },
     locationDetails: { currentZone: 'Palasia', currentBranch: 'Palasia Branch', parkingLocation: 'Slot B-9' },
     documents: { rcUrl: '', insuranceUrl: '', pucUrl: '', fitnessUrl: '' },

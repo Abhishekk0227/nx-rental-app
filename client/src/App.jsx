@@ -216,8 +216,16 @@ export default function App() {
         headers: getAuthHeaders(),
         body: JSON.stringify(extendData)
       });
-      if (res.ok) fetchInitialData();
-    } catch (err) { console.error(err); }
+      if (res.ok) {
+        fetchInitialData();
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        alert(`Failed to extend booking: ${errData.message || res.statusText}`);
+      }
+    } catch (err) { 
+      console.error(err); 
+      alert(`Error extending booking: ${err.message}`);
+    }
   };
 
   const handleReplaceVehicle = async (bookingId, replaceData) => {

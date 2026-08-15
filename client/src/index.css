@@ -2616,7 +2616,7 @@ select.form-control {
   overflow-y: auto;
 }
 
-/* Sidebar-split modal layout (Vehicle Config edit) */
+/* Sidebar-mixed modal layout (Vehicle Config edit) */
 .modal-sidebar-layout {
   display: flex;
   overflow: hidden;

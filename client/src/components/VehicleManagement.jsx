@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { customRound } from '../utils/billingEngine';
 import { Search, SlidersHorizontal, Plus, Car, Bike, Eye, Clock, ToggleLeft, ToggleRight, MapPin, Trash2, X, Pencil, Camera, Upload, AlertTriangle, Users } from 'lucide-react';
 
 export default function VehicleManagement({ vehicles, bookings = [], zones = [], userRole, onAddVehicle, onUpdateVehicle, onToggleStatus, onDeleteVehicle, autoOpenAdd, onAutoOpenConsumed }) {
@@ -1778,7 +1779,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                         const endM = b.dropDetails?.endMeter || 0;
                         const kmUsed = endM > startM ? (endM - startM) : 0;
                         const finalAmt = b.settlement?.totalBill || b.finalAmount || b.baseFare || 0;
-                        const fmtAmt = (Math.round(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
+                        const fmtAmt = (customRound(finalAmt * 100) / 100).toLocaleString('en-IN', { maximumFractionDigits: 2 });
                         const pickupDate = new Date(b.pickupDate || b.rentalPeriod?.startDate).toLocaleDateString();
                         const dropDate = b.dropDetails?.actualTime
                           ? new Date(b.dropDetails.actualTime).toLocaleDateString()
@@ -1873,14 +1874,14 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
                           <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>💳 Financial Breakdown</h4>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                            <div>Base Fare: <strong>₹{(Math.round(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extensions Total: <strong>₹{(Math.round(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extra Charges: <strong>₹{(Math.round(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(Math.round((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(Math.round(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(Math.round(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Security Deposit: <strong>₹{(Math.round(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(Math.round(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Base Fare: <strong>₹{(customRound(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extensions Total: <strong>₹{(customRound(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Extra Charges: <strong>₹{(customRound(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(customRound((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(customRound(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(customRound(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Security Deposit: <strong>₹{(customRound(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(customRound(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
                           </div>
                         </div>
 
@@ -1892,7 +1893,7 @@ export default function VehicleManagement({ vehicles, bookings = [], zones = [],
                               {b.paymentCollection.map((p, idx) => (
                                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', fontSize: '0.8rem' }}>
                                   <span>{p.reference || 'Payment Received'} ({p.mode})</span>
-                                  <strong>₹{(Math.round((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                                  <strong>₹{(customRound((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
                                 </div>
                               ))}
                             </div>

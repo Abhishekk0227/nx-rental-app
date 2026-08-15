@@ -1,0 +1,1 @@
+const addHoursToDateString = (dateStr, hours) => { if (!dateStr) return ''; const d = new Date(dateStr); d.setHours(d.getHours() + hours); const tzOffset = d.getTimezoneOffset() * 60000; return new Date(d - tzOffset).toISOString().slice(0, 16); }; console.log('Original Output:', addHoursToDateString('2026-08-15T12:06', 12));

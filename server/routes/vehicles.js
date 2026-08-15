@@ -12,18 +12,18 @@ router.get('/', async (req, res) => {
     if (isDbConnected()) {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
-      
+
       // If pagination is requested
       if (req.query.page) {
         const page = parseInt(req.query.page, 10) || 1;
         const limit = parseInt(req.query.limit, 10) || 50;
         const skip = (page - 1) * limit;
-        
+
         const [vehicles, total] = await Promise.all([
-          Vehicle.find(filter).select('-images -documents').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+          Vehicle.find(filter).select('-documents').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
           Vehicle.countDocuments(filter)
         ]);
-        
+
         return res.json({
           data: vehicles,
           total,
@@ -31,12 +31,12 @@ router.get('/', async (req, res) => {
           totalPages: Math.ceil(total / limit)
         });
       }
-      
+
       // Fallback: unpaginated but with projection for performance
-      const vehicles = await Vehicle.find(filter).select('-images -documents').sort({ createdAt: -1 }).lean();
+      const vehicles = await Vehicle.find(filter).select('-documents').sort({ createdAt: -1 }).lean();
       return res.json(vehicles);
     }
-    
+
     // Memory fallback
     let memVehicles = getVehicles().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     if (req.query.page) {
@@ -133,7 +133,7 @@ router.put('/:vehicleId', async (req, res) => {
       if (body.zoneId && vehicle.zoneId?.toString() !== body.zoneId.toString()) {
         const oldZoneId = vehicle.zoneId;
         const oldWorker = vehicle.assignedWorker;
-        
+
         // Fetch new worker
         const worker = await User.findOne({ role: 'worker', zoneId: body.zoneId });
         const newWorker = worker ? worker.name : 'Unassigned';

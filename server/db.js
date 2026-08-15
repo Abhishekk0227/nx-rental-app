@@ -2,9 +2,17 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dns from 'dns';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+
+dns.setServers([
+  "8.8.8.8",
+  "8.8.4.4",
+]);
+
 
 // Ensure env variables are loaded from server/.env as well
 dotenv.config({ path: path.join(__dirname, '.env') });

@@ -214,7 +214,7 @@ export default function BookedVehicles({
   // Core View State
   const [viewState, setViewState] = useState('list'); // 'list' | 'view-booking' | 'drop-off' | 'extend' | 'replace' | 'edit-booking' | 'collect' | 'delete'
   const [selectedBooking, setSelectedBooking] = useState(null);
-
+  console.log("Selected Booking", selectedBooking)
   // Resolve current active vehicle for selectedBooking
   const resolvedVehicleObj = selectedBooking ? vehicles.find(v => v.vehicleId === selectedBooking.vehicleId) : null;
   const activeVehicle = selectedBooking ? {
@@ -232,9 +232,62 @@ export default function BookedVehicles({
 
   // Search & Filters Panel States
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [zoneFilter, setZoneFilter] = useState('All');
   const [sortFilter, setSortFilter] = useState('Latest Booking');
+  
+  const [serverBookings, setServerBookings] = useState([]);
+  const [isSearchingServer, setIsSearchingServer] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(20);
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchTerm), 500);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    // Only search server if looking for history or specific search terms
+    const needsServerFetch = debouncedSearch.trim().length > 0 || ['Completed', 'Cancelled', 'All Bookings'].includes(statusFilter);
+    
+    if (!needsServerFetch) {
+      setServerBookings([]); // Use active bookings from props
+      return;
+    }
+
+    const fetchServerData = async () => {
+      setIsSearchingServer(true);
+      try {
+        const token = localStorage.getItem('token');
+        let url = `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings?limit=100`; // Limit to prevent massive payload
+        
+        if (debouncedSearch) url += `&search=${encodeURIComponent(debouncedSearch)}`;
+        if (statusFilter !== 'All' && statusFilter !== 'All Bookings' && statusFilter !== 'Active Bookings') {
+          url += `&status=${encodeURIComponent(statusFilter)}`;
+        }
+        if (zoneFilter !== 'All') url += `&zoneId=${encodeURIComponent(zoneFilter)}`;
+
+        const res = await fetch(url, { headers: token ? { 'Authorization': `Bearer ${token}` } : {} });
+        if (res.ok) {
+          const data = await res.json();
+          // API returns { data, total, page, totalPages } when limit is passed
+          setServerBookings(data.data || data); 
+        }
+      } catch (err) {
+        console.error('Failed to fetch historical bookings:', err);
+      } finally {
+        setIsSearchingServer(false);
+      }
+    };
+
+    fetchServerData();
+  }, [debouncedSearch, statusFilter, zoneFilter]);
+
+  const sourceBookings = (debouncedSearch.trim().length > 0 || ['Completed', 'Cancelled', 'All Bookings'].includes(statusFilter)) 
+    ? serverBookings 
+    : bookings;
+
+  // Filter Bar state
   const [showFilterBar, setShowFilterBar] = useState(false);
 
   // Delete booking state
@@ -297,6 +350,7 @@ export default function BookedVehicles({
   const [editSecurityDeposit, setEditSecurityDeposit] = useState(0);
   const [editHelmetsCount, setEditHelmetsCount] = useState(0);
   const [editNotes, setEditNotes] = useState('');
+  const [editStartMeter, setEditStartMeter] = useState('');
   const [editFuelIncluded, setEditFuelIncluded] = useState(false);
   const [editDiscountAmount, setEditDiscountAmount] = useState(0);
   const [editDiscountType, setEditDiscountType] = useState('₹');
@@ -576,6 +630,7 @@ export default function BookedVehicles({
     if (status === 'Completed' || status === 'Cancelled') return { text: 'N/A', cls: 'badge-secondary', isOverdue: false };
     const now = new Date();
     const exp = new Date(expectedDropDate);
+
     const diffMs = exp.getTime() - now.getTime();
     if (diffMs < 0) {
       const overdueMs = Math.abs(diffMs);
@@ -745,7 +800,7 @@ export default function BookedVehicles({
     setEndCustomMax('');
   };
 
-  const filteredBookings = bookings.filter(b => {
+  const filteredBookings = sourceBookings.filter(b => {
     // 1. Search text
     const custName = String(b.customerName || b.customer?.name || '');
     const bId = String(b.bookingId || '');
@@ -1007,6 +1062,7 @@ export default function BookedVehicles({
     setEditExpectedDropDate(booking.expectedDropDate || formatLocalISO(new Date(booking.rentalPeriod?.expectedEndDate)));
     setEditPlanType(booking.selectedPlan?.planType || '24-Hour');
     setEditSecurityDeposit(booking.securityDeposit || 0);
+    setEditStartMeter(booking.handover?.startMeter || '');
     setEditHelmetsCount(booking.addons?.helmetsCount || 0);
     setEditNotes(booking.addons?.otherAccessories || '');
     setEditFuelIncluded(booking.handover?.fuelIncluded || false);
@@ -1399,7 +1455,7 @@ export default function BookedVehicles({
         mode: addPayment.mode,
         cashSplit: addPayment.cashAmount,
         onlineSplit: addPayment.onlineAmount,
-        
+
         remarks: `Extension payment upfront`
       };
     }
@@ -1421,7 +1477,7 @@ export default function BookedVehicles({
     const newKmLimit = oldKmLimit + additionalKmGranted;
 
     const payload = {
-      newEndDateTime: extensionEndDate,
+      newEndDateTime: newEnd.toISOString(),
       extraCharges: Number(extensionExtraCharges),
       remarks: `${extensionRemarks} (${extensionPlanType} extension)`,
       workerId: currentWorker,
@@ -1642,7 +1698,7 @@ export default function BookedVehicles({
           mode: replacePaymentMode,
           cashSplit: replacePaymentMode === 'Cash' ? comp.rentDiff : 0,
           onlineSplit: ['UPI', 'Online', 'Card'].includes(replacePaymentMode) ? comp.rentDiff : 0,
-          
+
           vikasSplit: replacePaymentMode === 'Vikas' ? comp.rentDiff : 0,
           remarks: `Replacement Rent Difference Upfront`
         };
@@ -1744,8 +1800,12 @@ export default function BookedVehicles({
         aadhaar: editAadhaar,
         address: { street: editStreet, city: editCity, state: editState, pincode: editPincode }
       },
-      pickupDate: editPickupDate,
-      expectedDropDate: editExpectedDropDate,
+      pickupDate: new Date(editPickupDate).toISOString(),
+      expectedDropDate: new Date(editExpectedDropDate).toISOString(),
+      handover: {
+        ...selectedBooking.handover,
+        startMeter: editStartMeter === '' ? selectedBooking.handover?.startMeter : Number(editStartMeter)
+      },
       selectedPlan: {
         ...selectedBooking.selectedPlan,
         planType: editPlanType,
@@ -1922,14 +1982,18 @@ export default function BookedVehicles({
     const payload = {
       customerName: editFullName,
       customerPhone: editPhone,
-      pickupDate: editPickupDate,
-      expectedDropDate: editExpectedDropDate,
+      pickupDate: new Date(editPickupDate).toISOString(),
+      expectedDropDate: new Date(editExpectedDropDate).toISOString(),
       expectedEndDate: new Date(editExpectedDropDate),
       baseFare: Number(editBaseFare),
       discount: Number(editDiscountAmount),
       advancePaid: Number(editAdvancePaid),
       rentalPaid: Number(editAdvancePaid),
       depositHeld: Number(editSecurityDeposit),
+      handover: {
+        ...selectedBooking.handover,
+        startMeter: editStartMeter === '' ? selectedBooking.handover?.startMeter : Number(editStartMeter)
+      },
       outstandingRent: Math.max(0, (Number(editBaseFare) + (Number(editHelmetsCount) * 50) - Number(editDiscountAmount)) - Number(editAdvancePaid)),
       paymentMethod: editPaymentMethod,
       paymentMode: editPaymentMethod,
@@ -2093,7 +2157,7 @@ export default function BookedVehicles({
           mode: collectMode,
           cashSplit: Math.round(depCashAdd),
           onlineSplit: Math.round(depOnlineAdd),
-          
+
           remarks: `${collectNotes} (Deposit Part)`
         }
       };
@@ -2967,7 +3031,7 @@ export default function BookedVehicles({
         cashSplit: dropPaymentMethod === 'Mixed' ? Number(dropCashReceived) : dropPaymentMethod === 'Cash' ? reqVal : 0,
         onlineSplit: dropPaymentMethod === 'Mixed' ? Number(dropOnlineReceived) : ['UPI', 'Online', 'Card'].includes(dropPaymentMethod) ? reqVal : 0,
         vikasSplit: ['Vikas'].includes(dropPaymentMethod) ? reqVal : 0,
-        
+
         remarks: dropCollectNotes || 'Dropoff Collection'
       };
     }
@@ -3243,7 +3307,7 @@ export default function BookedVehicles({
           <div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-              {sortedBookings.map(b => {
+              {sortedBookings.slice(0, visibleCount).map(b => {
                 const flow = getCardFlow(b);
                 const totalExt = b.extensions?.reduce((sum, ext) => sum + ext.extraCharges, 0) || 0;
                 const extraCharges = b.dropDetails
@@ -3759,8 +3823,10 @@ export default function BookedVehicles({
                 </h4>
                 {(() => {
                   const formatDate = (dateStr) => {
+
                     if (!dateStr) return 'N/A';
                     const d = new Date(dateStr);
+
                     return isNaN(d.getTime()) ? 'N/A' : d.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
                   };
                   return (
@@ -6835,8 +6901,12 @@ export default function BookedVehicles({
                     <h4 style={{ color: 'var(--secondary)', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '4px', marginBottom: '8px' }}>Rental Plan Dates</h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                       <div className="form-group">
-                        <label>Start pickup Date {selectedBooking.status !== 'Reserved' && <span style={{ fontSize: '0.7rem', color: '#f43f5e' }}>(Locked - Ongoing)</span>}</label>
-                        <input type="datetime-local" className="form-control" value={editPickupDate} onChange={e => setEditPickupDate(e.target.value)} disabled={selectedBooking.status !== 'Reserved'} required />
+                        <label>Start pickup Date</label>
+                        <input type="datetime-local" className="form-control" value={editPickupDate} onChange={e => setEditPickupDate(e.target.value)} required />
+                      </div>
+                      <div className="form-group">
+                        <label>Starting Meter (KM)</label>
+                        <input type="number" className="form-control" value={editStartMeter} onChange={e => setEditStartMeter(e.target.value)} />
                       </div>
                       <div className="form-group">
                         <label>Expected return date {selectedBooking.status !== 'Reserved' && <span style={{ fontSize: '0.7rem', color: '#f43f5e' }}>(Locked - Use Extend)</span>}</label>
@@ -6892,18 +6962,18 @@ export default function BookedVehicles({
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Cash Portion (₹)</label>
                           <input type="text" inputMode="numeric" className="form-control" value={editMixedCash} onChange={e => {
-                              const val = Number(e.target.value);
-                              setEditMixedCash(val);
-                              setEditMixedOnline(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
-                            }} />
+                            const val = Number(e.target.value);
+                            setEditMixedCash(val);
+                            setEditMixedOnline(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
+                          }} />
                         </div>
                         <div className="form-group" style={{ marginBottom: 0 }}>
                           <label>Rental Online Portion (₹)</label>
                           <input type="text" inputMode="numeric" className="form-control" value={editMixedOnline} onChange={e => {
-                              const val = Number(e.target.value);
-                              setEditMixedOnline(val);
-                              setEditMixedCash(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
-                            }} />
+                            const val = Number(e.target.value);
+                            setEditMixedOnline(val);
+                            setEditMixedCash(Math.max(0, Number((editMoneyReceived - val).toFixed(2))));
+                          }} />
                         </div>
                       </div>
                     )}

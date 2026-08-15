@@ -10,6 +10,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('price-asc');
   const [showFilters, setShowFilters] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(20);
 
   // Modal State Controllers
   const [avViewState, setAvViewState] = useState('list'); // 'list' | 'config' | 'history' | 'maintenance'
@@ -503,7 +504,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
 
         {/* 📋 VEHICLES DATA CARDS — Responsive Grid */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '16px' }}>
-          {filteredVehicles.map(v => {
+          {filteredVehicles.slice(0, visibleCount).map(v => {
             const zone = zones.find(z => z._id === v.zoneId)?.name || 'Unassigned';
             const category = v.category || v.type || 'Car';
             const rate24h = v.pricingPlans?.twentyFourHour?.baseRate || v.perDayRate || 0;
@@ -628,6 +629,18 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
             </div>
           )}
         </div>
+        
+        {visibleCount < filteredVehicles.length && (
+          <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+            <button
+              onClick={() => setVisibleCount(prev => prev + 20)}
+              className="btn btn-secondary"
+              style={{ padding: '10px 24px', fontSize: '1rem', borderRadius: '8px', background: 'var(--bg-light)' }}
+            >
+              Load More Vehicles ({filteredVehicles.length - visibleCount} remaining)
+            </button>
+          </div>
+        )}
 
       </>)}
 

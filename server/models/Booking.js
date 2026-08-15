@@ -345,5 +345,13 @@ bookingSchema.pre('save', async function (next) {
   next();
 });
 
+// ─── Indexes for performance ──────────────────────────────────────────────────
+bookingSchema.index({ zoneId: 1 });
+bookingSchema.index({ workerId: 1 });
+bookingSchema.index({ status: 1 });
+bookingSchema.index({ 'rentalPeriod.startDate': -1 });
+bookingSchema.index({ createdAt: -1 });
+
+
 const Booking = mongoose.model('Booking', bookingSchema);
 export default Booking;

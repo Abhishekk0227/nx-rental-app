@@ -228,5 +228,11 @@ vehicleSchema.pre('save', async function(next) {
   next();
 });
 
+// ─── Indexes for performance ──────────────────────────────────────────────────
+vehicleSchema.index({ status: 1 });
+vehicleSchema.index({ zoneId: 1 });
+vehicleSchema.index({ category: 1 });
+
+
 const Vehicle = mongoose.model('Vehicle', vehicleSchema);
 export default Vehicle;

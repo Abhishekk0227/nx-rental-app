@@ -810,8 +810,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       customerName: fullName,
       customerPhone: phoneNumber,
       customerIdProof: docAadhaarFront ? 'Aadhaar Scan Attached' : 'Details Provided',
-      pickupDate,
-      expectedDropDate,
+      pickupDate: start.toISOString(),
+      expectedDropDate: end.toISOString(),
       zoneId: vehicle?.zoneId,
       perDayRate: selectedPlanType.includes('24') ? planRate : 0,
       perHourRate: selectedPlanType.includes('Hour') ? planRate : 0,
@@ -1089,6 +1089,12 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                 <input type="text" inputMode="numeric" className="form-control" value={depositOnline} disabled />
               </div>
             )}
+            {depositMethod === 'Vikas' && (
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label>Vikas Amount Received for Deposit (₹)</label>
+                <input type="text" inputMode="numeric" className="form-control" value={depositVikas} disabled />
+              </div>
+            )}
             {depositMethod === 'Mixed' && (
               <div className="grid-2col" style={{ gap: '8px' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
@@ -1096,7 +1102,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                   <input type="text" inputMode="numeric" className="form-control" value={depositCash} onChange={e => {
                     const val = e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''));
                     setDepositCash(val);
-                    if (val !== '') setDepositOnline(Math.max(0, securityDeposit - Number(val)));
+                    if (val !== '') setDepositOnline(Math.max(0, securityDeposit - Number(val) - depositVikas));
                   }} />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
@@ -1104,7 +1110,14 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
                   <input type="text" inputMode="numeric" className="form-control" value={depositOnline} onChange={e => {
                     const val = e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''));
                     setDepositOnline(val);
-                    if (val !== '') setDepositCash(Math.max(0, securityDeposit - Number(val)));
+                    if (val !== '') setDepositCash(Math.max(0, securityDeposit - Number(val) - depositVikas));
+                  }} />
+                </div>
+                <div className="form-group" style={{ marginBottom: 0, gridColumn: '1 / -1' }}>
+                  <label>Vikas ₹</label>
+                  <input type="text" inputMode="numeric" className="form-control" value={depositVikas} onChange={e => {
+                    const val = e.target.value === '' ? '' : Number(e.target.value.replace(/[^0-9.-]/g, ''));
+                    setDepositVikas(val);
                   }} />
                 </div>
               </div>

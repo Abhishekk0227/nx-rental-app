@@ -18,6 +18,12 @@ export default function App() {
   const { token, currentUser, loading: authLoading } = useAuth();
   const [vehicles, setVehicles] = useState([]);
   const [bookings, setBookings] = useState([]);
+  const [dashboardStats, setDashboardStats] = useState({
+    pendingPickupsCount: 0,
+    ongoingTripsCount: 0,
+    activeRentalsCount: 0,
+    completedRevenue: 0
+  });
   const [backendActive, setBackendActive] = useState(false);
   const [dbStatus, setDbStatus] = useState({ connected: false, mode: 'Checking...', host: '' });
   const [zones, setZones] = useState([]);
@@ -56,11 +62,13 @@ export default function App() {
       const headers = { 'Authorization': `Bearer ${token}` };
       const apiBase = import.meta.env.VITE_API_BASE_URL || '';
 
-      const [vRes, bRes, zRes, uRes] = await Promise.all([
+      const [vRes, bRes, zRes, uRes, statsRes] = await Promise.all([
         fetch(`${apiBase}/api/vehicles`, { headers }),
-        fetch(`${apiBase}/api/bookings`, { headers }),
+        // Fetch only active/recent bookings for main app state to reduce payload size
+        fetch(`${apiBase}/api/bookings?status=Reserved,Ongoing,Extended,Overdue`, { headers }),
         fetch(`${apiBase}/api/zones`,    { headers }),
-        fetch(`${apiBase}/api/users`,    { headers })
+        fetch(`${apiBase}/api/users`,    { headers }),
+        fetch(`${apiBase}/api/bookings/dashboard-stats`, { headers })
       ]);
 
       // Handle auth errors — token is bad, force logout
@@ -89,6 +97,11 @@ export default function App() {
       if (uRes.ok) {
         const uData = await uRes.json();
         setUsers(uData);
+      }
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json();
+        setDashboardStats(statsData);
       }
 
       setBackendActive(true);
@@ -298,7 +311,9 @@ export default function App() {
         
         <Route path="dashboard" element={
           <DashboardHome 
-            vehicles={vehicles} bookings={bookings} 
+            vehicles={vehicles} 
+            bookings={bookings} 
+            dashboardStats={dashboardStats}
             userRole={currentUser?.role || 'worker'} 
             zones={zones}
             setCurrentTab={(tab) => navigate(`/${tab}`)}

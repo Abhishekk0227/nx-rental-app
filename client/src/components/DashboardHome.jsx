@@ -405,7 +405,7 @@ function RecentBookings({ bookings, vehicles = [], setCurrentTab }) {
 }
 
 // Main Dashboard
-export default function DashboardHome({ vehicles, bookings, userRole, setCurrentTab, onPickup, onDropOff }) {
+export default function DashboardHome({ vehicles, bookings, dashboardStats, userRole, setCurrentTab, onPickup, onDropOff }) {
   const isAdmin = userRole === 'admin';
   const now = new Date();
 
@@ -417,19 +417,15 @@ export default function DashboardHome({ vehicles, bookings, userRole, setCurrent
     maintenance: vehicles.filter(v => v.status === 'Maintenance' || v.status === 'Out Of Service' || v.status === 'Inactive').length,
   }), [vehicles]);
 
-  const bookingStats = useMemo(() => {
-    const pendingPickups = bookings.filter(b => b.status === 'Reserved');
-    const ongoingTrips = bookings.filter(b => ['Ongoing', 'Extended'].includes(b.status));
-    const activeRentals = bookings.filter(b => ['Ongoing', 'Extended', 'Reserved'].includes(b.status));
-    return { pendingPickups, ongoingTrips, activeRentals };
-  }, [bookings]);
+  const bookingStats = {
+    pendingPickups: { length: dashboardStats?.pendingPickupsCount || 0 },
+    ongoingTrips: { length: dashboardStats?.ongoingTripsCount || 0 },
+    activeRentals: { length: dashboardStats?.activeRentalsCount || 0 }
+  };
 
-  const financials = useMemo(() => {
-    const completedRevenue = bookings
-      .filter(b => b.status === 'Completed')
-      .reduce((sum, b) => sum + (Number(b.rentalCost) || Number(b.baseFare) || 0), 0);
-    return { completedRevenue };
-  }, [bookings]);
+  const financials = {
+    completedRevenue: dashboardStats?.completedRevenue || 0
+  };
 
   const utilization = vehicles.length > 0
     ? customRound(((fleetStats.ongoing + fleetStats.reserved) / vehicles.length) * 100)

@@ -77,16 +77,34 @@ const getPaymentSplit = (p) => {
   return { cash, online, vikas };
 };
 
-// ─── GET daily accounting summary ─────────────────────────────────────────────
+// ─── GET /api/accounting ────────────────────────────────────────────────────────
 router.get('/', async (req, res) => {
-  const { date, workerId, vehicleId } = req.query;
+  const { date, workerId, vehicleId, zoneId } = req.query;
+  const targetDate = date || new Date().toISOString().slice(0, 10);
 
   try {
-    const allBookings = isDbConnected()
-      ? await Booking.find(req.query.zoneId ? { zoneId: req.query.zoneId } : {})
-      : getBookings();
+    let allBookings;
+    if (isDbConnected()) {
+      const startOfDay = new Date(targetDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(targetDate);
+      endOfDay.setHours(23, 59, 59, 999);
 
-    const targetDate = date || new Date().toISOString().slice(0, 10);
+      const filter = {
+        $or: [
+          { createdAt: { $gte: startOfDay, $lte: endOfDay } },
+          { 'paymentCollection.timestamp': { $gte: startOfDay, $lte: endOfDay } },
+          { 'revisions.timestamp': { $gte: startOfDay, $lte: endOfDay } },
+          { status: { $in: ['Ongoing', 'Extended', 'Reserved', 'Overdue'] } },
+          { 'rentalPeriod.actualReturnDate': { $gte: startOfDay, $lte: endOfDay } },
+          { 'rentalPeriod.actualPickupDate': { $gte: startOfDay, $lte: endOfDay } }
+        ]
+      };
+      if (zoneId) filter.zoneId = zoneId;
+      allBookings = await Booking.find(filter).lean();
+    } else {
+      allBookings = getBookings();
+    }
 
     let totalBookings = 0;
     let totalRevenue = 0;
@@ -303,7 +321,7 @@ router.post('/settle', async (req, res) => {
   }
 
   try {
-    const allBookings = isDbConnected() ? await Booking.find(req.query.zoneId ? { zoneId: req.query.zoneId } : {}) : getBookings();
+    const allBookings = isDbConnected() ? await Booking.find(req.query.zoneId ? { zoneId: req.query.zoneId } : {}).lean() : getBookings();
 
     // Calculate total cash this worker collected on this date
     // Use workerId stored directly on each payment entry (reliable — no fuzzy timestamp matching)

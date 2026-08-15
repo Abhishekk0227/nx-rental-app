@@ -12,11 +12,45 @@ router.get('/', async (req, res) => {
     if (isDbConnected()) {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
-      const vehicles = await Vehicle.find(filter).sort({ createdAt: -1 });
-      res.json(vehicles);
-    } else {
-      res.json(getVehicles().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+      
+      // If pagination is requested
+      if (req.query.page) {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 50;
+        const skip = (page - 1) * limit;
+        
+        const [vehicles, total] = await Promise.all([
+          Vehicle.find(filter).select('-images -documents').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+          Vehicle.countDocuments(filter)
+        ]);
+        
+        return res.json({
+          data: vehicles,
+          total,
+          page,
+          totalPages: Math.ceil(total / limit)
+        });
+      }
+      
+      // Fallback: unpaginated but with projection for performance
+      const vehicles = await Vehicle.find(filter).select('-images -documents').sort({ createdAt: -1 }).lean();
+      return res.json(vehicles);
     }
+    
+    // Memory fallback
+    let memVehicles = getVehicles().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (req.query.page) {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 50;
+      const skip = (page - 1) * limit;
+      return res.json({
+        data: memVehicles.slice(skip, skip + limit),
+        total: memVehicles.length,
+        page,
+        totalPages: Math.ceil(memVehicles.length / limit)
+      });
+    }
+    res.json(memVehicles);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

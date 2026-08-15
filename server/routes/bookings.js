@@ -53,10 +53,146 @@ router.get('/', async (req, res) => {
     if (isDbConnected()) {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
-      const bookings = await Booking.find(filter).sort({ createdAt: -1 });
+      if (req.query.status) {
+        if (req.query.status !== 'All') {
+          filter.status = { $in: req.query.status.split(',') };
+        }
+      }
+      
+      if (req.query.search) {
+        const searchRegex = new RegExp(req.query.search, 'i');
+        filter.$or = [
+          { customerName: searchRegex },
+          { 'customer.name': searchRegex },
+          { customerPhone: searchRegex },
+          { 'customer.phone': searchRegex },
+          { bookingId: searchRegex },
+          { vehicleName: searchRegex },
+          { vehicleRegNumber: searchRegex },
+          { 'vehicleDetails.name': searchRegex },
+          { 'vehicleDetails.regNumber': searchRegex }
+        ];
+      }
+      
+      // If pagination is requested
+      if (req.query.page) {
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 50;
+        const skip = (page - 1) * limit;
+        
+        const [bookings, total] = await Promise.all([
+          Booking.find(filter).select('-dropDetails.photos').sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+          Booking.countDocuments(filter)
+        ]);
+        
+        return res.json({
+          data: bookings,
+          total,
+          page,
+          totalPages: Math.ceil(total / limit)
+        });
+      }
+      
+      // Fallback: unpaginated but with projection for performance
+      const bookings = await Booking.find(filter).select('-dropDetails.photos').sort({ createdAt: -1 }).lean();
       return res.json(bookings);
     }
-    res.json(getBookings().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    
+    // Memory fallback
+    let memBookings = getBookings().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    if (req.query.page) {
+      const page = parseInt(req.query.page, 10) || 1;
+      const limit = parseInt(req.query.limit, 10) || 50;
+      const skip = (page - 1) * limit;
+      return res.json({
+        data: memBookings.slice(skip, skip + limit),
+        total: memBookings.length,
+        page,
+        totalPages: Math.ceil(memBookings.length / limit)
+      });
+    }
+    res.json(memBookings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ─── GET dashboard stats ──────────────────────────────────────────────────────
+router.get('/dashboard-stats', async (req, res) => {
+  try {
+    if (isDbConnected()) {
+      const filter = {};
+      if (req.query.zoneId) filter.zoneId = req.query.zoneId;
+
+      const [pendingPickupsCount, ongoingTripsCount, activeRentalsCount, completedBookings] = await Promise.all([
+        Booking.countDocuments({ ...filter, status: 'Reserved' }),
+        Booking.countDocuments({ ...filter, status: { $in: ['Ongoing', 'Extended'] } }),
+        Booking.countDocuments({ ...filter, status: { $in: ['Ongoing', 'Extended', 'Reserved'] } }),
+        Booking.find({ ...filter, status: 'Completed' }).select('rentalCost baseFare').lean()
+      ]);
+
+      const completedRevenue = completedBookings.reduce((sum, b) => sum + (Number(b.rentalCost) || Number(b.baseFare) || 0), 0);
+
+      return res.json({
+        pendingPickupsCount,
+        ongoingTripsCount,
+        activeRentalsCount,
+        completedRevenue
+      });
+    }
+
+    // Memory fallback
+    let memBookings = getBookings();
+    if (req.query.zoneId) memBookings = memBookings.filter(b => b.zoneId === req.query.zoneId);
+
+    const pendingPickupsCount = memBookings.filter(b => b.status === 'Reserved').length;
+    const ongoingTripsCount = memBookings.filter(b => ['Ongoing', 'Extended'].includes(b.status)).length;
+    const activeRentalsCount = memBookings.filter(b => ['Ongoing', 'Extended', 'Reserved'].includes(b.status)).length;
+    const completedRevenue = memBookings
+      .filter(b => b.status === 'Completed')
+      .reduce((sum, b) => sum + (Number(b.rentalCost) || Number(b.baseFare) || 0), 0);
+
+    res.json({ pendingPickupsCount, ongoingTripsCount, activeRentalsCount, completedRevenue });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ─── GET hisab bookings ───────────────────────────────────────────────────────
+router.get('/hisab', async (req, res) => {
+  try {
+    const { date, zoneId } = req.query;
+    if (!date) return res.status(400).json({ message: 'Date is required' });
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    if (isDbConnected()) {
+      const filter = {
+        $or: [
+          { createdAt: { $gte: startOfDay, $lte: endOfDay } },
+          { 'paymentCollection.timestamp': { $gte: startOfDay, $lte: endOfDay } },
+          { 'revisions.timestamp': { $gte: startOfDay, $lte: endOfDay } },
+          { status: { $in: ['Ongoing', 'Extended', 'Reserved', 'Overdue'] } },
+          { 'rentalPeriod.actualReturnDate': { $gte: startOfDay, $lte: endOfDay } },
+          { 'rentalPeriod.actualPickupDate': { $gte: startOfDay, $lte: endOfDay } }
+        ]
+      };
+      if (zoneId) filter.zoneId = zoneId;
+
+      const bookings = await Booking.find(filter).select('-dropDetails.photos').lean();
+      return res.json(bookings);
+    }
+
+    // Memory fallback
+    let memBookings = getBookings();
+    if (zoneId) memBookings = memBookings.filter(b => b.zoneId === zoneId);
+    
+    // Very naive filter for in-memory, just returns everything for simplicity 
+    // (since it's a small array anyway)
+    res.json(memBookings);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -396,6 +532,8 @@ router.post('/:bookingId/replace', async (req, res) => {
         regNumber: newVehicle.regNumber,
         category: newVehicle.category
       },
+      vehicleName: newVehicle.name,
+      vehicleRegNumber: newVehicle.regNumber,
       workerId: workerId || booking.workerId,
       rentalCost: newRentalCost,
       baseFare: newRentalCost,
@@ -436,7 +574,7 @@ router.post('/:bookingId/replace', async (req, res) => {
       });
       await newVehicle.save();
 
-      Object.assign(booking, updates);
+      booking.set(updates);
       booking.markModified('replacements');
       booking.markModified('vehicleDetails');
       if (req.body.selectedPlan) booking.markModified('selectedPlan');

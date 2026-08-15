@@ -970,7 +970,7 @@ export default function DailyHisab({
         }
 
         rentalCollections.cash += cash;
-        rentalCollections.online += upi;
+        rentalCollections.online += online;
         rentalCollections.card += card;
         rentalCollections.vikas += vikas;
         rentalCollections.total += (cash + online + card + vikas);
@@ -1020,7 +1020,7 @@ export default function DailyHisab({
           }
 
           depositCollections.cash += cash;
-          depositCollections.online += upi;
+          depositCollections.online += online;
           depositCollections.card += card;
           depositCollections.vikas += vikas;
           depositCollections.total += (cash + online + card + vikas);
@@ -1060,7 +1060,7 @@ export default function DailyHisab({
           }
 
           depositRefunds.cash += cash;
-          depositRefunds.online += upi;
+          depositRefunds.online += online;
           depositRefunds.card += card;
           depositRefunds.vikas += vikas;
           depositRefunds.total += (cash + online + card + vikas);
@@ -1484,7 +1484,8 @@ export default function DailyHisab({
           mode: p.mode,
           amount: p.amount,
           cash,
-          upi,
+          upi: online,
+          vikas,
           card,
           reference: p.reference,
           operator: getPaymentOperator(p, b.revisions)
@@ -1529,7 +1530,8 @@ export default function DailyHisab({
           mode: rev.depositDetails.mode,
           amount: diff,
           cash,
-          upi,
+          upi: online,
+          vikas,
           card,
           operator: rev.operator || 'System'
         });
@@ -1562,7 +1564,8 @@ export default function DailyHisab({
         mode: b.refundDetails.method,
         amount: amt,
         cash,
-        upi,
+        upi: online,
+        vikas,
         card,
         notes: b.refundDetails.notes,
         operator: b.dropDetails?.operator || b.workerId || 'System'

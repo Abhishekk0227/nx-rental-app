@@ -6,13 +6,11 @@ const settlementSchema = new mongoose.Schema({
     required: true
   },
   zoneId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Zone',
-    required: true
+    type: String, // optional zone identifier
+    required: false
   },
   workerId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String, // plain string identifier, e.g. "Worker 1" or a user name
     required: true
   },
   cashCollected: {

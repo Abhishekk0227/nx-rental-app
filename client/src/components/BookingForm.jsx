@@ -661,7 +661,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
 
     const rentalCostTotal = Math.max(0, bill.cost - bill.discountVal) + bill.helmets;
     const outstandingRentalCost = Math.max(0, rentalCostTotal - bill.moneyReceived);
-    const depositCollected = Number(depositCash) + Number(depositOnline);
+    const depositCollected = Number(depositCash) + Number(depositOnline) + Number(depositVikas);
 
     const isFuture = new Date(pickupDate) > new Date();
     const initialStatus = isFuture ? 'Reserved' : 'Ongoing';
@@ -681,6 +681,10 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
         docRegistration: docRegistration || '',
         address: { street: streetAddress, city, state, pincode }
       },
+      baseFare: bill.cost,
+      discount: bill.discountVal,
+      advancePaid: bill.moneyReceived,
+      securityDeposit: depositCollected,
       vehicleId: vehicle.vehicleId,
       rentalPeriod: {
         startDate: new Date(pickupDate),
@@ -815,12 +819,8 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
       zoneId: vehicle?.zoneId,
       perDayRate: selectedPlanType.includes('24') ? planRate : 0,
       perHourRate: selectedPlanType.includes('Hour') ? planRate : 0,
-      discount: bill.discountVal,
-      advancePaid: bill.moneyReceived,
-      securityDeposit: bill.deposit,
       durationHours: durationHours,
       durationDays: Math.ceil(durationHours / 24),
-      baseFare: bill.cost,
       finalAmount: outstandingRentalCost,
       paymentMethod,
       settled: outstandingRentalCost === 0
@@ -1057,7 +1057,7 @@ export default function BookingForm({ vehicle, onConfirmBooking, onCancel, curre
           {/* Row 2: Deposit Collection Mode */}
           <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: '7px', padding: '8px 10px' }}>
             <label style={{ fontSize: '0.75rem', fontWeight: 700, color: '#1e293b', display: 'block', marginBottom: '6px' }}>Deposit Collection Mode</label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px', marginBottom: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px', marginBottom: '8px' }}>
               {['Cash', 'Online', 'Vikas', 'Mixed'].map(mode => (
                 <button key={mode} type="button"
                   style={{

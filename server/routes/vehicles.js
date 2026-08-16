@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     if (isDbConnected()) {
-      const filter = {};
+      const filter = {}; 
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
 
       // If pagination is requested

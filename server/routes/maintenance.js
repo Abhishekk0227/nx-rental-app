@@ -1,5 +1,5 @@
 import express from 'express';
-import mongoose from 'mongoose';
+import mongoose from 'mongoose'; 
 import Vehicle from '../models/Vehicle.js';
 import { isDbConnected, getVehicles, updateVehicle } from '../memoryDb.js';
 

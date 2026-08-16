@@ -134,7 +134,7 @@ const getCardFlow = (b) => {
   if (b.depositDetails) {
     if (b.depositDetails.mode === 'Cash') cashIn += Number(b.depositDetails.cashAmount || b.securityDeposit || 0);
     else if (['Online', 'UPI'].includes(b.depositDetails.mode)) onlineIn += Number(b.depositDetails.onlineAmount || b.securityDeposit || 0);
-    else if (b.depositDetails.mode === 'Vikas') vikasIn += Number(b.depositDetails.cashAmount || b.depositDetails.onlineAmount || b.securityDeposit || 0);
+    else if (b.depositDetails.mode === 'Vikas') vikasIn += Number(b.depositDetails.vikasAmount || b.securityDeposit || 0);
     else if (b.depositDetails.mode === 'Mixed') {
       cashIn += Number(b.depositDetails.cashAmount || 0);
       onlineIn += Number(b.depositDetails.onlineAmount || 0);

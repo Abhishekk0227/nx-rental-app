@@ -759,12 +759,14 @@ export default function DailyHisab({
   }, [dateFilter, workerFilter, bookings]);
 
   // Safe date helper to avoid 500 crashes
+  // Uses LOCAL timezone (same as dateFilter/getTodayString) to avoid UTC vs IST off-by-one-day bugs.
   const safeDateStr = (dateVal) => {
     if (!dateVal) return '';
     try {
       const d = new Date(dateVal);
       if (isNaN(d.getTime())) return '';
-      return d.toISOString().slice(0, 10);
+      const tzOffset = d.getTimezoneOffset() * 60000;
+      return new Date(d - tzOffset).toISOString().slice(0, 10);
     } catch (err) {
       return '';
     }
@@ -1121,7 +1123,7 @@ export default function DailyHisab({
       const token = localStorage.getItem('token');
       const response = await fetch((import.meta.env.VITE_API_BASE_URL || '') + '/api/accounting/settle', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {})
         },
@@ -1598,6 +1600,24 @@ export default function DailyHisab({
     // Check if the booking is operationally active on this date (vehicle is still out)
     const isOperationallyActive = isActiveOnDate(b, dateFilter);
 
+    // DEBUG: Log completed bookings that might be getting filtered out
+    if (b.status === 'Completed') {
+      console.log(`[DailyHisab DEBUG] Completed Booking ${b.bookingId}:`, {
+        dateFilter,
+        returnDateStr,
+        createdDateStr,
+        rawActualReturnDate: b.actualReturnDate,
+        rawRentalPeriodReturnDate: b.rentalPeriod?.actualReturnDate,
+        todayPayments: todayPayments.length,
+        todayRevisions: todayRevisions.length,
+        isRefundToday,
+        hasDateActivity,
+        workerFilter,
+        dropDetailsOperator: b.dropDetails?.operator,
+        bookingWorkerId: b.workerId,
+      });
+    }
+
     // Exclude only if NEITHER a timestamp-anchored event NOR an active-window overlap exists
     if (!hasDateActivity && !isOperationallyActive) {
       return false;
@@ -1619,6 +1639,16 @@ export default function DailyHisab({
       const createdByWorker = createdDateStr === dateFilter && (b.workerId === workerFilter);
       const pickupByWorker = pickupDateStr === dateFilter && (b.handover?.operator === workerFilter || b.workerId === workerFilter);
       const returnByWorker = returnDateStr === dateFilter && (b.dropDetails?.operator === workerFilter || b.workerId === workerFilter);
+
+      if (b.status === 'Completed') {
+        console.log(`[DailyHisab DEBUG] Worker filter check for ${b.bookingId}:`, {
+          workerFilter,
+          hasPaymentByWorker, hasRevisionByWorker, hasRefundByWorker,
+          createdByWorker, pickupByWorker, returnByWorker,
+          dropDetailsOperator: b.dropDetails?.operator,
+          todayRevisionOperators: todayRevisions.map(r => r.operator),
+        });
+      }
 
       if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker) {
         return false;

@@ -10,7 +10,7 @@ const router = express.Router();
 router.get('/', async (req, res) => {
   try {
     if (isDbConnected()) {
-      const filter = {};
+      const filter = {}; 
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
       const vehicles = await Vehicle.find(filter).sort({ createdAt: -1 });
       res.json(vehicles);

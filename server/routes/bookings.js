@@ -54,6 +54,31 @@ router.get('/', async (req, res) => {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
       const bookings = await Booking.find(filter).sort({ createdAt: -1 });
+      
+      // Auto-fix missing fields for older records
+      let needsSave = false;
+      for (const b of bookings) {
+        let changed = false;
+        if (!b.baseFare) {
+          if (b.selectedPlan && b.selectedPlan.rate) {
+            b.baseFare = b.selectedPlan.rate;
+            changed = true;
+          }
+        }
+        if (!b.advancePaid && b.settlement && b.settlement.previousPaid > 0) {
+          b.advancePaid = b.settlement.previousPaid;
+          changed = true;
+        }
+        if (!b.securityDeposit && b.settlement && b.settlement.depositCollected > 0) {
+          b.securityDeposit = b.settlement.depositCollected;
+          changed = true;
+        }
+        if (changed) {
+          await b.save();
+          needsSave = true;
+        }
+      }
+      
       return res.json(bookings);
     }
     res.json(getBookings().slice().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
@@ -63,6 +88,37 @@ router.get('/', async (req, res) => {
 });
 
 // ─── GET single booking ───────────────────────────────────────────────────────
+router.get('/fix-db', async (req, res) => {
+  try {
+    const bookings = await Booking.find({});
+    let updated = 0;
+    for (const b of bookings) {
+      let needsUpdate = false;
+      if (!b.baseFare) {
+        if (b.selectedPlan && b.selectedPlan.rate) {
+          b.baseFare = b.selectedPlan.rate;
+          needsUpdate = true;
+        }
+      }
+      if (!b.advancePaid && b.settlement && b.settlement.previousPaid > 0) {
+        b.advancePaid = b.settlement.previousPaid;
+        needsUpdate = true;
+      }
+      if (!b.securityDeposit && b.settlement && b.settlement.depositCollected > 0) {
+        b.securityDeposit = b.settlement.depositCollected;
+        needsUpdate = true;
+      }
+      if (needsUpdate) {
+        await b.save();
+        updated++;
+      }
+    }
+    res.json({ message: `Fixed ${updated} bookings` });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/:bookingId', async (req, res) => {
   try {
     if (isDbConnected()) {

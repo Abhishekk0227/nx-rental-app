@@ -294,6 +294,41 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
     } catch { alert('Failed to add maintenance requirement. Please try again.'); }
   };
 
+  const handleDismissKmAlert = async (v) => {
+    if (!window.confirm(`Dismiss KM Alert for "${v.name}"?\n\nThis will update the Last Service KM to current reading (${v.meterReading} km) and hide the alert.`)) return;
+    try {
+      // We can reuse a vehicle update endpoint, but let's just make a POST to a new or existing route.
+      // Wait, there's no direct vehicle update route here. 
+      // I'll just use a direct fetch to the bookings/override or we need to add a small route.
+      // Actually, if we just create a "fake" completed maintenance record, it will update lastServiceKm!
+      const fakeRecord = {
+        workDone: 'KM Alert Dismissed',
+        vendor: 'System',
+        cost: 0,
+        serviceKm: v.meterReading,
+        notes: 'KM alert manually dismissed by user.',
+        serviceDate: new Date().toISOString()
+      };
+      
+      const res = await doFetch(`${API_BASE}/maintenance/${v.vehicleId}`, {
+        method: 'POST',
+        body: JSON.stringify({ issue: 'KM Alert Reset', priority: 'Low', notes: 'Resetting KM', workerId: currentWorker })
+      });
+      // The POST returns the updated vehicle. 
+      // The newly created record is activeRecord. We need to complete it instantly.
+      if (res.activeRecord) {
+         await doFetch(`${API_BASE}/maintenance/${v.vehicleId}/${res.activeRecord._id || res.activeRecord.id}/complete`, {
+           method: 'POST',
+           body: JSON.stringify(fakeRecord)
+         });
+      }
+      refresh();
+    } catch (err) { 
+      console.error(err);
+      alert('Failed to dismiss KM alert.'); 
+    }
+  };
+
   const handleStopVehicle = async (vehicle, recordId) => {
     if (!window.confirm(`Stop "${vehicle.name}" for maintenance?\n\nThis will make it unavailable for bookings until serviced.`)) return;
     try {
@@ -494,24 +529,36 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                             <StopCircle size={15} /> Stop Vehicle
                           </button>
                           
-                          {v.pendingRecord && (
-                            <div style={{ display: 'flex', gap: 6 }}>
-                              <button
-                                onClick={() => setEditActiveForm({ vehicleId: v.vehicleId, recordId: v.pendingRecord._id, issue: v.pendingRecord.issue, priority: v.pendingRecord.priority || 'Medium', notes: v.pendingRecord.notes || '' })}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#f8fafc', color: '#3b82f6', border: '1px solid #e2e8f0', borderRadius: 8, cursor: 'pointer' }}
-                                title="Edit Request"
-                              >
-                                <Pencil size={14} />
-                              </button>
-                              <button
-                                onClick={() => setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.pendingRecord })}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, cursor: 'pointer' }}
-                                title="Delete Request"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          )}
+                          <div style={{ display: 'flex', gap: 6 }}>
+                            <button
+                              onClick={() => {
+                                if (v.pendingRecord) {
+                                  setEditActiveForm({ vehicleId: v.vehicleId, recordId: v.pendingRecord._id, issue: v.pendingRecord.issue, priority: v.pendingRecord.priority || 'Medium', notes: v.pendingRecord.notes || '' });
+                                } else {
+                                  setAddForm({ vehicleId: v.vehicleId, issue: '', priority: 'Medium', notes: '' });
+                                  setShowAddModal(true);
+                                }
+                              }}
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#f8fafc', color: '#3b82f6', border: '1px solid #e2e8f0', borderRadius: 8, cursor: 'pointer' }}
+                              title={v.pendingRecord ? "Edit Request" : "Create Request"}
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (v.pendingRecord) {
+                                  setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.pendingRecord });
+                                  setShowDeleteHistoryModal(true);
+                                } else {
+                                  handleDismissKmAlert(v);
+                                }
+                              }}
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '32px', height: '32px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 8, cursor: 'pointer' }}
+                              title={v.pendingRecord ? "Delete Request" : "Dismiss Alert"}
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     );
@@ -588,7 +635,7 @@ export default function MaintenanceManagement({ userRole, currentWorker, vehicle
                             <Pencil size={14} /> Edit
                           </button>
                           <button
-                            onClick={() => setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.activeRecord })}
+                            onClick={() => { setDeleteHistoryItem({ vehicleId: v.vehicleId, record: v.activeRecord }); setShowDeleteHistoryModal(true); }}
                             style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px 12px', background: '#fef2f2', color: '#ef4444', border: '1px solid #fecaca', borderRadius: 9, cursor: 'pointer' }}
                             title="Delete Record"
                           >

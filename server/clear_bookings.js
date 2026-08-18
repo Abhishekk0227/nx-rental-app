@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from 'mongoose';  
 import dotenv from 'dotenv';
 import Booking from './models/Booking.js';
 import Settlement from './models/Settlement.js';

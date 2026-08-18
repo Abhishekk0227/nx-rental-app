@@ -5,7 +5,32 @@ import { isDbConnected, getUsers, addUser, updateUser, deleteUser } from '../mem
 
 const router = express.Router();
 
-router.use(protect, adminOnly);
+router.use(protect);
+
+// Get all Workers (Readable by all authenticated users to map IDs to Names)
+router.get('/', async (req, res) => {
+  try {
+    if (isDbConnected()) {
+      const users = await User.find({ role: 'worker' }).populate('zoneId').select('-password');
+      res.json(users);
+    } else {
+      // populate zoneId in memory
+      import('../memoryDb.js').then(({ getZones }) => {
+        const zones = getZones();
+        const users = getUsers().filter(u => u.role === 'worker').map(u => ({
+          ...u,
+          zoneId: zones.find(z => z._id === u.zoneId) || u.zoneId
+        }));
+        res.json(users);
+      });
+    }
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Admin-only routes from here on
+router.use(adminOnly);
 
 // Create Worker
 router.post('/', async (req, res) => {
@@ -23,27 +48,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all Workers
-router.get('/', async (req, res) => {
-  try {
-    if (isDbConnected()) {
-      const users = await User.find({ role: 'worker' }).populate('zoneId');
-      res.json(users);
-    } else {
-      // populate zoneId in memory
-      import('../memoryDb.js').then(({ getZones }) => {
-        const zones = getZones();
-        const users = getUsers().filter(u => u.role === 'worker').map(u => ({
-          ...u,
-          zoneId: zones.find(z => z._id === u.zoneId) || u.zoneId
-        }));
-        res.json(users);
-      });
-    }
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
 
 // Update Worker
 router.put('/:id', async (req, res) => {

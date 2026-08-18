@@ -1137,14 +1137,14 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                         <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid var(--border-light)', padding: '12px 16px', borderRadius: '8px' }}>
                           <h4 style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: 'var(--secondary)' }}>💳 Financial Breakdown</h4>
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                            <div>Base Fare: <strong>₹{(customRound(base * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extensions Total: <strong>₹{(customRound(ext * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Extra Charges: <strong>₹{(customRound(extra * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{(customRound((b.discount || 0) * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{(customRound(gross * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{(customRound(advance * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Security Deposit: <strong>₹{(customRound(deposit * 100) / 100).toLocaleString('en-IN')}</strong></div>
-                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{(customRound(due * 100) / 100).toLocaleString('en-IN')}</strong></div>
+                            <div>Base Fare: <strong>₹{Math.round(base).toLocaleString('en-IN')}</strong></div>
+                            <div>Extensions Total: <strong>₹{Math.round(ext).toLocaleString('en-IN')}</strong></div>
+                            <div>Extra Charges: <strong>₹{Math.round(extra).toLocaleString('en-IN')}</strong></div>
+                            <div>Discount: <strong style={{ color: '#10b981' }}>- ₹{Math.round(b.discount || 0).toLocaleString('en-IN')}</strong></div>
+                            <div>Total Bill: <strong style={{ fontSize: '1rem', color: '#6366f1' }}>₹{Math.round(gross).toLocaleString('en-IN')}</strong></div>
+                            <div>Advance Paid: <strong style={{ color: '#10b981' }}>₹{Math.round(advance).toLocaleString('en-IN')}</strong></div>
+                            <div>Security Deposit: <strong>₹{Math.round(deposit).toLocaleString('en-IN')}</strong></div>
+                            <div>Remaining Due: <strong style={{ color: due > 0 ? '#ef4444' : '#10b981' }}>₹{Math.round(due).toLocaleString('en-IN')}</strong></div>
                           </div>
                         </div>
 
@@ -1156,7 +1156,7 @@ export default function AvailableVehicles({ vehicles, bookings = [], zones = [],
                               {b.paymentCollection.map((p, idx) => (
                                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px', background: 'rgba(255,255,255,0.02)', borderRadius: '4px', fontSize: '0.8rem' }}>
                                   <span>{p.reference || 'Payment Received'} ({p.mode})</span>
-                                  <strong>₹{(customRound((p.amount || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                                  <strong>₹{Math.round(p.amount || 0).toLocaleString('en-IN')}</strong>
                                 </div>
                               ))}
                             </div>

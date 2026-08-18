@@ -2131,6 +2131,12 @@ export default function DailyHisab({
                       <span className="hisab-pill fuel">{fuel}</span>
                       <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={10} />{zone}</span>
                       <span className={`hisab-pill status-${(b.status || '').toLowerCase()}`}>{b.status}</span>
+{(b.replacements && b.replacements.length > 0) && (
+  <span className="hisab-pill" style={{ background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>[Replaced]</span>
+)}
+{b.status !== 'Extended' && ((b.revisions && b.revisions.some(r => r.actionType === 'Extend')) || (b.extensionHistory && b.extensionHistory.length > 0)) && (
+  <span className="hisab-pill" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>[Extended]</span>
+)}
                       {(() => {
                         const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
                         const endT = b.actualReturnDate || b.rentalPeriod?.actualReturnDate;

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, AlertTriangle, Clock, Calendar, CheckCircle, Search, SlidersHorizontal, Car, Bike, User, Phone, MapPin, ArrowRight, Banknote, CreditCard, Wallet, Monitor, Eye, Pencil, RotateCw, Truck, Printer, FileText, X, ChevronDown, ChevronUp, Trash2, Lock } from 'lucide-react';
+import { getActiveStartMeter } from '../utils/billingEngine';
 
 export default function BookedVehicles({
   bookings,
@@ -1537,7 +1538,7 @@ export default function BookedVehicles({
     const newVehicle = vehicles.find(v => v.vehicleId === newVehicleId);
     if (!newVehicle) return alert('New vehicle not found.');
 
-    const startMeter = selectedBooking.handover?.startMeter || 0;
+    const startMeter = getActiveStartMeter(selectedBooking);
     if (Number(oldVehicleClosingMeter) < startMeter) {
       return alert(`Closing meter (${oldVehicleClosingMeter} KM) cannot be less than starting meter (${startMeter} KM) of current vehicle.`);
     }
@@ -2459,7 +2460,7 @@ export default function BookedVehicles({
                 <div class="inv-section-title">Journey Details</div>
                 <div class="inv-row"><span class="label">Pickup Time</span><span class="value">${startPickup}</span></div>
                 <div class="inv-row"><span class="label">Return Time</span><span class="value">${endDrop}</span></div>
-                <div class="inv-row"><span class="label">Start KM</span><span class="value">${booking.pickupDetails?.odometerStart || booking.handover?.startMeter || 'N/A'}</span></div>
+                <div class="inv-row"><span class="label">Start KM</span><span class="value">${getActiveStartMeter(booking)}</span></div>
                 <div class="inv-row"><span class="label">End KM</span><span class="value">${booking.dropDetails?.endMeter || 'N/A'}</span></div>
               </div>
               <div class="inv-section">
@@ -2548,7 +2549,7 @@ export default function BookedVehicles({
     const depositHeld = (selectedBooking.depositHeld !== undefined && selectedBooking.depositHeld !== null) ? selectedBooking.depositHeld : (snapshot.depositCollected || 0);
     const rentalPaid = (selectedBooking.rentalPaid !== undefined && selectedBooking.rentalPaid !== null) ? selectedBooking.rentalPaid : (snapshot.rentalPaid || 0);
 
-    const startMeter = selectedBooking.pickupDetails?.odometerStart || selectedBooking.handover?.startMeter || 0;
+    const startMeter = getActiveStartMeter(selectedBooking);
 
     // Meter reading computations
     const endMeter = Number(dropEndMeter) || startMeter;
@@ -2981,7 +2982,7 @@ export default function BookedVehicles({
       return alert('Please enter Actual Return Time and End Meter Reading before completing the return.');
     }
 
-    const startOdo = selectedBooking.pickupDetails?.odometerStart || selectedBooking.handover?.startMeter || 0;
+    const startOdo = getActiveStartMeter(selectedBooking);
     if (Number(dropEndMeter) < Number(startOdo)) {
       return alert(`Odometer at return (${dropEndMeter} KM) cannot be less than pickup odometer (${startOdo} KM).`);
     }
@@ -3006,7 +3007,7 @@ export default function BookedVehicles({
     if (dropPaymentMethod === 'Mixed' || dropPaymentMethod === 'Mixed Refund') {
       const sum = Number(dropCashReceived) + Number(dropOnlineReceived);
       if (Math.abs(sum - reqVal) > 0.01) {
-        return alert(`Mixed mixed error: Cash Amount (₹${dropCashReceived}) + Online Amount (₹${dropOnlineReceived}) must equal ${isRefund ? 'refund' : 'collect'} amount (₹${reqVal.toFixed(2)}).`);
+        return alert(`Mixed mixed error: Cash Amount (₹${dropCashReceived}) + Online Amount (₹${dropOnlineReceived}) must equal ${isRefund ? 'refund' : 'collect'} amount (₹${reqVal}).`);
       }
       mixedDetails = `Cash: ${dropCashReceived}, Online: ${dropOnlineReceived}`;
     }
@@ -3450,6 +3451,16 @@ export default function BookedVehicles({
                             <span className={`badge ${remainingTime.isOverdue ? 'badge-danger' : 'badge-' + b.status.toLowerCase()}`} style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px' }}>
                               {remainingTime.isOverdue ? 'OVERDUE' : b.status.toUpperCase()}
                             </span>
+                            {(b.replacements && b.replacements.length > 0) && (
+                              <span className="badge" style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>
+                                [REPLACED]
+                              </span>
+                            )}
+                            {b.status !== 'Extended' && ((b.revisions && b.revisions.some(r => r.actionType === 'Extend')) || (b.extensionHistory && b.extensionHistory.length > 0)) && (
+                              <span className="badge" style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>
+                                [EXTENDED]
+                              </span>
+                            )}
 
                             {['Ongoing', 'Reserved', 'Extended'].includes(b.status) && (
                               <span className={`badge ${remainingTime.isOverdue ? 'badge-danger' : 'badge-active'}`} style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px' }}>
@@ -3766,7 +3777,7 @@ export default function BookedVehicles({
                         </div>
                         <div>
                           <span style={{ color: '#64748b', display: 'block', marginBottom: '2px' }}>Meter Reading:</span>
-                          <strong style={{ color: '#1e293b' }}>{vehicleObj?.meterReading ? `${vehicleObj.meterReading} km` : `${selectedBooking.handover?.startMeter || selectedBooking.pickupDetails?.odometerStart || 0} km`}</strong>
+                          <strong style={{ color: '#1e293b' }}>{vehicleObj?.meterReading ? `${vehicleObj.meterReading} km` : `${getActiveStartMeter(selectedBooking)} km`}</strong>
                         </div>
                       </>
                     );
@@ -3923,7 +3934,7 @@ export default function BookedVehicles({
                               <strong style={{ color: '#0f172a', borderBottom: '1px solid #e2e8f0', paddingBottom: '6px', marginBottom: '4px', fontSize: '0.9rem' }}>Actual Pickup Information</strong>
                               <div>Pickup Completed: <strong style={{ color: '#16a34a' }}>Yes</strong></div>
                               <div>Pickup Time: <strong style={{ color: '#1e293b' }}>{formatDate(selectedBooking.pickupDetails?.actualTime || selectedBooking.rentalPeriod?.actualPickupDate)}</strong></div>
-                              <div>Odometer Reading: <strong style={{ color: '#1e293b' }}>{selectedBooking.pickupDetails?.odometerStart || selectedBooking.handover?.startMeter || 0} km</strong></div>
+                              <div>Odometer Reading: <strong style={{ color: '#1e293b' }}>{getActiveStartMeter(selectedBooking)} km</strong></div>
                             </div>
                           ) : (
                             <>
@@ -4947,7 +4958,7 @@ export default function BookedVehicles({
                           fontWeight: 'bold',
                           fontSize: '1.1rem'
                         }}>
-                          Refund Customer: ₹{refundAmount.toFixed(2)}
+                          Refund Customer: ₹{refundAmount}
                         </div>
                       ) : netSettlement > 0 ? (
                         <div style={{
@@ -4960,7 +4971,7 @@ export default function BookedVehicles({
                           fontWeight: 'bold',
                           fontSize: '1.1rem'
                         }}>
-                          Collect More: ₹{netSettlement.toFixed(2)}
+                          Collect More: ₹{netSettlement}
                         </div>
                       ) : (
                         <div style={{
@@ -5802,44 +5813,44 @@ export default function BookedVehicles({
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Base Hourly Rent ({calc.actualDurationStr})</span>
-                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.baseHourlyCost?.toFixed(2)}</strong>
+                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.baseHourlyCost}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Distance Fuel Charge ({calc.totalKmUsedRounded} KM)</span>
-                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.distanceCharge?.toFixed(2)}</strong>
+                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.distanceCharge}</strong>
                         </div>
                       </>
                     ) : (
                       <>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Base Rental</span>
-                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.originalBaseFare?.toFixed(2)}</strong>
+                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.originalBaseFare}</strong>
                         </div>
                         {calc.extTotal > 0 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                             <span style={{ color: 'var(--text-secondary)' }}>Extensions</span>
-                            <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extTotal?.toFixed(2)}</strong>
+                            <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extTotal}</strong>
                           </div>
                         )}
                         {calc.addonsTotal > 0 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                             <span style={{ color: 'var(--text-secondary)' }}>Add-ons (Helmets)</span>
-                            <strong style={{ color: 'var(--text-primary)' }}>₹{calc.addonsTotal?.toFixed(2)}</strong>
+                            <strong style={{ color: 'var(--text-primary)' }}>₹{calc.addonsTotal}</strong>
                           </div>
                         )}
                         {calc.discount > 0 && (
                           <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-available)' }}>
                             <span style={{ color: 'var(--text-secondary)' }}>Discount</span>
-                            <strong style={{ color: 'var(--status-available)' }}>-₹{calc.discount?.toFixed(2)}</strong>
+                            <strong style={{ color: 'var(--status-available)' }}>-₹{calc.discount}</strong>
                           </div>
                         )}
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Extra Hour Charge ({calc.chargeableHoursStr})</span>
-                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extraHourCharge?.toFixed(2)}</strong>
+                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extraHourCharge}</strong>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                           <span style={{ color: 'var(--text-secondary)' }}>Extra KM Charge ({calc.extraKmRounded} KM)</span>
-                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extraKmCharge?.toFixed(2)}</strong>
+                          <strong style={{ color: 'var(--text-primary)' }}>₹{calc.extraKmCharge}</strong>
                         </div>
                       </>
                     )}
@@ -5847,48 +5858,48 @@ export default function BookedVehicles({
                     {calc.accessoryChargeTotal > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-maintenance)' }}>
                         <span>Accessories Penalty</span>
-                        <strong>₹{calc.accessoryChargeTotal?.toFixed(2)}</strong>
+                        <strong>₹{calc.accessoryChargeTotal}</strong>
                       </div>
                     )}
 
                     {calc.damageChargeSum > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-maintenance)' }}>
                         <span>Damage Recovery</span>
-                        <strong>₹{calc.damageChargeSum?.toFixed(2)}</strong>
+                        <strong>₹{calc.damageChargeSum}</strong>
                       </div>
                     )}
 
                     {calc.cleaningChargeSum > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Cleaning Fee</span>
-                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.cleaningChargeSum?.toFixed(2)}</strong>
+                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.cleaningChargeSum}</strong>
                       </div>
                     )}
 
                     {calc.towingChargeSum > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Towing Fee</span>
-                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.towingChargeSum?.toFixed(2)}</strong>
+                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.towingChargeSum}</strong>
                       </div>
                     )}
 
                     {calc.otherChargesSum > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                         <span style={{ color: 'var(--text-secondary)' }}>Other Fees</span>
-                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.otherChargesSum?.toFixed(2)}</strong>
+                        <strong style={{ color: 'var(--text-primary)' }}>₹{calc.otherChargesSum}</strong>
                       </div>
                     )}
 
                     {calc.waiverDiscount > 0 && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-available)' }}>
                         <span>Discount / Waiver</span>
-                        <strong>-₹{calc.waiverDiscount?.toFixed(2)}</strong>
+                        <strong>-₹{calc.waiverDiscount}</strong>
                       </div>
                     )}
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid var(--border-light)', paddingTop: '10px', fontSize: '1rem', marginTop: '4px' }}>
                       <span style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>{selectedBooking.status === 'Completed' ? 'Actual Rental Bill' : 'Estimated Rental Bill'}</span>
-                      <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
+                      <strong style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>₹{calc.actualRentalBill}</strong>
                     </div>
                   </div>
                 </div>
@@ -5910,15 +5921,15 @@ export default function BookedVehicles({
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                             <div style={{ textAlign: 'center' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Cash</span>
-                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.rentalCash || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.rentalCash || 0)}</strong>
                             </div>
                             <div style={{ textAlign: 'center' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Online</span>
-                              <strong style={{ color: 'var(--text-primary)' }}>₹{((snapshot.paymentBreakdown?.rentalOnline || 0) + (snapshot.paymentBreakdown?.rentalCard || 0)).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--text-primary)' }}>₹{((snapshot.paymentBreakdown?.rentalOnline || 0) + (snapshot.paymentBreakdown?.rentalCard || 0))}</strong>
                             </div>
                             <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border-light)' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Total Paid</span>
-                              <strong style={{ color: 'var(--secondary)' }}>₹{(calc.rentalPaid || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--secondary)' }}>₹{(calc.rentalPaid || 0)}</strong>
                             </div>
                           </div>
                         </div>
@@ -5930,15 +5941,15 @@ export default function BookedVehicles({
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', background: 'rgba(255,255,255,0.02)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                             <div style={{ textAlign: 'center' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Cash</span>
-                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.depositCash || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.depositCash || 0)}</strong>
                             </div>
                             <div style={{ textAlign: 'center' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Online</span>
-                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.depositOnline || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--text-primary)' }}>₹{(snapshot.paymentBreakdown?.depositOnline || 0)}</strong>
                             </div>
                             <div style={{ textAlign: 'center', borderLeft: '1px solid var(--border-light)' }}>
                               <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block' }}>Total Deposit</span>
-                              <strong style={{ color: 'var(--status-available)' }}>₹{(calc.depositHeld || 0).toFixed(2)}</strong>
+                              <strong style={{ color: 'var(--status-available)' }}>₹{(calc.depositHeld || 0)}</strong>
                             </div>
                           </div>
                         </div>
@@ -5958,49 +5969,49 @@ export default function BookedVehicles({
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>{selectedBooking.status === 'Completed' ? 'Actual Rental Bill' : 'Estimated Rental Bill'}</span>
-                      <strong style={{ color: 'var(--text-primary)' }}>₹{calc.actualRentalBill?.toFixed(2)}</strong>
+                      <strong style={{ color: 'var(--text-primary)' }}>₹{calc.actualRentalBill}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-maintenance)' }}>
                       <span>Rental Cost Already Paid</span>
-                      <strong>-₹{calc.rentalPaid?.toFixed(2)}</strong>
+                      <strong>-₹{calc.rentalPaid}</strong>
                     </div>
                     {calc.rentalPaid > calc.actualRentalBill && (
                       <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: '#10b981', background: 'rgba(16,185,129,0.08)', padding: '6px 8px', borderRadius: '6px' }}>
                         <span>➡️ Forwarded Replacement Refund Credit</span>
-                        <strong>+₹{(calc.rentalPaid - calc.actualRentalBill).toFixed(2)}</strong>
+                        <strong>+₹{(calc.rentalPaid - calc.actualRentalBill)}</strong>
                       </div>
                     )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', fontWeight: 'bold' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Net Rental Due</span>
                       <strong style={{ color: calc.rentalDue >= 0 ? 'var(--text-primary)' : 'var(--status-available)' }}>
-                        {calc.rentalDue >= 0 ? `₹${calc.rentalDue.toFixed(2)}` : `-₹${Math.abs(calc.rentalDue).toFixed(2)} (Refund Credit)`}
+                        {calc.rentalDue >= 0 ? `₹${calc.rentalDue}` : `-₹${Math.abs(calc.rentalDue)} (Refund Credit)`}
                       </strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
                       <span style={{ color: 'var(--text-secondary)' }}>Security Deposit Held</span>
-                      <strong style={{ color: 'var(--status-available)' }}>₹{calc.depositHeld?.toFixed(2)}</strong>
+                      <strong style={{ color: 'var(--status-available)' }}>₹{calc.depositHeld}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px', color: 'var(--status-maintenance)' }}>
                       <span>Security Deposit Adjusted</span>
-                      <strong>-₹{calc.depositAdjustment?.toFixed(2)}</strong>
+                      <strong>-₹{calc.depositAdjustment}</strong>
                     </div>
 
                     <div style={{ borderTop: '2px solid var(--border-light)', paddingTop: '10px', marginTop: '4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {calc.remainingCollection > 0 && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', fontWeight: 'bold', color: '#f87171' }}>
                           <span>Net Collection:</span>
-                          <span>₹{calc.remainingCollection?.toFixed(2)}</span>
+                          <span>₹{calc.remainingCollection}</span>
                         </div>
                       )}
                       {calc.depositRefund > 0 && (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', background: 'rgba(16,185,129,0.1)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(16,185,129,0.3)' }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.95rem', fontWeight: 'bold', color: '#34d399' }}>
                             <span>Total Net Refund:</span>
-                            <span>₹{calc.depositRefund?.toFixed(2)}</span>
+                            <span>₹{calc.depositRefund}</span>
                           </div>
                           <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                            Calculation: Deposit Held (₹{(calc.depositHeld - calc.depositAdjustment).toFixed(2)})
-                            {calc.rentalDue < 0 && ` + Forwarded Swap Refund (₹${Math.abs(calc.rentalDue).toFixed(2)})`}
+                            Calculation: Deposit Held (₹{(calc.depositHeld - calc.depositAdjustment)})
+                            {calc.rentalDue < 0 && ` + Forwarded Swap Refund (₹${Math.abs(calc.rentalDue)})`}
                           </div>
                         </div>
                       )}
@@ -6035,7 +6046,7 @@ export default function BookedVehicles({
                           fontWeight: 'bold',
                           fontSize: '1.05rem'
                         }}>
-                          Collect More: ₹{calc.remainingCollection.toFixed(2)}
+                          Collect More: ₹{calc.remainingCollection}
                         </div>
                       ) : calc.settlementStatus === 'Refund' ? (
                         <div style={{
@@ -6048,7 +6059,7 @@ export default function BookedVehicles({
                           fontWeight: 'bold',
                           fontSize: '1.05rem'
                         }}>
-                          Refund: ₹{calc.depositRefund.toFixed(2)}
+                          Refund: ₹{calc.depositRefund}
                         </div>
                       ) : (
                         <div style={{
@@ -6074,7 +6085,7 @@ export default function BookedVehicles({
                           <input
                             type="text"
                             className="form-control"
-                            value={`₹${calc.remainingCollection.toFixed(2)}`}
+                            value={`₹${calc.remainingCollection}`}
                             readOnly
                             disabled
                           />
@@ -6108,7 +6119,7 @@ export default function BookedVehicles({
                                 onChange={e => {
                                   const val = Number(e.target.value);
                                   setDropCashReceived(val);
-                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val))));
                                 }}
                                 required
                               />
@@ -6122,13 +6133,13 @@ export default function BookedVehicles({
                                 onChange={e => {
                                   const val = Number(e.target.value);
                                   setDropOnlineReceived(val);
-                                  setDropCashReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                  setDropCashReceived(Math.max(0, Number((reqVal - val))));
                                 }}
                                 required
                               />
                             </div>
                             <div style={{ gridColumn: 'span 2', fontSize: '0.75rem', textAlign: 'center', color: Math.abs(Number(dropCashReceived) + Number(dropOnlineReceived) - calc.remainingCollection) > 0.01 ? 'var(--status-maintenance)' : 'var(--status-available)' }}>
-                              Total Split: ₹{(Number(dropCashReceived) + Number(dropOnlineReceived)).toFixed(2)} / Required: ₹{calc.remainingCollection.toFixed(2)}
+                              Total Split: ₹{(Number(dropCashReceived) + Number(dropOnlineReceived))} / Required: ₹{calc.remainingCollection}
                             </div>
                           </div>
                         ) : (
@@ -6163,7 +6174,7 @@ export default function BookedVehicles({
                           const snapshot = getBookingFinancialSnapshot(selectedBooking);
                           return (
                             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '8px', border: '1px dashed var(--border-light)', fontSize: '0.8rem' }}>
-                              <strong>Original Deposit Details:</strong> Held Cash: ₹{snapshot.paymentBreakdown?.depositCash?.toFixed(2)}, Held Online: ₹{snapshot.paymentBreakdown?.depositOnline?.toFixed(2)}
+                              <strong>Original Deposit Details:</strong> Held Cash: ₹{snapshot.paymentBreakdown?.depositCash}, Held Online: ₹{snapshot.paymentBreakdown?.depositOnline}
                             </div>
                           );
                         })()}
@@ -6173,7 +6184,7 @@ export default function BookedVehicles({
                           <input
                             type="text"
                             className="form-control"
-                            value={`₹${calc.depositRefund.toFixed(2)}`}
+                            value={`₹${calc.depositRefund}`}
                             readOnly
                             disabled
                           />
@@ -6208,7 +6219,7 @@ export default function BookedVehicles({
                                 onChange={e => {
                                   const val = Number(e.target.value);
                                   setDropCashReceived(val);
-                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                  setDropOnlineReceived(Math.max(0, Number((reqVal - val))));
                                 }}
                                 required
                               />
@@ -6222,13 +6233,13 @@ export default function BookedVehicles({
                                 onChange={e => {
                                   const val = Number(e.target.value);
                                   setDropOnlineReceived(val);
-                                  setDropCashReceived(Math.max(0, Number((reqVal - val).toFixed(2))));
+                                  setDropCashReceived(Math.max(0, Number((reqVal - val))));
                                 }}
                                 required
                               />
                             </div>
                             <div style={{ gridColumn: 'span 2', fontSize: '0.75rem', textAlign: 'center', color: Math.abs(Number(dropCashReceived) + Number(dropOnlineReceived) - calc.depositRefund) > 0.01 ? 'var(--status-maintenance)' : 'var(--status-available)' }}>
-                              Total Refund Split: ₹{(Number(dropCashReceived) + Number(dropOnlineReceived)).toFixed(2)} / Required: ₹{calc.depositRefund.toFixed(2)}
+                              Total Refund Split: ₹{(Number(dropCashReceived) + Number(dropOnlineReceived))} / Required: ₹{calc.depositRefund}
                             </div>
                           </div>
                         ) : (
@@ -6275,7 +6286,7 @@ export default function BookedVehicles({
                             transition: 'all 0.2s'
                           }}
                         >
-                          {dropSettlementConfirmed ? "Collection Confirmed" : `Confirm Collection ₹${calc.remainingCollection.toFixed(2)}`}
+                          {dropSettlementConfirmed ? "Collection Confirmed" : `Confirm Collection ₹${calc.remainingCollection}`}
                         </button>
                       )}
 
@@ -6299,7 +6310,7 @@ export default function BookedVehicles({
                             transition: 'all 0.2s'
                           }}
                         >
-                          {dropSettlementConfirmed ? "Refund Confirmed" : `Confirm Refund ₹${calc.depositRefund.toFixed(2)}`}
+                          {dropSettlementConfirmed ? "Refund Confirmed" : `Confirm Refund ₹${calc.depositRefund}`}
                         </button>
                       )}
 
@@ -6687,7 +6698,7 @@ export default function BookedVehicles({
                         className="form-control"
                         value={oldVehicleClosingMeter}
                         onChange={e => setOldVehicleClosingMeter(Number(e.target.value))}
-                        min={selectedBooking.handover?.startMeter || 0}
+                        min={getActiveStartMeter(selectedBooking)}
                         required
                       />
                     </div>
@@ -7017,7 +7028,7 @@ export default function BookedVehicles({
                           <input type="text" inputMode="numeric" className="form-control" value={editMixedCash} onChange={e => {
                             const val = Number(e.target.value);
                             setEditMixedCash(val);
-                            setEditMixedOnline(Math.max(0, Number((editAdvancePaid - val).toFixed(2))));
+                            setEditMixedOnline(Math.max(0, Number((editAdvancePaid - val))));
                           }} />
                         </div>
                         <div className="form-group" style={{ marginBottom: 0 }}>
@@ -7025,7 +7036,7 @@ export default function BookedVehicles({
                           <input type="text" inputMode="numeric" className="form-control" value={editMixedOnline} onChange={e => {
                             const val = Number(e.target.value);
                             setEditMixedOnline(val);
-                            setEditMixedCash(Math.max(0, Number((editAdvancePaid - val).toFixed(2))));
+                            setEditMixedCash(Math.max(0, Number((editAdvancePaid - val))));
                           }} />
                         </div>
                       </div>

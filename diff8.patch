@@ -1,0 +1,17 @@
+﻿commit c07ffedaab131b54742b88fe39214d74457299de
+Author: Abhishek Yadav <169173695+Abhishekk0227@users.noreply.github.com>
+Date:   Sun Aug 16 12:28:43 2026 +0530
+
+    Final fix
+
+diff --git a/client/src/components/AvailableVehicles.jsx b/client/src/components/AvailableVehicles.jsx
+index 3d54cc0..8936df7 100644
+--- a/client/src/components/AvailableVehicles.jsx
++++ b/client/src/components/AvailableVehicles.jsx
+@@ -1,5 +1,5 @@
+ import React, { useState, useEffect, useRef } from 'react';
+-import { customRound } from '../utils/billingEngine';
++import { customRound } from '../utils/billingEngine'; 
+ import { Search, SlidersHorizontal, Car, Bike, Calendar, Eye, Pencil, Wrench, X, Camera, Upload, MapPin, Fuel, Gauge, Users, ChevronDown } from 'lucide-react';
+ 
+ export default function AvailableVehicles({ vehicles, bookings = [], zones = [], userRole = 'worker', onBookVehicle, onUpdateVehicle, onToggleStatus }) {

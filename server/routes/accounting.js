@@ -276,15 +276,38 @@ router.get('/', async (req, res) => {
     res.json({
       summary: {
         totalBookings,
-        totalRevenue,
-        totalOutstanding,
-        rentalCollections,
-        depositCollections,
-        depositRefunds,
-        netCashCollection: rentalCollections.cash + depositCollections.cash - depositRefunds.cash,
-        netCollection: rentalCollections.total + depositCollections.total - depositRefunds.total
+        totalRevenue: Math.round(totalRevenue),
+        totalOutstanding: Math.round(totalOutstanding),
+        rentalCollections: {
+          cash: Math.round(rentalCollections.cash),
+          online: Math.round(rentalCollections.online),
+          vikas: Math.round(rentalCollections.vikas),
+          total: Math.round(rentalCollections.total)
+        },
+        depositCollections: {
+          cash: Math.round(depositCollections.cash),
+          online: Math.round(depositCollections.online),
+          vikas: Math.round(depositCollections.vikas),
+          total: Math.round(depositCollections.total)
+        },
+        depositRefunds: {
+          cash: Math.round(depositRefunds.cash),
+          online: Math.round(depositRefunds.online),
+          vikas: Math.round(depositRefunds.vikas),
+          total: Math.round(depositRefunds.total)
+        },
+        netCashCollection: Math.round(rentalCollections.cash + depositCollections.cash - depositRefunds.cash),
+        netCollection: Math.round(rentalCollections.total + depositCollections.total - depositRefunds.total)
       },
-      bookings: matchedBookingsList,
+      bookings: matchedBookingsList.map(b => ({
+        ...b,
+        rentalCost: Math.round(b.rentalCost),
+        rentalPaid: Math.round(b.rentalPaid),
+        outstanding: Math.round(b.outstanding),
+        depositHeld: Math.round(b.depositHeld),
+        collectAmount: Math.round(b.collectAmount),
+        refundAmount: Math.round(b.refundAmount)
+      })),
       workerSettlement: {
         workerId: workerId || 'All',
         date: date || '',

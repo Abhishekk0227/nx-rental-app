@@ -94,6 +94,54 @@ router.get('/', async (req, res) => {
   }
 });
 
+// ─── GET Dashboard Stats ──────────────────────────────────────────────────────
+router.get('/dashboard-stats', async (req, res) => {
+  try {
+    const filter = {};
+    if (req.query.zoneId) filter.zoneId = req.query.zoneId;
+    
+    const allBookings = isDbConnected() ? await Booking.find(filter) : getBookings().filter(b => !req.query.zoneId || b.zoneId === req.query.zoneId);
+    let totalRevenue = 0;
+    let activeRentals = 0;
+    let pendingDropoffs = 0;
+    let upcomingBookings = 0;
+
+    const today = new Date();
+    // Use local timezone offset to get local date string
+    const tzOffset = today.getTimezoneOffset() * 60000;
+    const todayStr = new Date(today - tzOffset).toISOString().slice(0, 10);
+
+    for (const b of allBookings) {
+      // Revenue calculation: sum of all collected advance/rental payments
+      totalRevenue += (Number(b.rentalPaid) || 0);
+
+      if (['Ongoing', 'Extended', 'Overdue'].includes(b.status)) {
+        activeRentals++;
+        
+        const expectedDrop = b.rentalPeriod?.expectedEndDate || b.expectedDropDate || b.expectedReturnDate;
+        if (expectedDrop) {
+          const dropDate = new Date(expectedDrop);
+          const dropDateStr = new Date(dropDate - (dropDate.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+          if (dropDateStr <= todayStr) {
+            pendingDropoffs++;
+          }
+        }
+      } else if (b.status === 'Reserved') {
+        upcomingBookings++;
+      }
+    }
+    
+    res.json({ 
+      completedRevenue: Math.round(totalRevenue), 
+      activeRentalsCount: activeRentals, 
+      pendingPickupsCount: upcomingBookings, 
+      ongoingTripsCount: activeRentals 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // ─── GET single booking ───────────────────────────────────────────────────────
 router.get('/fix-db', async (req, res) => {
   try {

@@ -165,6 +165,23 @@ export function calculateSettlement({ actualBill = 0, rentalPaid = 0, depositHel
 }
 
 /**
+ * Get the actual starting meter, accounting for replacements.
+ * If a vehicle was replaced, its starting meter is the last replacement's starting meter.
+ *
+ * @param {Object} booking — live booking object
+ * @returns {number} true starting meter for the current active vehicle
+ */
+export function getActiveStartMeter(booking) {
+  if (!booking) return 0;
+  const replacements = booking.replacements || [];
+  if (replacements.length > 0) {
+    const lastRep = replacements[replacements.length - 1];
+    return Number(lastRep.newVehicleStartingMeter) || 0;
+  }
+  return Number(booking.pickupDetails?.odometerStart) || Number(booking.handover?.startMeter) || 0;
+}
+
+/**
  * Full settlement calculation from a booking object + drop-off details.
  * This is the canonical entry point used in the dropoff route.
  *
@@ -173,7 +190,7 @@ export function calculateSettlement({ actualBill = 0, rentalPaid = 0, depositHel
  * @returns {{ actualBill, netDue, depositAdjustment, finalRefund, finalCollection }}
  */
 export function calculateDropOffSettlement(booking, dropDetails = {}) {
-  const startMeter = Number(booking.handover?.startMeter) || 0;
+  const startMeter = getActiveStartMeter(booking);
   const endMeter = Number(dropDetails.endMeter) || startMeter;
   const actualKm = Math.max(0, endMeter - startMeter);
 

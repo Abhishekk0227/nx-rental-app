@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { customRound } from '../utils/billingEngine';
 import { Car, Users, DollarSign, Calendar, Clock, Bike, Truck, Zap, Banknote, Monitor, CreditCard, Wallet, Phone, MapPin, User, Eye } from 'lucide-react';
 
-const fmt = (n) => `₹${Number(n || 0).toLocaleString('en-IN')}`;
+const fmt = (n) => `₹${Math.round(Number(n || 0)).toLocaleString('en-IN')}`;
 const fmtUSD = (n) => `$${Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
 
 const isToday = (dateVal) => {

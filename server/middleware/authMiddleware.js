@@ -29,6 +29,7 @@ export const isolateWorkerData = (req, res, next) => {
   if (req.user && req.user.role === 'worker') {
     // Inject zoneId into the request query and body to ensure data isolation
     req.query.zoneId = req.user.zoneId;
+    req.query.workerId = req.user.userId;
     if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
       req.body.zoneId = req.user.zoneId;
       req.body.workerId = req.user.userId; // track which worker made the change

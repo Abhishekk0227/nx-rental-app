@@ -65,7 +65,7 @@ app.use(mongoSanitize());
 // ─── Global Rate Limiting ─────────────────────────────────────────────────────
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500,
+  max: 10000, // Generous limit for high-frequency dashboard polling & multi-user testing
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many requests, please try again later.' }
@@ -74,7 +74,7 @@ const globalLimiter = rateLimit({
 // Stricter limiter for write operations (POST/PUT/PATCH)
 const writeLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 100,
+  max: 2000,
   standardHeaders: true,
   legacyHeaders: false,
   message: { message: 'Too many write requests, please slow down.' }

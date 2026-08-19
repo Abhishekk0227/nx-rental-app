@@ -1,6 +1,6 @@
 import { customRound } from '../utils/billingEngine';
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock, Clock } from 'lucide-react';
+import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock, Clock, RotateCw } from 'lucide-react';
 
 // Embedded high-fidelity styles to match your design guidelines
 const rawStyles = `
@@ -697,14 +697,7 @@ const rawStyles = `
   }
 `;
 
-export default function DailyHisab({
-  userRole,
-  currentWorker,
-  vehicles,
-  bookings,
-  zones = [],
-  onRecordDeposit
-}) {
+export default function DailyHisab({ userRole, currentWorker, vehicles = [], bookings = [], zones = [], users = [], onRecordDeposit }) {
   const isAdmin = userRole === 'admin';
 
   // Get current local date string (YYYY-MM-DD)
@@ -842,30 +835,58 @@ export default function DailyHisab({
     }
   };
 
-  const getPaymentOperator = (p, revisions) => {
-    if (!revisions || revisions.length === 0) return 'System';
-    let closestRev = null;
-    let minDiff = Infinity;
-    revisions.forEach(r => {
-      if (!r.timestamp) return;
-      const diff = Math.abs(new Date(r.timestamp).getTime() - new Date(p.timestamp).getTime());
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestRev = r;
-      }
-    });
-    if (minDiff < 15000 && closestRev) {
-      return closestRev.operator || 'System';
-    }
-    return 'System';
+  const matchWorkerLocal = (opOrId, targetWorker) => {
+    if (!targetWorker || targetWorker === 'All') return true;
+    if (!opOrId || opOrId === 'System') return false;
+    const opStr = String(opOrId).trim().toLowerCase();
+    const targetStr = String(targetWorker).trim().toLowerCase();
+    if (opStr === targetStr) return true;
+
+    const opUser = users.find(u =>
+      String(u._id) === String(opOrId) ||
+      String(u.username).trim().toLowerCase() === opStr ||
+      String(u.name).trim().toLowerCase() === opStr
+    );
+    const targetUser = users.find(u =>
+      String(u._id) === String(targetWorker) ||
+      String(u.username).trim().toLowerCase() === targetStr ||
+      String(u.name).trim().toLowerCase() === targetStr
+    );
+
+    if (opUser && targetUser) return String(opUser._id) === String(targetUser._id);
+    if (opUser) return String(opUser._id) === String(targetWorker) || String(opUser.username).trim().toLowerCase() === targetStr || String(opUser.name).trim().toLowerCase() === targetStr;
+    if (targetUser) return String(targetUser._id) === String(opOrId) || String(targetUser.username).trim().toLowerCase() === opStr || String(targetUser.name).trim().toLowerCase() === opStr;
+    return false;
   };
 
-  // Helper to parse mixed payments mixed (e.g., "Cash: 100, Online: 200, Card: 300, Vikas: 400")
-  const parseMixedRef = (refStr) => {
-    let cash = 0;
-    let online = 0;
-    let card = 0;
-    let vikas = 0;
+  const getPaymentOperator = (p, revisions, defaultWorkerId = 'System') => {
+    if (p.workerId && p.workerId !== 'System') return p.workerId;
+    if (revisions && revisions.length > 0) {
+      let closestRev = null;
+      let minDiff = Infinity;
+      revisions.forEach(r => {
+        if (!r.timestamp) return;
+        const diff = Math.abs(new Date(r.timestamp).getTime() - new Date(p.timestamp).getTime());
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestRev = r;
+        }
+      });
+      if (minDiff < 30000 && closestRev && closestRev.operator && closestRev.operator !== 'System') {
+        return closestRev.operator;
+      }
+    }
+    return defaultWorkerId && defaultWorkerId !== 'System' ? defaultWorkerId : 'System';
+  };
+
+  const getWorkerName = (idOrName) => {
+    if (!idOrName || idOrName === 'System') return 'System';
+    const found = users.find(u => u._id === idOrName || u.username === idOrName || u.name === idOrName);
+    return found ? found.name : idOrName;
+  };
+
+  const parseMixedRef = (refStr = '') => {
+    let cash = 0, online = 0, card = 0, vikas = 0;
     if (!refStr) return { cash, online, card, vikas };
     const cashMatch = refStr.match(/Cash:\s*([\d.]+)/i);
     if (cashMatch) cash = parseFloat(cashMatch[1]) || 0;
@@ -908,19 +929,22 @@ export default function DailyHisab({
     let totalOnlineHandledByWorker = 0;
     let totalVikasHandledByWorker = 0;
 
-    const rentalCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
-    const depositCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
-    const depositRefunds = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
+    const rentalCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositRefunds = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
 
     const matchedBookingsList = [];
 
     bookings.forEach(b => {
+      const isCreatedToday = safeDateStr(b.createdAt) === dateFilter;
+      const bCreator = b.revisions?.[0]?.operator || b.workerId || 'System';
+
       const todayPayments = b.paymentCollection?.filter(p => safeDateStr(p.timestamp) === dateFilter) || [];
       const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
       const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
-      const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+      const isRefundToday = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0);
 
-      if (todayPayments.length === 0 && todayRevisions.length === 0 && !isRefundToday) {
+      if (!isCreatedToday && todayPayments.length === 0 && todayRevisions.length === 0 && !isRefundToday) {
         return;
       }
 
@@ -930,17 +954,13 @@ export default function DailyHisab({
         hasWorkerActivity = true;
       } else {
         const hasPaymentByWorker = todayPayments.some(p => {
-          const op = getPaymentOperator(p, b.revisions);
-          return op === workerFilter;
+          const op = getPaymentOperator(p, b.revisions, b.workerId);
+          return matchWorkerLocal(op, workerFilter);
         });
-        const hasRevisionByWorker = todayRevisions.some(r => r.operator === workerFilter);
-        let hasRefundByWorker = false;
-        if (isRefundToday) {
-          const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-          const refundOp = dropOffRev?.operator || b.workerId || 'System';
-          hasRefundByWorker = (refundOp === workerFilter);
-        }
-        hasWorkerActivity = hasPaymentByWorker || hasRevisionByWorker || hasRefundByWorker;
+        const hasRevisionByWorker = todayRevisions.some(r => matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+        const hasCreationByWorker = isCreatedToday && matchWorkerLocal(bCreator, workerFilter);
+        let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+        hasWorkerActivity = hasPaymentByWorker || hasRevisionByWorker || hasCreationByWorker || hasRefundByWorker;
       }
 
       if (!hasWorkerActivity) return;
@@ -951,24 +971,34 @@ export default function DailyHisab({
 
       // Loop through individual payments
       todayPayments.forEach(p => {
-        const op = getPaymentOperator(p, b.revisions);
-        if (workerFilter !== 'All' && op !== workerFilter) return;
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
+        if (workerFilter !== 'All' && !matchWorkerLocal(op, workerFilter)) return;
 
         let cash = 0;
         let online = 0;
         let card = 0;
         let vikas = 0;
 
-        if (p.mode === 'Cash') cash = p.amount;
-        else if (p.mode === 'Card') card = p.amount;
-        else if (p.mode === 'Vikas') vikas = p.amount;
-        else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) online = p.amount;
-        else if (p.mode === 'Mixed') {
-          const split = parseMixedRef(p.reference);
-          cash = split.cash;
-          online = split.online;
-          card = split.card;
-          vikas = split.vikas;
+        if (p.mode === 'Cash') {
+          cash = p.cashAmount || p.amount || 0;
+        } else if (p.mode === 'Card') {
+          card = p.cardAmount || p.amount || 0;
+        } else if (p.mode === 'Vikas') {
+          vikas = p.vikasAmount || p.amount || 0;
+        } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
+          online = p.onlineAmount || p.amount || 0;
+        } else if (p.mode === 'Mixed') {
+          cash = p.cashAmount || 0;
+          online = p.onlineAmount || 0;
+          card = p.cardAmount || 0;
+          vikas = p.vikasAmount || 0;
+          if (cash === 0 && online === 0 && card === 0 && vikas === 0) {
+            const split = parseMixedRef(p.reference || '');
+            cash = split.cash;
+            online = split.online;
+            card = split.card;
+            vikas = split.vikas;
+          }
         }
 
         rentalCollections.cash += cash;
@@ -977,15 +1007,59 @@ export default function DailyHisab({
         rentalCollections.vikas += vikas;
         rentalCollections.total += (cash + online + card + vikas);
 
-        if (op === workerFilter || workerFilter === 'All') {
+        if (workerFilter === 'All' || matchWorkerLocal(op, workerFilter)) {
           totalCashHandledByWorker += cash;
         }
       });
 
+      // Initial deposit collected on creation date
+      const isDepositByWorker = workerFilter === 'All' || matchWorkerLocal(bCreator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter);
+      if (isCreatedToday && isDepositByWorker) {
+        let initCash = Number(b.depositDetails?.cashAmount) || 0;
+        let initOnline = Number(b.depositDetails?.onlineAmount) || 0;
+        let initCard = Number(b.depositDetails?.cardAmount) || 0;
+        let initVikas = Number(b.depositDetails?.vikasAmount) || 0;
+
+        const breakdownSum = initCash + initOnline + initCard + initVikas;
+        const totalInitDep = breakdownSum > 0 ? breakdownSum : (Number(b.securityDeposit) || Number(b.depositDetails?.amount) || 0);
+
+        if (breakdownSum === 0 && totalInitDep > 0) {
+          const mode = (b.depositDetails?.mode || b.paymentMethod || b.paymentMode || 'Cash').trim();
+          if (mode.toLowerCase() === 'card') {
+            initCard = totalInitDep;
+          } else if (mode.toLowerCase() === 'vikas') {
+            initVikas = totalInitDep;
+          } else if (['online', 'upi', 'bank transfer'].includes(mode.toLowerCase())) {
+            initOnline = totalInitDep;
+          } else if (mode.toLowerCase() === 'mixed') {
+            const split = parseMixedRef(b.depositDetails?.remarks || b.paymentReference || '');
+            initCash = split.cash || 0;
+            initOnline = split.online || 0;
+            initCard = split.card || 0;
+            initVikas = split.vikas || 0;
+            if (initCash === 0 && initOnline === 0 && initCard === 0 && initVikas === 0) {
+              initCash = totalInitDep;
+            }
+          } else {
+            initCash = totalInitDep;
+          }
+        }
+
+        if (totalInitDep > 0) {
+          depositCollections.cash += initCash;
+          depositCollections.online += initOnline;
+          depositCollections.card += initCard;
+          depositCollections.vikas += initVikas;
+          depositCollections.total += (initCash + initOnline + initCard + initVikas);
+          totalCashHandledByWorker += initCash;
+        }
+      }
+
       // Loop through revisions today to find deposit collections
       todayRevisions.forEach(rev => {
-        const op = rev.operator || 'System';
-        if (workerFilter !== 'All' && op !== workerFilter) return;
+        if (rev.revisionNumber === 1 && isCreatedToday) return; // Already counted above
+        const op = rev.operator || b.workerId || 'System';
+        if (workerFilter !== 'All' && !matchWorkerLocal(op, workerFilter)) return;
 
         if (rev.depositDetails && rev.depositDetails.difference > 0) {
           const diff = rev.depositDetails.difference;
@@ -1019,6 +1093,16 @@ export default function DailyHisab({
             const curVikas = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0;
             const prevVikas = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0) : 0;
             vikas = Math.max(0, curVikas - prevVikas);
+
+            if (cash === 0 && online === 0 && card === 0 && vikas === 0) {
+              const split = parseMixedRef(rev.depositDetails.remarks || '');
+              if (split.cash > 0 || split.online > 0 || split.card > 0 || split.vikas > 0) {
+                cash = split.cash;
+                online = split.online;
+                card = split.card;
+                vikas = split.vikas;
+              }
+            }
           }
 
           depositCollections.cash += cash;
@@ -1034,27 +1118,24 @@ export default function DailyHisab({
       });
 
       // Loop through refunds today
-      if (isRefundToday) {
-        const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-        const op = dropOffRev?.operator || b.workerId || 'System';
+      todayRevisions.forEach(rev => {
+        const op = rev.operator || 'System';
+        if (workerFilter !== 'All' && op !== workerFilter) return;
 
-        if (workerFilter === 'All' || op === workerFilter) {
-          let cash = 0;
-          let online = 0;
-          let card = 0;
-          let vikas = 0;
-          const amt = b.refundDetails.amount || 0;
+        if (rev.refundDetails && rev.refundDetails.amount > 0) {
+          let cash = 0, online = 0, card = 0, vikas = 0;
+          const amt = rev.refundDetails.amount || 0;
 
-          if (b.refundDetails.method === 'Cash') {
+          if (rev.refundDetails.method === 'Cash') {
             cash = amt;
-          } else if (b.refundDetails.method === 'Card') {
+          } else if (rev.refundDetails.method === 'Card') {
             card = amt;
-          } else if (b.refundDetails.method === 'Vikas') {
+          } else if (rev.refundDetails.method === 'Vikas') {
             vikas = amt;
-          } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
+          } else if (['UPI', 'Online'].includes(rev.refundDetails.method)) {
             online = amt;
-          } else if (b.refundDetails.method === 'Mixed') {
-            const split = parseMixedRef(b.refundDetails.notes);
+          } else if (rev.refundDetails.method === 'Mixed') {
+            const split = parseMixedRef(rev.refundDetails.notes);
             cash = split.cash;
             online = split.online;
             card = split.card;
@@ -1071,7 +1152,7 @@ export default function DailyHisab({
             totalCashHandledByWorker -= cash;
           }
         }
-      }
+      });
 
       matchedBookingsList.push({
         bookingId: b.bookingId,
@@ -1490,7 +1571,7 @@ export default function DailyHisab({
           vikas,
           card,
           reference: p.reference,
-          operator: getPaymentOperator(p, b.revisions)
+          operator: getPaymentOperator(p, b.revisions, b.workerId)
         });
       }
     });
@@ -1540,37 +1621,38 @@ export default function DailyHisab({
       }
     });
 
+    const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
     const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
-    const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+    const isRefundToday = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0);
     if (isRefundToday) {
-      const amt = b.refundDetails.amount || 0;
-      let cash = 0, online = 0, card = 0, vikas = 0;
-      if (b.refundDetails.method === 'Cash') {
-        cash = amt;
-      } else if (b.refundDetails.method === 'Card') {
-        card = amt;
-      } else if (b.refundDetails.method === 'Vikas') {
-        vikas = amt;
-      } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
-        online = amt;
-      } else if (b.refundDetails.method === 'Mixed') {
-        const split = parseMixedRef(b.refundDetails.notes);
-        cash = split.cash;
-        online = split.online;
-        card = split.card;
-        vikas = split.vikas;
-      }
+      todayRevisions.forEach(rev => {
+        if (rev.refundDetails && rev.refundDetails.amount > 0) {
+          const amt = rev.refundDetails.amount || 0;
+          let cash = 0, online = 0, card = 0, vikas = 0;
+          if (rev.refundDetails.method === 'Cash') cash = amt;
+          else if (rev.refundDetails.method === 'Card') card = amt;
+          else if (rev.refundDetails.method === 'Vikas') vikas = amt;
+          else if (['UPI', 'Online'].includes(rev.refundDetails.method)) online = amt;
+          else if (rev.refundDetails.method === 'Mixed') {
+            const split = parseMixedRef(rev.refundDetails.notes);
+            cash = split.cash;
+            online = split.online;
+            card = split.card;
+            vikas = split.vikas;
+          }
 
-      refunds.push({
-        time: formatTimeDisplay(b.refundDetails.timestamp || b.actualReturnDate || b.rentalPeriod?.actualReturnDate || b.updatedAt),
-        mode: b.refundDetails.method,
-        amount: amt,
-        cash,
-        upi: online,
-        vikas,
-        card,
-        notes: b.refundDetails.notes,
-        operator: b.dropDetails?.operator || b.workerId || 'System'
+          refunds.push({
+            time: formatTimeDisplay(rev.timestamp || b.actualReturnDate || b.updatedAt),
+            mode: rev.refundDetails.method,
+            amount: amt,
+            cash,
+            upi: online,
+            vikas,
+            card,
+            notes: rev.refundDetails.notes,
+            operator: rev.operator || b.workerId || 'System'
+          });
+        }
       });
     }
 
@@ -1585,7 +1667,7 @@ export default function DailyHisab({
 
     const todayPayments = b.paymentCollection?.filter(p => safeDateStr(p.timestamp) === dateFilter) || [];
     const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
-    const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+    const isRefundToday = todayRevisions.some(r => (r.refundDetails && r.refundDetails.amount > 0) || (r.actionType === 'DropOff' && b.settlement?.refundAmount > 0));
 
     // Check if any timestamp-anchored activity happened on this date
     const hasDateActivity = (
@@ -1626,31 +1708,19 @@ export default function DailyHisab({
     // Filter worker profile
     if (workerFilter && workerFilter !== 'All') {
       const hasPaymentByWorker = todayPayments.some(p => {
-        const op = getPaymentOperator(p, b.revisions);
-        return op === workerFilter;
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
+        return matchWorkerLocal(op, workerFilter);
       });
-      const hasRevisionByWorker = todayRevisions.some(r => r.operator === workerFilter);
-      let hasRefundByWorker = false;
-      if (isRefundToday) {
-        const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-        const refundOp = dropOffRev?.operator || b.workerId || 'System';
-        hasRefundByWorker = (refundOp === workerFilter);
-      }
-      const createdByWorker = createdDateStr === dateFilter && (b.workerId === workerFilter);
-      const pickupByWorker = pickupDateStr === dateFilter && (b.handover?.operator === workerFilter || b.workerId === workerFilter);
-      const returnByWorker = returnDateStr === dateFilter && (b.dropDetails?.operator === workerFilter || b.workerId === workerFilter);
+      const hasRevisionByWorker = todayRevisions.some(r => matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+      let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+      const createdByWorker = createdDateStr === dateFilter && (matchWorkerLocal(b.workerId, workerFilter) || matchWorkerLocal(b.revisions?.[0]?.operator, workerFilter));
+      const pickupByWorker = pickupDateStr === dateFilter && (matchWorkerLocal(b.handover?.operator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter));
+      const returnByWorker = returnDateStr === dateFilter && (matchWorkerLocal(b.dropDetails?.operator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter));
+      
+      const isCarryOverForWorker = isOperationallyActive && !hasDateActivity && 
+        (matchWorkerLocal(b.workerId, workerFilter) || matchWorkerLocal(b.revisions?.[0]?.operator, workerFilter));
 
-      if (b.status === 'Completed') {
-        console.log(`[DailyHisab DEBUG] Worker filter check for ${b.bookingId}:`, {
-          workerFilter,
-          hasPaymentByWorker, hasRevisionByWorker, hasRefundByWorker,
-          createdByWorker, pickupByWorker, returnByWorker,
-          dropDetailsOperator: b.dropDetails?.operator,
-          todayRevisionOperators: todayRevisions.map(r => r.operator),
-        });
-      }
-
-      if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker) {
+      if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker && !isCarryOverForWorker) {
         return false;
       }
     }
@@ -1686,14 +1756,15 @@ export default function DailyHisab({
   let editsCount = 0;
   let collectionsCount = 0;
   let dropOffsCount = 0;
+  let refundsCount = 0;
 
   bookings.forEach(b => {
     const todayPayments = b.paymentCollection?.filter(p => {
       const matchDate = safeDateStr(p.timestamp) === dateFilter;
       if (!matchDate) return false;
       if (workerFilter && workerFilter !== 'All') {
-        const op = getPaymentOperator(p, b.revisions);
-        return op === workerFilter;
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
+        return matchWorkerLocal(op, workerFilter);
       }
       return true;
     }) || [];
@@ -1703,7 +1774,10 @@ export default function DailyHisab({
     const todayRevisions = b.revisions?.filter(r => {
       const matchDate = safeDateStr(r.timestamp) === dateFilter;
       if (!matchDate) return false;
-      if (workerFilter && workerFilter !== 'All' && r.operator !== workerFilter) return false;
+      if (workerFilter && workerFilter !== 'All') {
+        const op = r.operator && r.operator !== 'System' ? r.operator : b.workerId;
+        return matchWorkerLocal(op, workerFilter);
+      }
       return true;
     }) || [];
 
@@ -1720,6 +1794,11 @@ export default function DailyHisab({
 
       if (r.depositDetails && r.depositDetails.difference > 0) {
         collectionsCount++;
+      }
+
+      const hasRefund = r.refundDetails?.amount > 0 || (r.actionType === 'DropOff' && b.settlement?.refundAmount > 0 && !r.refundDetails);
+      if (hasRefund) {
+        refundsCount++;
       }
     });
   });
@@ -1924,8 +2003,9 @@ export default function DailyHisab({
             disabled={!isAdmin}
           >
             {isAdmin && <option value="All">All Workers</option>}
-            <option value="Ramesh Kumar">Ramesh Kumar</option>
-            <option value="Suresh Singh">Suresh Singh</option>
+            {(users || []).filter(u => u.role !== 'admin').map(u => (
+              <option key={u._id} value={u.name}>{u.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -2066,28 +2146,33 @@ export default function DailyHisab({
           let refundOnline = 0;
           let refundCard = 0;
           let refundVikas = 0;
-          if (b.refundDetails) {
-            const refundEntries = Array.isArray(b.refundDetails) ? b.refundDetails : [b.refundDetails];
-            refundEntries.forEach(r => {
-              if (r.status === 'Completed' && r.amount > 0) {
-                totalRefundAmt += r.amount;
-                if (r.method === 'Cash') {
-                  refundCash += r.amount;
-                } else if (r.method === 'Card') {
-                  refundCard += r.amount;
-                } else if (r.method === 'Vikas') {
-                  refundVikas += r.amount;
-                } else if (r.method === 'Mixed') {
-                  const split = parseMixedRef(r.notes);
+          if (b.revisions && b.revisions.length > 0) {
+            b.revisions.forEach(r => {
+              if (r.refundDetails && r.refundDetails.amount > 0) {
+                totalRefundAmt += r.refundDetails.amount;
+                const method = r.refundDetails.method || 'Cash';
+                if (method === 'Cash') refundCash += r.refundDetails.amount;
+                else if (method === 'Card') refundCard += r.refundDetails.amount;
+                else if (method === 'Vikas') refundVikas += r.refundDetails.amount;
+                else if (method === 'Mixed') {
+                  const split = parseMixedRef(r.refundDetails.notes);
                   refundCash += split.cash;
                   refundOnline += split.online;
                   refundCard += split.card;
                   refundVikas += split.vikas;
-                } else {
-                  refundOnline += r.amount;
-                }
+                } else refundOnline += r.refundDetails.amount;
               }
             });
+          }
+
+          // Fallback for old drop-offs where refundDetails was stripped by schema bug
+          if (totalRefundAmt === 0 && b.settlement?.refundAmount > 0) {
+            totalRefundAmt = b.settlement.refundAmount;
+            const fallbackMode = b.refundDetails?.method || b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+            if (['Cash', 'Cash Refund'].includes(fallbackMode)) refundCash = totalRefundAmt;
+            else if (['Card', 'Card Refund'].includes(fallbackMode)) refundCard = totalRefundAmt;
+            else if (['Vikas', 'Vikas Refund'].includes(fallbackMode)) refundVikas = totalRefundAmt;
+            else refundOnline = totalRefundAmt;
           }
 
           // 5. Net Collection & Outstanding Due
@@ -2096,7 +2181,7 @@ export default function DailyHisab({
 
           const isExpanded = expandedBookingId === b.bookingId;
 
-          const totalPaidAllDays = (b.paymentCollection?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0) - (b.refundDetails?.status === 'Completed' ? (b.refundDetails?.amount || 0) : 0);
+          const totalPaidAllDays = (b.paymentCollection?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0) - totalRefundAmt;
 
           return (
             <div key={b.bookingId} className="hisab-item-card" style={{ position: 'relative' }}>
@@ -2130,12 +2215,19 @@ export default function DailyHisab({
                       <span className="hisab-pill plan">{b.selectedPlan?.planType || '24-Hour'}</span>
                       <span className="hisab-pill fuel">{fuel}</span>
                       <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={10} />{zone}</span>
+                      <span className="hisab-pill" style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 600 }} title="Booked / Handled By">
+                        <User size={10} color="#6366f1" />Op: {getWorkerName(b.workerId || b.revisions?.[0]?.operator)}
+                      </span>
                       <span className={`hisab-pill status-${(b.status || '').toLowerCase()}`}>{b.status}</span>
 {(b.replacements && b.replacements.length > 0) && (
-  <span className="hisab-pill" style={{ background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>[Replaced]</span>
+  <span className="hisab-pill" style={{ background: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#b45309', border: '1px solid #fcd34d', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold' }}>
+    <RotateCw size={10} /> REPLACED
+  </span>
 )}
 {b.status !== 'Extended' && ((b.revisions && b.revisions.some(r => r.actionType === 'Extend')) || (b.extensionHistory && b.extensionHistory.length > 0)) && (
-  <span className="hisab-pill" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>[Extended]</span>
+  <span className="hisab-pill" style={{ background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', color: '#4338ca', border: '1px solid #a5b4fc', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold' }}>
+    <Clock size={10} /> EXTENDED
+  </span>
 )}
                       {(() => {
                         const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
@@ -2356,7 +2448,7 @@ export default function DailyHisab({
                                 Assigned Worker
                               </div>
                               <div style={{ fontWeight: 700, color: '#cbd5e1', fontSize: '0.82rem' }}>
-                                {b.workerId || 'System'}
+                                {getWorkerName(b.workerId)}
                               </div>
                             </div>
 
@@ -2510,9 +2602,23 @@ export default function DailyHisab({
                               </a>
                             </span>
                           </div>
+                          <div className="hisab-detail-row">
+                            <span className="hisab-detail-label">Booked By (Worker/Admin)</span>
+                            <span className="hisab-detail-val" style={{ fontWeight: 700, color: '#2563eb' }}>
+                              {getWorkerName(b.workerId || b.revisions?.[0]?.operator)}
+                            </span>
+                          </div>
+                          {b.handover?.operator && (
+                            <div className="hisab-detail-row">
+                              <span className="hisab-detail-label">Handover By</span>
+                              <span className="hisab-detail-val" style={{ fontWeight: 600, color: '#059669' }}>
+                                {getWorkerName(b.handover.operator)}
+                              </span>
+                            </div>
+                          )}
                           {b.status === 'Completed' && (
-                            <div className="hisab-returned-banner" style={{ margin: '8px 0', fontSize: '0.8rem' }}>
-                              Returned to: {b.dropDetails?.operator || b.workerId || 'System'}
+                            <div className="hisab-returned-banner" style={{ margin: '8px 0', fontSize: '0.8rem', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '6px 10px', borderRadius: '6px', fontWeight: 600 }}>
+                              Returned & Closed by: {getWorkerName(b.dropDetails?.operator || b.workerId)}
                             </div>
                           )}
                         </div>
@@ -2660,7 +2766,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {r.cash} | U: {r.upi} | V: {r.vikas}</span>
-                                  <span>Op: {r.operator}</span>
+                                  <span>Op: {getWorkerName(r.operator)}</span>
                                 </div>
                               </div>
                             ))}
@@ -2685,7 +2791,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {d.cash} | U: {d.upi} | V: {d.vikas}</span>
-                                  <span>Op: {d.operator}</span>
+                                  <span>Op: {getWorkerName(d.operator)}</span>
                                 </div>
                               </div>
                             ))}
@@ -2710,7 +2816,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {ref.cash} | U: {ref.upi} | V: {ref.vikas}</span>
-                                  <span>Op: {ref.operator}</span>
+                                  <span>Op: {getWorkerName(ref.operator)}</span>
                                 </div>
                               </div>
                             ))}

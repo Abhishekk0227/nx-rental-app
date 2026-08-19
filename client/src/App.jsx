@@ -254,15 +254,24 @@ export default function App() {
   };
 
   const handleDropOff = async (bookingId, dropOffData) => {
-    if (!backendActive) return;
+    if (!backendActive) return { success: false, message: 'Backend inactive' };
     try {
       const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${bookingId}/dropoff`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(dropOffData)
       });
-      if (res.ok) fetchInitialData();
-    } catch (err) { console.error(err); }
+      if (res.ok) {
+        fetchInitialData();
+        return { success: true };
+      } else {
+        const err = await res.json();
+        return { success: false, message: err.message || 'Failed to complete drop off' };
+      }
+    } catch (err) { 
+      console.error(err);
+      return { success: false, message: err.message };
+    }
   };
 
   const handleCancelBooking = async (bookingId) => {
@@ -359,7 +368,7 @@ export default function App() {
             userRole={currentUser?.role || 'worker'}
             currentWorker={currentUser?.name || ''}
             vehicles={vehicles} bookings={bookings}
-            zones={zones}
+            zones={zones} users={users}
             onRecordDeposit={handleRecordDeposit}
           />
         } />

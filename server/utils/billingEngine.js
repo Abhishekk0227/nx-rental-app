@@ -173,11 +173,26 @@ export function calculateSettlement({ actualBill = 0, rentalPaid = 0, depositHel
  */
 export function getActiveStartMeter(booking) {
   if (!booking) return 0;
+  
+  // 1. Check native replacements array
   const replacements = booking.replacements || [];
   if (replacements.length > 0) {
     const lastRep = replacements[replacements.length - 1];
-    return Number(lastRep.newVehicleStartingMeter) || 0;
+    if (lastRep && lastRep.newVehicleStartingMeter !== undefined) {
+      return Number(lastRep.newVehicleStartingMeter);
+    }
   }
+
+  // 2. Fallback to revisions array (if native array is missing but replace happened)
+  const replaceRevisions = (booking.revisions || []).filter(r => r.actionType === 'Replace');
+  if (replaceRevisions.length > 0) {
+    const lastRev = replaceRevisions[replaceRevisions.length - 1];
+    if (lastRev && lastRev.meterDetails && lastRev.meterDetails.newVehicleStartingMeter !== undefined) {
+      return Number(lastRev.meterDetails.newVehicleStartingMeter);
+    }
+  }
+
+  // 3. Fallback to original pickup meter
   return Number(booking.pickupDetails?.odometerStart) || Number(booking.handover?.startMeter) || 0;
 }
 

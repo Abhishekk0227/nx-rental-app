@@ -116,15 +116,17 @@ const bookingSchema = new mongoose.Schema({
   }],
 
   depositDetails: {
-    mode: { type: String, enum: ['Cash', 'Online', 'Mixed', 'Vikas'], default: 'Cash' },
+    mode: { type: String, default: 'Cash' },
     cashAmount: { type: Number, default: 0, set: Math.round },
     onlineAmount: { type: Number, default: 0, set: Math.round },
+    cardAmount: { type: Number, default: 0 },
     vikasAmount: { type: Number, default: 0, set: Math.round }
   },
 
   // ─── Payment mixed totals (derived from paymentCollection) ─────────────────
   cashAmount: { type: Number, default: 0, set: Math.round },
   onlineAmount: { type: Number, default: 0, set: Math.round },
+  cardAmount: { type: Number, default: 0 },
   vikasAmount: { type: Number, default: 0, set: Math.round },
 
   // ─── Drop-Off ──────────────────────────────────────────────────────────────
@@ -157,7 +159,7 @@ const bookingSchema = new mongoose.Schema({
     depositHeld: { type: Number, default: 0, set: Math.round },
     depositAdjustment: { type: Number, default: 0, set: Math.round },
     depositRefund: { type: Number, default: 0, set: Math.round },
-    depositRefundMode: { type: String, enum: ['Full', 'Partial', 'No Refund', ''], default: '' },
+    depositRefundMode: { type: String, default: '' },
     depositRefundReason: { type: String, default: '' },
     remainingToPay: { type: Number, default: 0, set: Math.round },    // = outstandingRent at settlement time
     collectAmount: { type: Number, default: 0, set: Math.round },
@@ -227,8 +229,11 @@ const bookingSchema = new mongoose.Schema({
         rentalCash: { type: Number, default: 0, set: Math.round },
         rentalOnline: { type: Number, default: 0, set: Math.round },
         rentalCard: { type: Number, default: 0, set: Math.round },
+        rentalVikas: { type: Number, default: 0 },
         depositCash: { type: Number, default: 0, set: Math.round },
-        depositOnline: { type: Number, default: 0, set: Math.round }
+        depositOnline: { type: Number, default: 0 },
+        depositCard: { type: Number, default: 0 },
+        depositVikas: { type: Number, default: 0, set: Math.round }
       }
     },
 
@@ -244,7 +249,15 @@ const bookingSchema = new mongoose.Schema({
       cashSplit: { type: Number, set: Math.round },
       onlineSplit: { type: Number, set: Math.round },
       cardSplit: { type: Number, set: Math.round },
+      vikasSplit: Number,
       remarks: String
+    },
+    refundDetails: {
+      amount: Number,
+      status: String,
+      method: String,
+      notes: String,
+      timestamp: Date
     },
     depositDetails: {
       oldDeposit: { type: Number, set: Math.round },
@@ -327,6 +340,7 @@ bookingSchema.pre('save', async function (next) {
   let cash = 0;
   let online = 0;
   let card = 0;
+  let vikas = 0;
   if (this.paymentCollection?.length > 0) {
     this.paymentCollection.forEach(p => {
       if (p.mode === 'Cash') {
@@ -334,13 +348,21 @@ bookingSchema.pre('save', async function (next) {
       } else if (p.mode === 'Mixed') {
         cash += p.cashAmount || 0;
         online += p.onlineAmount || 0;
+        card += p.cardAmount || 0;
+        vikas += p.vikasAmount || 0;
       } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
         online += p.onlineAmount || p.amount || 0;
+      } else if (p.mode === 'Card') {
+        card += p.cardAmount || p.amount || 0;
+      } else if (p.mode === 'Vikas') {
+        vikas += p.vikasAmount || p.amount || 0;
       }
     });
   }
   this.cashAmount = customRound(cash);
   this.onlineAmount = customRound(online);
+  this.cardAmount = customRound(card);
+  this.vikasAmount = customRound(vikas);
 
   next();
 });

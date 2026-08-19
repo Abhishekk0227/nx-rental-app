@@ -237,7 +237,7 @@ export default function BookedVehicles({
   const [statusFilter, setStatusFilter] = useState('All');
   const [zoneFilter, setZoneFilter] = useState('All');
   const [sortFilter, setSortFilter] = useState('Latest Booking');
-  
+
   const [serverBookings, setServerBookings] = useState([]);
   const [isSearchingServer, setIsSearchingServer] = useState(false);
   const [visibleCount, setVisibleCount] = useState(20);
@@ -250,7 +250,7 @@ export default function BookedVehicles({
   useEffect(() => {
     // Only search server if looking for history or specific search terms
     const needsServerFetch = debouncedSearch.trim().length > 0 || ['Completed', 'Cancelled', 'All Bookings'].includes(statusFilter);
-    
+
     if (!needsServerFetch) {
       setServerBookings([]); // Use active bookings from props
       return;
@@ -261,7 +261,7 @@ export default function BookedVehicles({
       try {
         const token = localStorage.getItem('token');
         let url = `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings?limit=100`; // Limit to prevent massive payload
-        
+
         if (debouncedSearch) url += `&search=${encodeURIComponent(debouncedSearch)}`;
         if (statusFilter !== 'All' && statusFilter !== 'All Bookings' && statusFilter !== 'Active Bookings') {
           url += `&status=${encodeURIComponent(statusFilter)}`;
@@ -272,7 +272,7 @@ export default function BookedVehicles({
         if (res.ok) {
           const data = await res.json();
           // API returns { data, total, page, totalPages } when limit is passed
-          setServerBookings(data.data || data); 
+          setServerBookings(data.data || data);
         }
       } catch (err) {
         console.error('Failed to fetch historical bookings:', err);
@@ -284,8 +284,8 @@ export default function BookedVehicles({
     fetchServerData();
   }, [debouncedSearch, statusFilter, zoneFilter]);
 
-  const sourceBookings = (debouncedSearch.trim().length > 0 || ['Completed', 'Cancelled', 'All Bookings'].includes(statusFilter)) 
-    ? serverBookings 
+  const sourceBookings = (debouncedSearch.trim().length > 0 || ['Completed', 'Cancelled', 'All Bookings'].includes(statusFilter))
+    ? serverBookings
     : bookings;
 
   // Filter Bar state
@@ -671,77 +671,81 @@ export default function BookedVehicles({
       cashIn += Number(b.securityDeposit || 0);
     }
 
-    // Payments Split
     if (b.paymentCollection && b.paymentCollection.length > 0) {
       b.paymentCollection.forEach(p => {
-        if (p.mode === 'Cash') {
-          cashIn += p.amount;
-        } else if (['UPI', 'Online'].includes(p.mode)) {
-          onlineIn += p.amount;
-        } else if (p.mode === 'Vikas') {
-          vikasIn += p.amount;
-        } else if (p.mode === 'Mixed') {
-          if (p.reference && p.reference.includes('Cash:')) {
-            const cashPart = p.reference.match(/Cash:\s*(\d+)/);
-            const onlinePart = p.reference.match(/Online:\s*(\d+)/);
+        if (p.mode === 'Cash') cashIn += p.amount;
+        else if (['UPI', 'Online'].includes(p.mode)) onlineIn += p.amount;
+        else if (p.mode === 'Vikas') vikasIn += p.amount;
+        else if (p.mode === 'Mixed') {
+          cashIn += Number(p.cashAmount || 0);
+          onlineIn += Number(p.onlineAmount || 0);
+          vikasIn += Number(p.vikasAmount || 0);
+          if (!p.cashAmount && !p.onlineAmount && p.reference) {
+            const cashPart = p.reference.match(/Cash:\s*(\d+)/i);
+            const onlinePart = p.reference.match(/Online:\s*(\d+)/i);
             if (cashPart) cashIn += Number(cashPart[1]);
             if (onlinePart) onlineIn += Number(onlinePart[1]);
-          } else {
-            cashIn += p.amount / 2;
-            onlineIn += p.amount / 2;
           }
         }
       });
     } else if (b.advancePaid > 0) {
-      if (b.paymentMethod === 'Cash') {
-        cashIn += b.advancePaid;
-      } else {
-        onlineIn += b.advancePaid;
-      }
+      if (b.paymentMethod === 'Cash') cashIn += b.advancePaid;
+      else onlineIn += b.advancePaid;
     }
 
-    // Settlements/Refunds mixed (Outflows)
-    let refundAmt = 0;
-    let refundMethod = 'Cash';
-
-    if (b.refundDetails && Number(b.refundDetails.amount) > 0) {
-      refundAmt = Number(b.refundDetails.amount || 0);
-      refundMethod = b.refundDetails.method || 'Cash';
-    } else if (b.settlement) {
-      refundAmt = Number(b.settlement.refundAmount || b.settlement.depositRefunded || b.settlement.depositRefund || 0);
-      refundMethod = b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
-    }
-
-    if (refundAmt === 0 && b.revisions) {
+    if (b.revisions && b.revisions.length > 0) {
       b.revisions.forEach(rev => {
         if (rev.refundDetails && Number(rev.refundDetails.amount) > 0) {
-          refundAmt += Number(rev.refundDetails.amount);
-          if (rev.refundDetails.method) refundMethod = rev.refundDetails.method;
+          const amt = Number(rev.refundDetails.amount);
+          const method = rev.refundDetails.method || 'Cash';
+          if (['Cash', 'Cash Refund'].includes(method)) cashOut += amt;
+          else if (['Vikas', 'Vikas Refund'].includes(method)) vikasOut += amt;
+          else if (['Mixed', 'Mixed Refund'].includes(method)) {
+            const notes = rev.refundDetails.notes || '';
+            const cashP = notes.match(/Cash:\s*(\d+)/i);
+            const onlineP = notes.match(/Online:\s*(\d+)/i);
+            const vikasP = notes.match(/Vikas:\s*(\d+)/i);
+            if (cashP || onlineP || vikasP) {
+              if (cashP) cashOut += Number(cashP[1]);
+              if (onlineP) onlineOut += Number(onlineP[1]);
+              if (vikasP) vikasOut += Number(vikasP[1]);
+            } else {
+              cashOut += Math.round(amt / 2);
+              onlineOut += amt - Math.round(amt / 2);
+            }
+          } else {
+            onlineOut += amt;
+          }
         }
       });
-    }
 
-    if (refundAmt > 0) {
-      if (['Cash', 'Cash Refund'].includes(refundMethod)) {
-        cashOut += refundAmt;
-      } else if (['Vikas', 'Vikas Refund'].includes(refundMethod)) {
-        vikasOut += refundAmt;
-      } else if (['Mixed', 'Mixed Refund'].includes(refundMethod)) {
-        const cashP = Number(b.refundDetails?.cashAmount || 0);
-        const onlineP = Number(b.refundDetails?.onlineAmount || 0);
-        if (cashP > 0 || onlineP > 0) {
-          cashOut += cashP;
-          onlineOut += onlineP;
-        } else {
-          cashOut += Math.round(refundAmt / 2);
-          onlineOut += refundAmt - Math.round(refundAmt / 2);
-        }
-      } else {
-        onlineOut += refundAmt;
+      // Fallback for old DropOffs where refundDetails was stripped by schema bug
+      if (cashOut === 0 && onlineOut === 0 && vikasOut === 0 && b.settlement?.refundAmount > 0) {
+        const amt = Number(b.settlement.refundAmount);
+        const method = b.refundDetails?.method || b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+        if (['Cash', 'Cash Refund'].includes(method)) cashOut += amt;
+        else if (['Vikas', 'Vikas Refund'].includes(method)) vikasOut += amt;
+        else onlineOut += amt;
+      }
+
+    } else {
+      let refundAmt = 0;
+      let refundMethod = 'Cash';
+      if (b.refundDetails && Number(b.refundDetails.amount) > 0) {
+        refundAmt = Number(b.refundDetails.amount || 0);
+        refundMethod = b.refundDetails.method || 'Cash';
+      } else if (b.settlement) {
+        refundAmt = Number(b.settlement.refundAmount || b.settlement.depositRefunded || b.settlement.depositRefund || 0);
+        refundMethod = b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+      }
+      if (refundAmt > 0) {
+        if (['Cash', 'Cash Refund'].includes(refundMethod)) cashOut += refundAmt;
+        else if (['Vikas', 'Vikas Refund'].includes(refundMethod)) vikasOut += refundAmt;
+        else onlineOut += refundAmt;
       }
     }
 
-    const r2 = (val) => Math.round((Number(val) || 0) * 100) / 100;
+    const r2 = (val) => Math.round(Number(val) || 0);
     return {
       cashIn: r2(cashIn),
       onlineIn: r2(onlineIn),
@@ -973,7 +977,7 @@ export default function BookedVehicles({
         const baseRate = plan === 'Hourly' ? extraHourRate : plan === '12-Hour' ? 350 : (booking.perDayRate || 500);
         rate = units * baseRate;
       }
-      setExtensionExtraCharges(rate);
+      setExtensionExtraCharges(Math.round(rate));
     } else {
       setExtensionExtraCharges(0);
     }
@@ -1070,12 +1074,20 @@ export default function BookedVehicles({
     setEditFuelIncluded(booking.handover?.fuelIncluded || false);
     setEditDiscountAmount(booking.discount || 0);
     setEditDiscountType('₹');
-    setEditBaseFare(booking.baseFare || 0);
-    setEditAdvancePaid(booking.advancePaid || 0);
-    setEditPaymentMethod(booking.paymentMethod || 'Cash');
+    setEditBaseFare(booking.baseFare || booking.rentalCost || 0);
+    setEditAdvancePaid(booking.rentalPaid !== undefined ? booking.rentalPaid : (booking.advancePaid || 0));
+    const pMode = booking.paymentMode || booking.paymentMethod || 'Cash';
+    setEditPaymentMethod(pMode);
     setEditAdditionalDeposit(0);
-    setEditMixedCash(0);
-    setEditMixedOnline(0);
+    
+    const firstMixed = (booking.paymentCollection || []).find(p => p.mode === 'Mixed');
+    if (pMode === 'Mixed' && firstMixed) {
+      setEditMixedCash(firstMixed.cashAmount || 0);
+      setEditMixedOnline(firstMixed.onlineAmount || 0);
+    } else {
+      setEditMixedCash(0);
+      setEditMixedOnline(0);
+    }
     const dDetails = booking.depositDetails || {};
     setEditDepositPaymentMode(dDetails.mode || 'Cash');
     setEditDepositMixedCash(dDetails.cashAmount || (dDetails.mode === 'Cash' ? booking.securityDeposit : 0));
@@ -1087,10 +1099,10 @@ export default function BookedVehicles({
     setSelectedBooking(booking);
     setOverrideBaseFare(booking.baseFare || 0);
     setOverrideDiscount(booking.discount || 0);
-    setOverrideAdvancePaid(booking.advancePaid || 0);
+    setOverrideAdvancePaid(booking.rentalPaid !== undefined ? booking.rentalPaid : (booking.advancePaid || 0));
     setOverrideSecurityDeposit(booking.securityDeposit || 0);
     setOverrideFinalAmount(booking.finalAmount || 0);
-    setOverridePaymentMethod(booking.paymentMethod || 'Cash');
+    setOverridePaymentMethod(booking.paymentMode || booking.paymentMethod || 'Cash');
     setOverrideStatus(booking.status || 'Reserved');
     setActiveModal('override');
   };
@@ -1371,6 +1383,8 @@ export default function BookedVehicles({
 
     const newDeposit = newVehicle.depositSettings?.amount ?? (isCar ? 5000 : isBike ? 2000 : 1000);
 
+    newBaseFare = Math.round(newBaseFare);
+
     const rentDiff = newBaseFare - oldBaseFare;
     const depositDiff = newDeposit - oldDeposit;
     const totalDiff = rentDiff + depositDiff;
@@ -1434,9 +1448,9 @@ export default function BookedVehicles({
       mode: extensionPaymentMode,
       amount: Number(extensionExtraCharges),
       cashAmount: extensionPaymentMode === 'Mixed' ? Number(extensionMixedCash) : extensionPaymentMode === 'Cash' ? Number(extensionExtraCharges) : 0,
-      onlineAmount: extensionPaymentMode === 'Mixed' ? Number(extensionMixedOnline) : ['UPI', 'Online', 'Card'].includes(extensionPaymentMode) ? Number(extensionExtraCharges) : 0,
+      onlineAmount: extensionPaymentMode === 'Mixed' ? Number(extensionMixedOnline) : ['UPI', 'Online'].includes(extensionPaymentMode) ? Number(extensionExtraCharges) : 0,
       vikasAmount: extensionPaymentMode === 'Vikas' ? Number(extensionExtraCharges) : 0,
-      cardAmount: 0
+      cardAmount: extensionPaymentMode === 'Card' ? Number(extensionExtraCharges) : 0
     } : null;
 
     const revisionOverrides = {
@@ -1635,7 +1649,7 @@ export default function BookedVehicles({
           }
         }
       }
-      
+
       let activeModes = [];
       if (newCashDeposit > 0) activeModes.push('Cash');
       if (newOnlineDeposit > 0) activeModes.push('Online');
@@ -1886,19 +1900,29 @@ export default function BookedVehicles({
       ? `Cash: ${editMixedCash}, Online: ${editMixedOnline}`
       : 'Advance Collection';
 
+    const newCashAmt = editPaymentMethod === 'Mixed' ? Number(editMixedCash) : (editPaymentMethod === 'Cash' ? Number(editAdvancePaid) : 0);
+    const newOnlineAmt = editPaymentMethod === 'Mixed' ? Number(editMixedOnline) : (['UPI', 'Online', 'Bank Transfer'].includes(editPaymentMethod) ? Number(editAdvancePaid) : 0);
+    const newVikasAmt = editPaymentMethod === 'Vikas' ? Number(editAdvancePaid) : 0;
+
     if (updatedPaymentCollection.length > 0) {
       updatedPaymentCollection[0] = {
         ...updatedPaymentCollection[0],
         amount: Number(editAdvancePaid),
         mode: editPaymentMethod,
-        reference: upfrontPaymentRef
+        reference: upfrontPaymentRef,
+        cashAmount: newCashAmt,
+        onlineAmount: newOnlineAmt,
+        vikasAmount: newVikasAmt
       };
     } else {
       updatedPaymentCollection = [{
         amount: Number(editAdvancePaid),
         mode: editPaymentMethod,
         date: new Date().toISOString(),
-        reference: upfrontPaymentRef
+        reference: upfrontPaymentRef,
+        cashAmount: newCashAmt,
+        onlineAmount: newOnlineAmt,
+        vikasAmount: newVikasAmt
       }];
     }
 
@@ -2249,6 +2273,7 @@ export default function BookedVehicles({
       cashAmount: collectMode === 'Mixed' ? Number(collectCashAmount) : collectMode === 'Cash' ? Number(collectAmount) : 0,
       onlineAmount: collectMode === 'Mixed' ? Number(collectOnlineAmount) : ['UPI', 'Online', 'Bank Transfer'].includes(collectMode) ? Number(collectAmount) : 0,
       cardAmount: collectMode === 'Mixed' ? Number(collectCardAmount) : collectMode === 'Card' ? Number(collectAmount) : 0,
+      vikasAmount: collectMode === 'Vikas' ? Number(collectAmount) : 0,
       revisions: updatedRevisions
     };
 
@@ -2345,7 +2370,7 @@ export default function BookedVehicles({
 
     const fmtNum = (val) => {
       const num = Number(val) || 0;
-      return (Math.round(num * 100) / 100).toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      return Math.round(num).toLocaleString('en-IN');
     };
 
     const snapshot = getBookingFinancialSnapshot(booking);
@@ -2632,7 +2657,7 @@ export default function BookedVehicles({
       : (selectedBooking.selectedPlan?.extraHourCharge || fallbackExtraHourRate);
 
     // Minute-based extra hour billing calculation
-    const extraHourCharge = (chargeableHrs * extraHourRate) + (chargeableMinsPart * (extraHourRate / 60));
+    const extraHourCharge = Math.round((chargeableHrs * extraHourRate) + (chargeableMinsPart * (extraHourRate / 60)));
 
     // 3. Extra KM Rate (Primary: persisted extraKmCharge. Fallback: resolve from active vehicle pricing plans)
     const fallbackExtraKmRate = activeVehiclePlan.extraKmCharge || (isCar ? 12 : isBike ? 8 : 5);
@@ -2663,14 +2688,14 @@ export default function BookedVehicles({
     if (isScootyFuel) {
       // Scooty with fuel logic: No Allowed KM / Extra KM / Extra KM charges.
       // Every km is chargeable, billed at fuelChargePerKm (from vehicle pricing plan)
-      distanceCharge = totalKmUsedRounded * fuelChargePerKm;
+      distanceCharge = Math.round(totalKmUsedRounded * fuelChargePerKm);
     } else {
       allowedKmLimit = Math.max(freeKmLimit, actualHoursDecimal * 10);
       allowedKmLimitRounded = customRoundKm(allowedKmLimit);
       freeKmLimitTotal = allowedKmLimit + Number(dropAddFreeKm || 0);
       extraKm = Math.max(0, totalKmUsed - freeKmLimitTotal);
       extraKmRounded = customRoundKm(extraKm);
-      extraKmCharge = extraKmRounded * extraKmRate;
+      extraKmCharge = Math.round(extraKmRounded * extraKmRate);
     }
 
     // Accessories Checklist computations (Toolkit, First Aid, Spare Tyre, EV Charger logic REMOVED)
@@ -2708,7 +2733,7 @@ export default function BookedVehicles({
       // Standard Formula: currentRentalCost + extra time + extra km + damages + accessories + other - discount
       actualRentalBill = currentRentalCost + extraHourCharge + extraKmCharge + manualChargesTotal + accessoryChargeTotal - waiverDiscount;
     }
-    actualRentalBill = Math.max(0, actualRentalBill);
+    actualRentalBill = Math.max(0, Math.round(actualRentalBill));
 
     // Settlement Logic (Corrections Section 1)
     const rentalDue = actualRentalBill - rentalPaid;
@@ -2976,8 +3001,12 @@ export default function BookedVehicles({
     }
   }, [calc.remainingCollection, calc.depositRefund, selectedBooking, viewState]);
 
-  const handleDropCompleteSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleDropCompleteSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!dropReturnDate || !dropEndMeter) {
       return alert('Please enter Actual Return Time and End Meter Reading before completing the return.');
     }
@@ -2991,22 +3020,25 @@ export default function BookedVehicles({
       return alert('Please confirm the settlement before completing the return.');
     }
 
+    setIsSubmitting(true);
     const isRefund = calc.depositRefund > 0;
     const reqVal = isRefund ? calc.depositRefund : calc.remainingCollection;
 
     // Validate payment/refund mode is selected
     if (isRefund && reqVal > 0 && !dropPaymentMethod) {
+      setIsSubmitting(false);
       return alert('Please select a Refund Mode (Cash, UPI, Card, Mixed) before submitting.');
     }
     if (!isRefund && reqVal > 0 && !dropPaymentMethod) {
+      setIsSubmitting(false);
       return alert('Please select a Payment Mode (Cash, UPI, Card, Mixed) before submitting.');
     }
 
-    // Mixed mixed details
     let mixedDetails = '';
     if (dropPaymentMethod === 'Mixed' || dropPaymentMethod === 'Mixed Refund') {
       const sum = Number(dropCashReceived) + Number(dropOnlineReceived);
       if (Math.abs(sum - reqVal) > 0.01) {
+        setIsSubmitting(false);
         return alert(`Mixed mixed error: Cash Amount (₹${dropCashReceived}) + Online Amount (₹${dropOnlineReceived}) must equal ${isRefund ? 'refund' : 'collect'} amount (₹${reqVal}).`);
       }
       mixedDetails = `Cash: ${dropCashReceived}, Online: ${dropOnlineReceived}`;
@@ -3016,9 +3048,9 @@ export default function BookedVehicles({
       mode: dropPaymentMethod === 'Mixed' ? 'Mixed' : dropPaymentMethod,
       amount: reqVal,
       cashAmount: dropPaymentMethod === 'Mixed' ? Number(dropCashReceived) : dropPaymentMethod === 'Cash' ? reqVal : 0,
-      onlineAmount: dropPaymentMethod === 'Mixed' ? Number(dropOnlineReceived) : ['UPI', 'Online', 'Card'].includes(dropPaymentMethod) ? reqVal : 0,
+      onlineAmount: dropPaymentMethod === 'Mixed' ? Number(dropOnlineReceived) : ['UPI', 'Online'].includes(dropPaymentMethod) ? reqVal : 0,
       vikasAmount: ['Vikas'].includes(dropPaymentMethod) ? reqVal : 0,
-      cardAmount: 0,
+      cardAmount: ['Card'].includes(dropPaymentMethod) ? reqVal : 0,
       transactionId: dropCollectTxnId || `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
       reference: dropPaymentMethod === 'Mixed' ? mixedDetails : dropCollectNotes,
       timestamp: new Date().toISOString()
@@ -3113,16 +3145,23 @@ export default function BookedVehicles({
         depositRefunded: calc.depositRefund,
         collectAmount: calc.remainingCollection,
         refundAmount: calc.depositRefund,
+        refundMode: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'online Refund' ? 'UPI' : dropPaymentMethod === 'Card Refund' ? 'Card' : dropPaymentMethod === 'Vikas Refund' ? 'Vikas' : 'Cash'),
+        depositRefundMode: dropPaymentMethod === 'Mixed Refund' ? 'Mixed' : (dropPaymentMethod === 'online Refund' ? 'UPI' : dropPaymentMethod === 'Card Refund' ? 'Card' : dropPaymentMethod === 'Vikas Refund' ? 'Vikas' : 'Cash'),
         settlementStatus: calc.settlementStatus
       },
       workerId: currentWorker || 'System',
       revisions: [...(selectedBooking.revisions || []), dropRevision]
     };
 
-    onDropOff(selectedBooking.bookingId, payload);
-    setViewState('list');
-    setSelectedBooking(null);
-    alert('Vehicle return checklist closed successfully!');
+    const res = await onDropOff(selectedBooking.bookingId, payload);
+    setIsSubmitting(false);
+    if (res && res.success === false) {
+      alert(`Failed to complete drop off: ${res.message}`);
+    } else {
+      setViewState('list');
+      setSelectedBooking(null);
+      alert('Vehicle return checklist closed successfully!');
+    }
   };
 
   return (
@@ -3452,13 +3491,15 @@ export default function BookedVehicles({
                               {remainingTime.isOverdue ? 'OVERDUE' : b.status.toUpperCase()}
                             </span>
                             {(b.replacements && b.replacements.length > 0) && (
-                              <span className="badge" style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>
-                                [REPLACED]
+                              <span className="badge" style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: '12px', background: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#b45309', border: '1px solid #fcd34d', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                <RotateCw size={10} />
+                                REPLACED
                               </span>
                             )}
                             {b.status !== 'Extended' && ((b.revisions && b.revisions.some(r => r.actionType === 'Extend')) || (b.extensionHistory && b.extensionHistory.length > 0)) && (
-                              <span className="badge" style={{ fontSize: '0.65rem', padding: '2px 8px', borderRadius: '12px', background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>
-                                [EXTENDED]
+                              <span className="badge" style={{ fontSize: '0.65rem', padding: '3px 8px', borderRadius: '12px', background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', color: '#4338ca', border: '1px solid #a5b4fc', display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                                <Clock size={10} />
+                                EXTENDED
                               </span>
                             )}
 
@@ -3569,22 +3610,22 @@ export default function BookedVehicles({
                       background: 'rgba(0,0,0,0.1)'
                     }}>
                       <div style={{ padding: '6px', color: 'var(--status-available)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <Banknote size={13} /> Cash In: <strong>₹{(Math.round((flow.cashIn || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <Banknote size={13} /> Cash In: <strong>₹{Math.round(flow.cashIn || 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: 'var(--status-ongoing)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <Monitor size={13} /> Online In: <strong>₹{(Math.round((flow.onlineIn || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <Monitor size={13} /> Online In: <strong>₹{Math.round(flow.onlineIn || 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <User size={13} /> Vikas In: <strong>₹{(Math.round((flow.vikasIn || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <User size={13} /> Vikas In: <strong>₹{Math.round(flow.vikasIn || 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <Wallet size={13} /> Cash Out: <strong>₹{(Math.round((flow.cashOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <Wallet size={13} /> Cash Out: <strong>₹{Math.round(flow.cashOut || 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <Monitor size={13} /> Online Out: <strong>₹{(Math.round((flow.onlineOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <Monitor size={13} /> Online Out: <strong>₹{Math.round(flow.onlineOut || 0).toLocaleString('en-IN')}</strong>
                       </div>
                       <div style={{ padding: '6px', color: '#f43f5e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <User size={13} /> Vikas Out: <strong>₹{(Math.round((flow.vikasOut || 0) * 100) / 100).toLocaleString('en-IN')}</strong>
+                        <User size={13} /> Vikas Out: <strong>₹{Math.round(flow.vikasOut || 0).toLocaleString('en-IN')}</strong>
                       </div>
                     </div>
                   </div>
@@ -4405,45 +4446,47 @@ export default function BookedVehicles({
                                       }}>
 
                                         {/* Financial Changes (Old vs New) */}
-                                        <div>
-                                          <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#475569', fontSize: '0.75rem' }}>Financial Changes (Old vs New):</div>
-                                          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e2e8f0', fontSize: '0.75rem' }}>
-                                            <thead>
-                                              <tr style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
-                                                <th style={{ padding: '6px', textAlign: 'left', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>Category</th>
-                                                <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>Old</th>
-                                                <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>New</th>
-                                                <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold' }}>Diff</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff' }}>
-                                                <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0', fontWeight: '500' }}>Rental Cost</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.rentalCost}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.rentalCost}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', fontWeight: '500', color: (rev.difference?.rentalCost || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
-                                                  {(rev.difference?.rentalCost || 0) >= 0 ? `+₹${rev.difference.rentalCost}` : `-₹${Math.abs(rev.difference.rentalCost)}`}
-                                                </td>
-                                              </tr>
-                                              <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff' }}>
-                                                <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0', fontWeight: '500' }}>Deposit Held</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.deposit}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.deposit}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', fontWeight: '500', color: (rev.difference?.deposit || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
-                                                  {(rev.difference?.deposit || 0) >= 0 ? `+₹${rev.difference.deposit}` : `-₹${Math.abs(rev.difference.deposit)}`}
-                                                </td>
-                                              </tr>
-                                              <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff', fontWeight: 'bold' }}>
-                                                <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0' }}>Booking Value</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.bookingValue}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.bookingValue}</td>
-                                                <td style={{ padding: '6px', textAlign: 'right', color: (rev.difference?.bookingValue || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
-                                                  {(rev.difference?.bookingValue || 0) >= 0 ? `+₹${rev.difference.bookingValue}` : `-₹${Math.abs(rev.difference.bookingValue)}`}
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-                                        </div>
+                                        {(rev.oldValues && rev.newValues) && (
+                                          <div>
+                                            <div style={{ fontWeight: 'bold', marginBottom: '4px', color: '#475569', fontSize: '0.75rem' }}>Financial Changes (Old vs New):</div>
+                                            <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #e2e8f0', fontSize: '0.75rem' }}>
+                                              <thead>
+                                                <tr style={{ background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
+                                                  <th style={{ padding: '6px', textAlign: 'left', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>Category</th>
+                                                  <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>Old</th>
+                                                  <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold', borderRight: '1px solid #e2e8f0' }}>New</th>
+                                                  <th style={{ padding: '6px', textAlign: 'right', fontWeight: 'bold' }}>Diff</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff' }}>
+                                                  <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0', fontWeight: '500' }}>Rental Cost</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.rentalCost}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.rentalCost}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', fontWeight: '500', color: (rev.difference?.rentalCost || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
+                                                    {(rev.difference?.rentalCost || 0) >= 0 ? `+₹${rev.difference.rentalCost}` : `-₹${Math.abs(rev.difference.rentalCost)}`}
+                                                  </td>
+                                                </tr>
+                                                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff' }}>
+                                                  <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0', fontWeight: '500' }}>Deposit Held</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.deposit}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.deposit}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', fontWeight: '500', color: (rev.difference?.deposit || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
+                                                    {(rev.difference?.deposit || 0) >= 0 ? `+₹${rev.difference.deposit}` : `-₹${Math.abs(rev.difference.deposit)}`}
+                                                  </td>
+                                                </tr>
+                                                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#ffffff', fontWeight: 'bold' }}>
+                                                  <td style={{ padding: '6px', borderRight: '1px solid #e2e8f0' }}>Booking Value</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.oldValues.bookingValue}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', borderRight: '1px solid #e2e8f0' }}>₹{rev.newValues.bookingValue}</td>
+                                                  <td style={{ padding: '6px', textAlign: 'right', color: (rev.difference?.bookingValue || 0) >= 0 ? '#16a34a' : '#dc2626' }}>
+                                                    {(rev.difference?.bookingValue || 0) >= 0 ? `+₹${rev.difference.bookingValue}` : `-₹${Math.abs(rev.difference.bookingValue)}`}
+                                                  </td>
+                                                </tr>
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        )}
 
                                         {/* Visual Ledger Box Snapshot */}
                                         {rev.financialSnapshotAfterChange && (
@@ -6102,7 +6145,7 @@ export default function BookedVehicles({
                             <option value="" disabled>-- Select Payment Mode --</option>
                             <option value="Cash">Cash</option>
                             <option value="UPI">UPI</option>
-                            <option value="Card">Card</option>
+                            {/* <option value="Card">Card</option> */}
                             <option value="Vikas">Vikas</option>
                             <option value="Mixed">Mixed Split</option>
                           </select>
@@ -6202,7 +6245,7 @@ export default function BookedVehicles({
                             <option value="" disabled>-- Select Refund Mode --</option>
                             <option value="Cash Refund">Cash</option>
                             <option value="online Refund">UPI</option>
-                            <option value="Card Refund">Card</option>
+                            {/* <option value="Card Refund">Card</option> */}
                             <option value="Vikas Refund">Vikas</option>
                             <option value="Mixed Refund">Mixed Split</option>
                           </select>
@@ -6370,16 +6413,19 @@ export default function BookedVehicles({
                         color: '#ffffff',
                         background: calc.settlementStatus === 'Refund' ? 'var(--status-available)' : 'var(--secondary)',
                         borderRadius: '8px',
-                        cursor: (!dropReturnDate || !dropEndMeter) ? 'not-allowed' : 'pointer',
+                        cursor: (!dropReturnDate || !dropEndMeter || isSubmitting) ? 'not-allowed' : 'pointer',
                         boxShadow: '0 4px 6px rgba(0,0,0,0.15)',
                         transition: 'all 0.2s',
                         marginTop: '8px',
-                        opacity: (dropSettlementConfirmed && dropReturnDate && dropEndMeter) ? 1 : 0.65
+                        opacity: (dropSettlementConfirmed && dropReturnDate && dropEndMeter && !isSubmitting) ? 1 : 0.65
                       }}
                       onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.1)'}
                       onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+                      disabled={!dropReturnDate || !dropEndMeter || isSubmitting}
                     >
-                      {calc.settlementStatus === 'Refund' ? 'Complete Return & Process Refund' : 'Complete Return & Settle'}
+                      {isSubmitting 
+                        ? 'Submitting...' 
+                        : (calc.settlementStatus === 'Refund' ? 'Complete Return & Process Refund' : 'Complete Return & Settle')}
                     </button>
                   </div>
                 </div>
@@ -6969,11 +7015,11 @@ export default function BookedVehicles({
                       </div>
                       <div className="form-group">
                         <label>Expected return date</label>
-                        <input type="datetime-local" className="form-control" value={editExpectedDropDate} onChange={e => setEditExpectedDropDate(e.target.value)} required />
+                        <input type="datetime-local" className="form-control" value={editExpectedDropDate} disabled style={{ backgroundColor: 'rgba(255,255,255,0.05)', opacity: 0.7, cursor: 'not-allowed' }} />
                       </div>
                       <div className="form-group">
                         <label>Rental pricing plan</label>
-                        <select className="form-control" value={editPlanType} onChange={e => setEditPlanType(e.target.value)}>
+                        <select className="form-control" value={editPlanType} disabled style={{ backgroundColor: 'rgba(255,255,255,0.05)', opacity: 0.7, cursor: 'not-allowed' }}>
                           <option value="Hourly">Hourly plan</option>
                           <option value="12-Hour">12-Hour plan</option>
                           <option value="24-Hour">24-Hour plan</option>

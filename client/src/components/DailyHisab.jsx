@@ -1,6 +1,6 @@
 import { customRound } from '../utils/billingEngine';
 import React, { useState, useEffect } from 'react';
-import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock, Clock } from 'lucide-react';
+import { RefreshCw, Calendar, CheckCircle, DollarSign, Zap, BarChart2, Car, Bike, User, MapPin, Phone, ArrowRight, Lock, Clock, RotateCw } from 'lucide-react';
 
 // Embedded high-fidelity styles to match your design guidelines
 const rawStyles = `
@@ -697,14 +697,7 @@ const rawStyles = `
   }
 `;
 
-export default function DailyHisab({
-  userRole,
-  currentWorker,
-  vehicles,
-  bookings,
-  zones = [],
-  onRecordDeposit
-}) {
+export default function DailyHisab({ userRole, currentWorker, vehicles = [], bookings = [], zones = [], users = [], onRecordDeposit }) {
   const isAdmin = userRole === 'admin';
 
   // Get current local date string (YYYY-MM-DD)
@@ -842,22 +835,30 @@ export default function DailyHisab({
     }
   };
 
-  const getPaymentOperator = (p, revisions) => {
-    if (!revisions || revisions.length === 0) return 'System';
-    let closestRev = null;
-    let minDiff = Infinity;
-    revisions.forEach(r => {
-      if (!r.timestamp) return;
-      const diff = Math.abs(new Date(r.timestamp).getTime() - new Date(p.timestamp).getTime());
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestRev = r;
+  const getPaymentOperator = (p, revisions, defaultWorkerId = 'System') => {
+    if (p.workerId && p.workerId !== 'System') return p.workerId;
+    if (revisions && revisions.length > 0) {
+      let closestRev = null;
+      let minDiff = Infinity;
+      revisions.forEach(r => {
+        if (!r.timestamp) return;
+        const diff = Math.abs(new Date(r.timestamp).getTime() - new Date(p.timestamp).getTime());
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestRev = r;
+        }
+      });
+      if (minDiff < 30000 && closestRev && closestRev.operator && closestRev.operator !== 'System') {
+        return closestRev.operator;
       }
-    });
-    if (minDiff < 15000 && closestRev) {
-      return closestRev.operator || 'System';
     }
-    return 'System';
+    return defaultWorkerId && defaultWorkerId !== 'System' ? defaultWorkerId : 'System';
+  };
+
+  const getWorkerName = (idOrName) => {
+    if (!idOrName || idOrName === 'System') return 'System';
+    const found = users.find(u => u._id === idOrName || u.username === idOrName || u.name === idOrName);
+    return found?.name || idOrName;
   };
 
   // Helper to parse mixed payments mixed (e.g., "Cash: 100, Online: 200, Card: 300, Vikas: 400")
@@ -918,7 +919,7 @@ export default function DailyHisab({
       const todayPayments = b.paymentCollection?.filter(p => safeDateStr(p.timestamp) === dateFilter) || [];
       const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
       const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
-      const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+      const isRefundToday = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0);
 
       if (todayPayments.length === 0 && todayRevisions.length === 0 && !isRefundToday) {
         return;
@@ -930,16 +931,11 @@ export default function DailyHisab({
         hasWorkerActivity = true;
       } else {
         const hasPaymentByWorker = todayPayments.some(p => {
-          const op = getPaymentOperator(p, b.revisions);
+          const op = getPaymentOperator(p, b.revisions, b.workerId);
           return op === workerFilter;
         });
-        const hasRevisionByWorker = todayRevisions.some(r => r.operator === workerFilter);
-        let hasRefundByWorker = false;
-        if (isRefundToday) {
-          const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-          const refundOp = dropOffRev?.operator || b.workerId || 'System';
-          hasRefundByWorker = (refundOp === workerFilter);
-        }
+        const hasRevisionByWorker = todayRevisions.some(r => (r.operator && r.operator !== 'System' ? r.operator : b.workerId) === workerFilter);
+        let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && (r.operator && r.operator !== 'System' ? r.operator : b.workerId) === workerFilter);
         hasWorkerActivity = hasPaymentByWorker || hasRevisionByWorker || hasRefundByWorker;
       }
 
@@ -951,7 +947,7 @@ export default function DailyHisab({
 
       // Loop through individual payments
       todayPayments.forEach(p => {
-        const op = getPaymentOperator(p, b.revisions);
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
         if (workerFilter !== 'All' && op !== workerFilter) return;
 
         let cash = 0;
@@ -1019,6 +1015,16 @@ export default function DailyHisab({
             const curVikas = rev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0;
             const prevVikas = prevRev ? (prevRev.financialSnapshotAfterChange?.paymentBreakdown?.depositVikas || 0) : 0;
             vikas = Math.max(0, curVikas - prevVikas);
+
+            if (cash === 0 && online === 0 && card === 0 && vikas === 0) {
+              const split = parseMixedRef(rev.depositDetails.remarks || '');
+              if (split.cash > 0 || split.online > 0 || split.card > 0 || split.vikas > 0) {
+                cash = split.cash;
+                online = split.online;
+                card = split.card;
+                vikas = split.vikas;
+              }
+            }
           }
 
           depositCollections.cash += cash;
@@ -1034,27 +1040,24 @@ export default function DailyHisab({
       });
 
       // Loop through refunds today
-      if (isRefundToday) {
-        const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-        const op = dropOffRev?.operator || b.workerId || 'System';
+      todayRevisions.forEach(rev => {
+        const op = rev.operator || 'System';
+        if (workerFilter !== 'All' && op !== workerFilter) return;
 
-        if (workerFilter === 'All' || op === workerFilter) {
-          let cash = 0;
-          let online = 0;
-          let card = 0;
-          let vikas = 0;
-          const amt = b.refundDetails.amount || 0;
+        if (rev.refundDetails && rev.refundDetails.amount > 0) {
+          let cash = 0, online = 0, card = 0, vikas = 0;
+          const amt = rev.refundDetails.amount || 0;
 
-          if (b.refundDetails.method === 'Cash') {
+          if (rev.refundDetails.method === 'Cash') {
             cash = amt;
-          } else if (b.refundDetails.method === 'Card') {
+          } else if (rev.refundDetails.method === 'Card') {
             card = amt;
-          } else if (b.refundDetails.method === 'Vikas') {
+          } else if (rev.refundDetails.method === 'Vikas') {
             vikas = amt;
-          } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
+          } else if (['UPI', 'Online'].includes(rev.refundDetails.method)) {
             online = amt;
-          } else if (b.refundDetails.method === 'Mixed') {
-            const split = parseMixedRef(b.refundDetails.notes);
+          } else if (rev.refundDetails.method === 'Mixed') {
+            const split = parseMixedRef(rev.refundDetails.notes);
             cash = split.cash;
             online = split.online;
             card = split.card;
@@ -1071,7 +1074,7 @@ export default function DailyHisab({
             totalCashHandledByWorker -= cash;
           }
         }
-      }
+      });
 
       matchedBookingsList.push({
         bookingId: b.bookingId,
@@ -1490,7 +1493,7 @@ export default function DailyHisab({
           vikas,
           card,
           reference: p.reference,
-          operator: getPaymentOperator(p, b.revisions)
+          operator: getPaymentOperator(p, b.revisions, b.workerId)
         });
       }
     });
@@ -1540,37 +1543,38 @@ export default function DailyHisab({
       }
     });
 
+    const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
     const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
-    const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+    const isRefundToday = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0);
     if (isRefundToday) {
-      const amt = b.refundDetails.amount || 0;
-      let cash = 0, online = 0, card = 0, vikas = 0;
-      if (b.refundDetails.method === 'Cash') {
-        cash = amt;
-      } else if (b.refundDetails.method === 'Card') {
-        card = amt;
-      } else if (b.refundDetails.method === 'Vikas') {
-        vikas = amt;
-      } else if (['UPI', 'Online'].includes(b.refundDetails.method)) {
-        online = amt;
-      } else if (b.refundDetails.method === 'Mixed') {
-        const split = parseMixedRef(b.refundDetails.notes);
-        cash = split.cash;
-        online = split.online;
-        card = split.card;
-        vikas = split.vikas;
-      }
+      todayRevisions.forEach(rev => {
+        if (rev.refundDetails && rev.refundDetails.amount > 0) {
+          const amt = rev.refundDetails.amount || 0;
+          let cash = 0, online = 0, card = 0, vikas = 0;
+          if (rev.refundDetails.method === 'Cash') cash = amt;
+          else if (rev.refundDetails.method === 'Card') card = amt;
+          else if (rev.refundDetails.method === 'Vikas') vikas = amt;
+          else if (['UPI', 'Online'].includes(rev.refundDetails.method)) online = amt;
+          else if (rev.refundDetails.method === 'Mixed') {
+            const split = parseMixedRef(rev.refundDetails.notes);
+            cash = split.cash;
+            online = split.online;
+            card = split.card;
+            vikas = split.vikas;
+          }
 
-      refunds.push({
-        time: formatTimeDisplay(b.refundDetails.timestamp || b.actualReturnDate || b.rentalPeriod?.actualReturnDate || b.updatedAt),
-        mode: b.refundDetails.method,
-        amount: amt,
-        cash,
-        upi: online,
-        vikas,
-        card,
-        notes: b.refundDetails.notes,
-        operator: b.dropDetails?.operator || b.workerId || 'System'
+          refunds.push({
+            time: formatTimeDisplay(rev.timestamp || b.actualReturnDate || b.updatedAt),
+            mode: rev.refundDetails.method,
+            amount: amt,
+            cash,
+            upi: online,
+            vikas,
+            card,
+            notes: rev.refundDetails.notes,
+            operator: rev.operator || b.workerId || 'System'
+          });
+        }
       });
     }
 
@@ -1585,7 +1589,7 @@ export default function DailyHisab({
 
     const todayPayments = b.paymentCollection?.filter(p => safeDateStr(p.timestamp) === dateFilter) || [];
     const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
-    const isRefundToday = b.refundDetails?.status === 'Completed' && (returnDateStr === dateFilter || safeDateStr(b.updatedAt || b.createdAt) === dateFilter);
+    const isRefundToday = todayRevisions.some(r => (r.refundDetails && r.refundDetails.amount > 0) || (r.actionType === 'DropOff' && b.settlement?.refundAmount > 0));
 
     // Check if any timestamp-anchored activity happened on this date
     const hasDateActivity = (
@@ -1630,27 +1634,25 @@ export default function DailyHisab({
         return op === workerFilter;
       });
       const hasRevisionByWorker = todayRevisions.some(r => r.operator === workerFilter);
-      let hasRefundByWorker = false;
-      if (isRefundToday) {
-        const dropOffRev = b.revisions?.find(r => r.actionType === 'DropOff' && safeDateStr(r.timestamp) === dateFilter);
-        const refundOp = dropOffRev?.operator || b.workerId || 'System';
-        hasRefundByWorker = (refundOp === workerFilter);
-      }
-      const createdByWorker = createdDateStr === dateFilter && (b.workerId === workerFilter);
+      let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && r.operator === workerFilter);
+      const createdByWorker = createdDateStr === dateFilter && (b.workerId === workerFilter || b.revisions?.[0]?.operator === workerFilter);
       const pickupByWorker = pickupDateStr === dateFilter && (b.handover?.operator === workerFilter || b.workerId === workerFilter);
       const returnByWorker = returnDateStr === dateFilter && (b.dropDetails?.operator === workerFilter || b.workerId === workerFilter);
+      
+      const isCarryOverForWorker = isOperationallyActive && !hasDateActivity && 
+        (b.workerId === workerFilter || b.revisions?.[0]?.operator === workerFilter);
 
       if (b.status === 'Completed') {
         console.log(`[DailyHisab DEBUG] Worker filter check for ${b.bookingId}:`, {
           workerFilter,
           hasPaymentByWorker, hasRevisionByWorker, hasRefundByWorker,
-          createdByWorker, pickupByWorker, returnByWorker,
+          createdByWorker, pickupByWorker, returnByWorker, isCarryOverForWorker,
           dropDetailsOperator: b.dropDetails?.operator,
           todayRevisionOperators: todayRevisions.map(r => r.operator),
         });
       }
 
-      if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker) {
+      if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker && !isCarryOverForWorker) {
         return false;
       }
     }
@@ -1686,6 +1688,7 @@ export default function DailyHisab({
   let editsCount = 0;
   let collectionsCount = 0;
   let dropOffsCount = 0;
+  let refundsCount = 0;
 
   bookings.forEach(b => {
     const todayPayments = b.paymentCollection?.filter(p => {
@@ -1720,6 +1723,11 @@ export default function DailyHisab({
 
       if (r.depositDetails && r.depositDetails.difference > 0) {
         collectionsCount++;
+      }
+
+      const hasRefund = r.refundDetails?.amount > 0 || (r.actionType === 'DropOff' && b.settlement?.refundAmount > 0 && !r.refundDetails);
+      if (hasRefund) {
+        refundsCount++;
       }
     });
   });
@@ -1924,8 +1932,9 @@ export default function DailyHisab({
             disabled={!isAdmin}
           >
             {isAdmin && <option value="All">All Workers</option>}
-            <option value="Ramesh Kumar">Ramesh Kumar</option>
-            <option value="Suresh Singh">Suresh Singh</option>
+            {(users || []).filter(u => u.role !== 'admin').map(u => (
+              <option key={u._id} value={u.name}>{u.name}</option>
+            ))}
           </select>
         </div>
       </div>
@@ -2066,28 +2075,33 @@ export default function DailyHisab({
           let refundOnline = 0;
           let refundCard = 0;
           let refundVikas = 0;
-          if (b.refundDetails) {
-            const refundEntries = Array.isArray(b.refundDetails) ? b.refundDetails : [b.refundDetails];
-            refundEntries.forEach(r => {
-              if (r.status === 'Completed' && r.amount > 0) {
-                totalRefundAmt += r.amount;
-                if (r.method === 'Cash') {
-                  refundCash += r.amount;
-                } else if (r.method === 'Card') {
-                  refundCard += r.amount;
-                } else if (r.method === 'Vikas') {
-                  refundVikas += r.amount;
-                } else if (r.method === 'Mixed') {
-                  const split = parseMixedRef(r.notes);
+          if (b.revisions && b.revisions.length > 0) {
+            b.revisions.forEach(r => {
+              if (r.refundDetails && r.refundDetails.amount > 0) {
+                totalRefundAmt += r.refundDetails.amount;
+                const method = r.refundDetails.method || 'Cash';
+                if (method === 'Cash') refundCash += r.refundDetails.amount;
+                else if (method === 'Card') refundCard += r.refundDetails.amount;
+                else if (method === 'Vikas') refundVikas += r.refundDetails.amount;
+                else if (method === 'Mixed') {
+                  const split = parseMixedRef(r.refundDetails.notes);
                   refundCash += split.cash;
                   refundOnline += split.online;
                   refundCard += split.card;
                   refundVikas += split.vikas;
-                } else {
-                  refundOnline += r.amount;
-                }
+                } else refundOnline += r.refundDetails.amount;
               }
             });
+          }
+
+          // Fallback for old drop-offs where refundDetails was stripped by schema bug
+          if (totalRefundAmt === 0 && b.settlement?.refundAmount > 0) {
+            totalRefundAmt = b.settlement.refundAmount;
+            const fallbackMode = b.refundDetails?.method || b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+            if (['Cash', 'Cash Refund'].includes(fallbackMode)) refundCash = totalRefundAmt;
+            else if (['Card', 'Card Refund'].includes(fallbackMode)) refundCard = totalRefundAmt;
+            else if (['Vikas', 'Vikas Refund'].includes(fallbackMode)) refundVikas = totalRefundAmt;
+            else refundOnline = totalRefundAmt;
           }
 
           // 5. Net Collection & Outstanding Due
@@ -2096,7 +2110,7 @@ export default function DailyHisab({
 
           const isExpanded = expandedBookingId === b.bookingId;
 
-          const totalPaidAllDays = (b.paymentCollection?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0) - (b.refundDetails?.status === 'Completed' ? (b.refundDetails?.amount || 0) : 0);
+          const totalPaidAllDays = (b.paymentCollection?.reduce((sum, p) => sum + (p.amount || 0), 0) || 0) - totalRefundAmt;
 
           return (
             <div key={b.bookingId} className="hisab-item-card" style={{ position: 'relative' }}>
@@ -2130,12 +2144,19 @@ export default function DailyHisab({
                       <span className="hisab-pill plan">{b.selectedPlan?.planType || '24-Hour'}</span>
                       <span className="hisab-pill fuel">{fuel}</span>
                       <span className="hisab-pill location" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}><MapPin size={10} />{zone}</span>
+                      <span className="hisab-pill" style={{ background: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 600 }} title="Booked / Handled By">
+                        <User size={10} color="#6366f1" />Op: {getWorkerName(b.workerId || b.revisions?.[0]?.operator)}
+                      </span>
                       <span className={`hisab-pill status-${(b.status || '').toLowerCase()}`}>{b.status}</span>
 {(b.replacements && b.replacements.length > 0) && (
-  <span className="hisab-pill" style={{ background: '#fef3c7', color: '#d97706', border: '1px solid #fde68a' }}>[Replaced]</span>
+  <span className="hisab-pill" style={{ background: 'linear-gradient(135deg, #fef3c7, #fde68a)', color: '#b45309', border: '1px solid #fcd34d', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold' }}>
+    <RotateCw size={10} /> REPLACED
+  </span>
 )}
 {b.status !== 'Extended' && ((b.revisions && b.revisions.some(r => r.actionType === 'Extend')) || (b.extensionHistory && b.extensionHistory.length > 0)) && (
-  <span className="hisab-pill" style={{ background: '#e0e7ff', color: '#4f46e5', border: '1px solid #c7d2fe' }}>[Extended]</span>
+  <span className="hisab-pill" style={{ background: 'linear-gradient(135deg, #e0e7ff, #c7d2fe)', color: '#4338ca', border: '1px solid #a5b4fc', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold' }}>
+    <Clock size={10} /> EXTENDED
+  </span>
 )}
                       {(() => {
                         const startT = b.actualPickupDate || b.rentalPeriod?.actualPickupDate || b.createdAt;
@@ -2356,7 +2377,7 @@ export default function DailyHisab({
                                 Assigned Worker
                               </div>
                               <div style={{ fontWeight: 700, color: '#cbd5e1', fontSize: '0.82rem' }}>
-                                {b.workerId || 'System'}
+                                {getWorkerName(b.workerId)}
                               </div>
                             </div>
 
@@ -2510,9 +2531,23 @@ export default function DailyHisab({
                               </a>
                             </span>
                           </div>
+                          <div className="hisab-detail-row">
+                            <span className="hisab-detail-label">Booked By (Worker/Admin)</span>
+                            <span className="hisab-detail-val" style={{ fontWeight: 700, color: '#2563eb' }}>
+                              {getWorkerName(b.workerId || b.revisions?.[0]?.operator)}
+                            </span>
+                          </div>
+                          {b.handover?.operator && (
+                            <div className="hisab-detail-row">
+                              <span className="hisab-detail-label">Handover By</span>
+                              <span className="hisab-detail-val" style={{ fontWeight: 600, color: '#059669' }}>
+                                {getWorkerName(b.handover.operator)}
+                              </span>
+                            </div>
+                          )}
                           {b.status === 'Completed' && (
-                            <div className="hisab-returned-banner" style={{ margin: '8px 0', fontSize: '0.8rem' }}>
-                              Returned to: {b.dropDetails?.operator || b.workerId || 'System'}
+                            <div className="hisab-returned-banner" style={{ margin: '8px 0', fontSize: '0.8rem', background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#166534', padding: '6px 10px', borderRadius: '6px', fontWeight: 600 }}>
+                              Returned & Closed by: {getWorkerName(b.dropDetails?.operator || b.workerId)}
                             </div>
                           )}
                         </div>
@@ -2660,7 +2695,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {r.cash} | U: {r.upi} | V: {r.vikas}</span>
-                                  <span>Op: {r.operator}</span>
+                                  <span>Op: {getWorkerName(r.operator)}</span>
                                 </div>
                               </div>
                             ))}
@@ -2685,7 +2720,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {d.cash} | U: {d.upi} | V: {d.vikas}</span>
-                                  <span>Op: {d.operator}</span>
+                                  <span>Op: {getWorkerName(d.operator)}</span>
                                 </div>
                               </div>
                             ))}
@@ -2710,7 +2745,7 @@ export default function DailyHisab({
                                 </div>
                                 <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: '2px', display: 'flex', justifyContent: 'space-between' }}>
                                   <span>C: {ref.cash} | U: {ref.upi} | V: {ref.vikas}</span>
-                                  <span>Op: {ref.operator}</span>
+                                  <span>Op: {getWorkerName(ref.operator)}</span>
                                 </div>
                               </div>
                             ))}

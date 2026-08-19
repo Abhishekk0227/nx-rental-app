@@ -20,23 +20,21 @@ function normalizePayment(p, workerId) {
   const obj = { ...p };
   obj.workerId = obj.workerId || workerId || 'System';
 
+  obj.cashAmount = obj.cashAmount ?? 0;
+  obj.onlineAmount = obj.onlineAmount ?? 0;
+  obj.vikasAmount = obj.vikasAmount ?? 0;
+  obj.cardAmount = obj.cardAmount ?? 0;
+
   if (obj.mode === 'Cash') {
-    obj.cashAmount = obj.cashAmount ?? obj.amount ?? 0;
-    obj.onlineAmount = obj.onlineAmount ?? 0;
-    obj.vikasAmount = obj.vikasAmount ?? 0;
+    obj.cashAmount = obj.cashAmount || obj.amount || 0;
   } else if (['UPI', 'Online', 'Bank Transfer'].includes(obj.mode)) {
-    obj.onlineAmount = obj.onlineAmount ?? obj.amount ?? 0;
-    obj.cashAmount = obj.cashAmount ?? 0;
-    obj.vikasAmount = obj.vikasAmount ?? 0;
+    obj.onlineAmount = obj.onlineAmount || obj.amount || 0;
   } else if (obj.mode === 'Vikas') {
-    obj.vikasAmount = obj.vikasAmount ?? obj.amount ?? 0;
-    obj.cashAmount = obj.cashAmount ?? 0;
-    obj.onlineAmount = obj.onlineAmount ?? 0;
+    obj.vikasAmount = obj.vikasAmount || obj.amount || 0;
+  } else if (obj.mode === 'Card') {
+    obj.cardAmount = obj.cardAmount || obj.amount || 0;
   } else if (obj.mode === 'Mixed') {
     // Keep existing splits if already set
-    obj.cashAmount = obj.cashAmount ?? 0;
-    obj.onlineAmount = obj.onlineAmount ?? 0;
-    obj.vikasAmount = obj.vikasAmount ?? 0;
   }
 
   return obj;
@@ -53,29 +51,18 @@ router.get('/', async (req, res) => {
     if (isDbConnected()) {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
-      const bookings = await Booking.find(filter).sort({ createdAt: -1 });
+      const bookings = await Booking.find(filter).sort({ createdAt: -1 }).lean();
       
-      // Auto-fix missing fields for older records
-      let needsSave = false;
+      // Auto-fix missing fields for older records dynamically in the response
       for (const b of bookings) {
-        let changed = false;
-        if (!b.baseFare) {
-          if (b.selectedPlan && b.selectedPlan.rate) {
-            b.baseFare = b.selectedPlan.rate;
-            changed = true;
-          }
+        if (!b.baseFare && b.selectedPlan && b.selectedPlan.rate) {
+          b.baseFare = b.selectedPlan.rate;
         }
         if (!b.advancePaid && b.settlement && b.settlement.previousPaid > 0) {
           b.advancePaid = b.settlement.previousPaid;
-          changed = true;
         }
         if (!b.securityDeposit && b.settlement && b.settlement.depositCollected > 0) {
           b.securityDeposit = b.settlement.depositCollected;
-          changed = true;
-        }
-        if (changed) {
-          await b.save();
-          needsSave = true;
         }
       }
       

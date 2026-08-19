@@ -149,14 +149,14 @@ const getCardFlow = (b) => {
       else if (['UPI', 'Online'].includes(p.mode)) onlineIn += p.amount;
       else if (p.mode === 'Vikas') vikasIn += p.amount;
       else if (p.mode === 'Mixed') {
-        if (p.reference && p.reference.includes('Cash:')) {
-          const cashPart = p.reference.match(/Cash:\s*(\d+)/);
-          const onlinePart = p.reference.match(/Online:\s*(\d+)/);
+        cashIn += Number(p.cashAmount || 0);
+        onlineIn += Number(p.onlineAmount || 0);
+        vikasIn += Number(p.vikasAmount || 0);
+        if (!p.cashAmount && !p.onlineAmount && p.reference) {
+          const cashPart = p.reference.match(/Cash:\s*(\d+)/i);
+          const onlinePart = p.reference.match(/Online:\s*(\d+)/i);
           if (cashPart) cashIn += Number(cashPart[1]);
           if (onlinePart) onlineIn += Number(onlinePart[1]);
-        } else {
-          cashIn += p.amount / 2;
-          onlineIn += p.amount / 2;
         }
       }
     });
@@ -165,43 +165,59 @@ const getCardFlow = (b) => {
     else onlineIn += b.advancePaid;
   }
 
-  let refundAmt = 0;
-  let refundMethod = 'Cash';
-
-  if (b.refundDetails && Number(b.refundDetails.amount) > 0) {
-    refundAmt = Number(b.refundDetails.amount || 0);
-    refundMethod = b.refundDetails.method || 'Cash';
-  } else if (b.settlement) {
-    refundAmt = Number(b.settlement.refundAmount || b.settlement.depositRefunded || b.settlement.depositRefund || 0);
-    refundMethod = b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
-  }
-
-  if (refundAmt === 0 && b.revisions) {
+  if (b.revisions && b.revisions.length > 0) {
     b.revisions.forEach(rev => {
       if (rev.refundDetails && Number(rev.refundDetails.amount) > 0) {
-        refundAmt += Number(rev.refundDetails.amount);
-        if (rev.refundDetails.method) refundMethod = rev.refundDetails.method;
+        const amt = Number(rev.refundDetails.amount);
+        const method = rev.refundDetails.method || 'Cash';
+        if (['Cash', 'Cash Refund'].includes(method)) cashOut += amt;
+        else if (['Vikas', 'Vikas Refund'].includes(method)) vikasOut += amt;
+        else if (['Mixed', 'Mixed Refund'].includes(method)) {
+          const notes = rev.refundDetails.notes || '';
+          const cashP = notes.match(/Cash:\s*(\d+)/i);
+          const onlineP = notes.match(/Online:\s*(\d+)/i);
+          const vikasP = notes.match(/Vikas:\s*(\d+)/i);
+          if (cashP || onlineP || vikasP) {
+            if (cashP) cashOut += Number(cashP[1]);
+            if (onlineP) onlineOut += Number(onlineP[1]);
+            if (vikasP) vikasOut += Number(vikasP[1]);
+          } else {
+            cashOut += Math.round(amt / 2);
+            onlineOut += amt - Math.round(amt / 2);
+          }
+        } else {
+          onlineOut += amt;
+        }
       }
     });
+
+    // Fallback for old DropOffs where refundDetails was stripped by schema bug
+    if (cashOut === 0 && onlineOut === 0 && vikasOut === 0 && b.settlement?.refundAmount > 0) {
+      const amt = Number(b.settlement.refundAmount);
+      const method = b.refundDetails?.method || b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+      if (['Cash', 'Cash Refund'].includes(method)) cashOut += amt;
+      else if (['Vikas', 'Vikas Refund'].includes(method)) vikasOut += amt;
+      else onlineOut += amt;
+    }
+
+  } else {
+    let refundAmt = 0;
+    let refundMethod = 'Cash';
+    if (b.refundDetails && Number(b.refundDetails.amount) > 0) {
+      refundAmt = Number(b.refundDetails.amount || 0);
+      refundMethod = b.refundDetails.method || 'Cash';
+    } else if (b.settlement) {
+      refundAmt = Number(b.settlement.refundAmount || b.settlement.depositRefunded || b.settlement.depositRefund || 0);
+      refundMethod = b.settlement.depositRefundMode || b.settlement.refundMode || b.paymentMethod || 'Cash';
+    }
+    if (refundAmt > 0) {
+      if (['Cash', 'Cash Refund'].includes(refundMethod)) cashOut += refundAmt;
+      else if (['Vikas', 'Vikas Refund'].includes(refundMethod)) vikasOut += refundAmt;
+      else onlineOut += refundAmt;
+    }
   }
 
-  if (refundAmt > 0) {
-    if (['Cash', 'Cash Refund'].includes(refundMethod)) cashOut += refundAmt;
-    else if (['Vikas', 'Vikas Refund'].includes(refundMethod)) vikasOut += refundAmt;
-    else if (['Mixed', 'Mixed Refund'].includes(refundMethod)) {
-      const cashP = Number(b.refundDetails?.cashAmount || 0);
-      const onlineP = Number(b.refundDetails?.onlineAmount || 0);
-      if (cashP > 0 || onlineP > 0) {
-        cashOut += cashP;
-        onlineOut += onlineP;
-      } else {
-        cashOut += customRound(refundAmt / 2);
-        onlineOut += refundAmt - customRound(refundAmt / 2);
-      }
-    } else onlineOut += refundAmt;
-  }
-
-  const r2 = (val) => customRound((Number(val) || 0) * 100) / 100;
+  const r2 = (val) => Math.round(Number(val) || 0);
   return {
     cashIn: r2(cashIn),
     onlineIn: r2(onlineIn),
@@ -260,7 +276,7 @@ function RecentBookings({ bookings, vehicles = [], setCurrentTab }) {
             const vName = resolvedV?.name || b.vehicleDetails?.name || b.vehicleName || 'Vehicle';
             const vReg = resolvedV?.regNumber || b.vehicleDetails?.regNumber || b.vehicleRegNumber || '';
             const frontImg = resolvedV?.images?.front;
-            const amt = (customRound((Number(b.amount || b.finalAmount || b.baseFare || 0)) * 100) / 100).toLocaleString('en-IN');
+            const amt = customRound(Number(b.amount || b.finalAmount || b.baseFare || 0)).toLocaleString('en-IN');
             const custName = b.customer?.name || b.customerName || 'Customer';
             const custPhone = b.customer?.phone || b.customerPhone || '';
 

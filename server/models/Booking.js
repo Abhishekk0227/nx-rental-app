@@ -68,16 +68,16 @@ const bookingSchema = new mongoose.Schema({
   // ─── Plan ──────────────────────────────────────────────────────────────────
   selectedPlan: {
     planType: { type: String, required: true }, // Hourly | 12-Hour | 24-Hour | Weekly | Monthly
-    rate: { type: Number, required: true },
+    rate: { type: Number, required: true, set: Math.round },
     kmLimit: { type: Number, default: 0 },
-    extraKmCharge: { type: Number, default: 0 },
-    extraHourCharge: { type: Number, default: 0 }
+    extraKmCharge: { type: Number, default: 0, set: Math.round },
+    extraHourCharge: { type: Number, default: 0, set: Math.round }
   },
 
   // ─── Addons ────────────────────────────────────────────────────────────────
   addons: {
     helmetsCount: { type: Number, default: 0 },
-    helmetsPrice: { type: Number, default: 50 },
+    helmetsPrice: { type: Number, default: 50, set: Math.round },
     otherAccessories: { type: String, default: '' }
   },
 
@@ -90,25 +90,25 @@ const bookingSchema = new mongoose.Schema({
   actualPickupDate: { type: Date },     // = rentalPeriod.actualPickupDate
   actualReturnDate: { type: Date },     // = rentalPeriod.actualReturnDate
 
-  rentalCost: { type: Number, default: 0 },       // cumulative base fare (incl. extensions)
-  securityDeposit: { type: Number, default: 0 },  // original deposit required
-  depositHeld: { type: Number, default: 0 },       // actual deposit collected so far
-  rentalPaid: { type: Number, default: 0 },        // total rental paid so far
-  outstandingRent: { type: Number, default: 0 },   // remaining rental due
-  collectAmount: { type: Number, default: 0 },     // final collection needed at settlement
-  refundAmount: { type: Number, default: 0 },      // refund due at settlement
+  rentalCost: { type: Number, default: 0, set: Math.round },       // cumulative base fare (incl. extensions)
+  securityDeposit: { type: Number, default: 0, set: Math.round },  // original deposit required
+  depositHeld: { type: Number, default: 0, set: Math.round },       // actual deposit collected so far
+  rentalPaid: { type: Number, default: 0, set: Math.round },        // total rental paid so far
+  outstandingRent: { type: Number, default: 0, set: Math.round },   // remaining rental due
+  collectAmount: { type: Number, default: 0, set: Math.round },     // final collection needed at settlement
+  refundAmount: { type: Number, default: 0, set: Math.round },      // refund due at settlement
 
-  discount: { type: Number, default: 0 },
-  baseFare: { type: Number, default: 0 },          // same as rentalCost (kept for compatibility during migration)
+  discount: { type: Number, default: 0, set: Math.round },
+  baseFare: { type: Number, default: 0, set: Math.round },          // same as rentalCost (kept for compatibility during migration)
 
   // ─── Payment ───────────────────────────────────────────────────────────────
   paymentMode: { type: String, default: 'Cash' },
   paymentCollection: [{
     mode: { type: String, enum: ['Cash', 'UPI', 'Bank Transfer', 'Mixed', 'online Refund', 'Cash Refund', 'Vikas', 'Vikas Refund'] },
-    amount: { type: Number, default: 0 },
-    cashAmount: { type: Number, default: 0 },
-    onlineAmount: { type: Number, default: 0 },
-    vikasAmount: { type: Number, default: 0 },
+    amount: { type: Number, default: 0, set: Math.round },
+    cashAmount: { type: Number, default: 0, set: Math.round },
+    onlineAmount: { type: Number, default: 0, set: Math.round },
+    vikasAmount: { type: Number, default: 0, set: Math.round },
     workerId: { type: String, default: 'System' },
     transactionId: { type: String, default: '' },
     reference: { type: String, default: '' },
@@ -117,15 +117,15 @@ const bookingSchema = new mongoose.Schema({
 
   depositDetails: {
     mode: { type: String, enum: ['Cash', 'Online', 'Mixed', 'Vikas'], default: 'Cash' },
-    cashAmount: { type: Number, default: 0 },
-    onlineAmount: { type: Number, default: 0 },
-    vikasAmount: { type: Number, default: 0 }
+    cashAmount: { type: Number, default: 0, set: Math.round },
+    onlineAmount: { type: Number, default: 0, set: Math.round },
+    vikasAmount: { type: Number, default: 0, set: Math.round }
   },
 
   // ─── Payment mixed totals (derived from paymentCollection) ─────────────────
-  cashAmount: { type: Number, default: 0 },
-  onlineAmount: { type: Number, default: 0 },
-  vikasAmount: { type: Number, default: 0 },
+  cashAmount: { type: Number, default: 0, set: Math.round },
+  onlineAmount: { type: Number, default: 0, set: Math.round },
+  vikasAmount: { type: Number, default: 0, set: Math.round },
 
   // ─── Drop-Off ──────────────────────────────────────────────────────────────
   dropDetails: {
@@ -134,15 +134,15 @@ const bookingSchema = new mongoose.Schema({
     endFuelLevel: { type: String, enum: ['Empty', '25%', '50%', '75%', 'Full', ''], default: '' },
     vehicleCondition: { type: String, enum: ['Excellent', 'Good', 'Minor Damage', 'Major Damage', 'Accident', ''], default: '' },
     damageNotes: { type: String, default: '' },
-    damageCharges: { type: Number, default: 0 },
-    cleaningCharges: { type: Number, default: 0 },
-    otherCharges: { type: Number, default: 0 },
+    damageCharges: { type: Number, default: 0, set: Math.round },
+    cleaningCharges: { type: Number, default: 0, set: Math.round },
+    otherCharges: { type: Number, default: 0, set: Math.round },
     photos: [{ type: String }],
     operator: { type: String }
   },
 
   refundDetails: {
-    amount: { type: Number, default: 0 },
+    amount: { type: Number, default: 0, set: Math.round },
     status: { type: String, enum: ['Pending', 'Processed', 'Completed', ''], default: '' },
     method: { type: String, default: '' },
     notes: { type: String, default: '' }
@@ -150,18 +150,18 @@ const bookingSchema = new mongoose.Schema({
 
   // ─── Settlement sub-document (audit record of final settlement) ─────────────
   settlement: {
-    actualBill: { type: Number, default: 0 },
-    totalBill: { type: Number, default: 0 },         // alias for actualBill (kept for compatibility)
-    previousPaid: { type: Number, default: 0 },      // = rentalPaid at settlement time
-    depositCollected: { type: Number, default: 0 },  // = depositHeld at settlement time
-    depositHeld: { type: Number, default: 0 },
-    depositAdjustment: { type: Number, default: 0 },
-    depositRefund: { type: Number, default: 0 },
+    actualBill: { type: Number, default: 0, set: Math.round },
+    totalBill: { type: Number, default: 0, set: Math.round },         // alias for actualBill (kept for compatibility)
+    previousPaid: { type: Number, default: 0, set: Math.round },      // = rentalPaid at settlement time
+    depositCollected: { type: Number, default: 0, set: Math.round },  // = depositHeld at settlement time
+    depositHeld: { type: Number, default: 0, set: Math.round },
+    depositAdjustment: { type: Number, default: 0, set: Math.round },
+    depositRefund: { type: Number, default: 0, set: Math.round },
     depositRefundMode: { type: String, enum: ['Full', 'Partial', 'No Refund', ''], default: '' },
     depositRefundReason: { type: String, default: '' },
-    remainingToPay: { type: Number, default: 0 },    // = outstandingRent at settlement time
-    collectAmount: { type: Number, default: 0 },
-    refundAmount: { type: Number, default: 0 }
+    remainingToPay: { type: Number, default: 0, set: Math.round },    // = outstandingRent at settlement time
+    collectAmount: { type: Number, default: 0, set: Math.round },
+    refundAmount: { type: Number, default: 0, set: Math.round }
   },
 
   // ─── Booking Status ────────────────────────────────────────────────────────
@@ -176,7 +176,7 @@ const bookingSchema = new mongoose.Schema({
   // ─── History ───────────────────────────────────────────────────────────────
   extensions: [{
     newEndDateTime: Date,
-    extraCharges: Number,
+    extraCharges: { type: Number, set: Math.round },
     remarks: String,
     timestamp: { type: Date, default: Date.now }
   }],
@@ -203,32 +203,32 @@ const bookingSchema = new mongoose.Schema({
     reason: { type: String, default: '' },
 
     oldValues: {
-      rentalCost: Number,
-      deposit: Number,
-      rentalPaid: Number,
-      depositCollected: Number,
-      outstandingRent: Number
+      rentalCost: { type: Number, set: Math.round },
+      deposit: { type: Number, set: Math.round },
+      rentalPaid: { type: Number, set: Math.round },
+      depositCollected: { type: Number, set: Math.round },
+      outstandingRent: { type: Number, set: Math.round }
     },
     newValues: {
-      rentalCost: Number,
-      deposit: Number,
-      rentalPaid: Number,
-      depositCollected: Number,
-      outstandingRent: Number
+      rentalCost: { type: Number, set: Math.round },
+      deposit: { type: Number, set: Math.round },
+      rentalPaid: { type: Number, set: Math.round },
+      depositCollected: { type: Number, set: Math.round },
+      outstandingRent: { type: Number, set: Math.round }
     },
 
     financialSnapshotAfterChange: {
-      rentalCost: Number,
-      depositHeld: Number,
-      rentalPaid: Number,
-      depositCollected: Number,
-      outstandingRent: Number,
+      rentalCost: { type: Number, set: Math.round },
+      depositHeld: { type: Number, set: Math.round },
+      rentalPaid: { type: Number, set: Math.round },
+      depositCollected: { type: Number, set: Math.round },
+      outstandingRent: { type: Number, set: Math.round },
       paymentBreakdown: {
-        rentalCash: { type: Number, default: 0 },
-        rentalOnline: { type: Number, default: 0 },
-        rentalCard: { type: Number, default: 0 },
-        depositCash: { type: Number, default: 0 },
-        depositOnline: { type: Number, default: 0 }
+        rentalCash: { type: Number, default: 0, set: Math.round },
+        rentalOnline: { type: Number, default: 0, set: Math.round },
+        rentalCard: { type: Number, default: 0, set: Math.round },
+        depositCash: { type: Number, default: 0, set: Math.round },
+        depositOnline: { type: Number, default: 0, set: Math.round }
       }
     },
 
@@ -239,20 +239,20 @@ const bookingSchema = new mongoose.Schema({
     }],
 
     collectionDetails: {
-      amount: Number,
+      amount: { type: Number, set: Math.round },
       mode: String,
-      cashSplit: Number,
-      onlineSplit: Number,
-      cardSplit: Number,
+      cashSplit: { type: Number, set: Math.round },
+      onlineSplit: { type: Number, set: Math.round },
+      cardSplit: { type: Number, set: Math.round },
       remarks: String
     },
     depositDetails: {
-      oldDeposit: Number,
-      newDeposit: Number,
-      difference: Number,
+      oldDeposit: { type: Number, set: Math.round },
+      newDeposit: { type: Number, set: Math.round },
+      difference: { type: Number, set: Math.round },
       mode: String,
-      cashAmount: Number,
-      onlineAmount: Number
+      cashAmount: { type: Number, set: Math.round },
+      onlineAmount: { type: Number, set: Math.round }
     },
     vehicleDetails: {
       oldVehicleId: String,
@@ -261,12 +261,12 @@ const bookingSchema = new mongoose.Schema({
       newVehicleId: String,
       newVehicleName: String,
       newVehicleReg: String,
-      oldPricing: Number,
-      newPricing: Number,
-      oldDeposit: Number,
-      newDeposit: Number,
-      additionalCollection: Number,
-      refundDifference: Number
+      oldPricing: { type: Number, set: Math.round },
+      newPricing: { type: Number, set: Math.round },
+      oldDeposit: { type: Number, set: Math.round },
+      newDeposit: { type: Number, set: Math.round },
+      additionalCollection: { type: Number, set: Math.round },
+      refundDifference: { type: Number, set: Math.round }
     },
     meterDetails: {
       oldVehicleClosingMeter: Number,
@@ -275,7 +275,7 @@ const bookingSchema = new mongoose.Schema({
     durationDetails: {
       oldDuration: Number,
       newDuration: Number,
-      difference: Number
+      difference: { type: Number, set: Math.round }
     }
   }]
 }, {

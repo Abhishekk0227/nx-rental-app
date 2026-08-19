@@ -15,15 +15,18 @@ const settlementSchema = new mongoose.Schema({
   },
   cashCollected: {
     type: Number,
-    default: 0
+    default: 0,
+    set: Math.round
   },
   depositToAdmin: {
     type: Number,
-    default: 0
+    default: 0,
+    set: Math.round
   },
   balance: {
     type: Number,
-    default: 0 // cashCollected - depositToAdmin
+    default: 0, // cashCollected - depositToAdmin
+    set: Math.round
   },
   status: {
     type: String,
@@ -41,8 +44,8 @@ const settlementSchema = new mongoose.Schema({
 settlementSchema.index({ date: 1, workerId: 1 }, { unique: true });
 
 // Calculate balance automatically before saving
-settlementSchema.pre('save', function(next) {
-  this.balance = this.cashCollected - this.depositToAdmin;
+settlementSchema.pre('save', function (next) {
+  this.balance = Math.round((this.cashCollected || 0) - (this.depositToAdmin || 0));
   if (this.balance === 0) {
     this.status = 'Settled';
   } else {

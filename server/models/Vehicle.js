@@ -67,54 +67,54 @@ const vehicleSchema = new mongoose.Schema({
   // Pricing plans
   pricingPlans: {
     hourly: {
-      rate: { type: Number, default: 0 },
+      rate: { type: Number, default: 0, set: Math.round },
       freeKm: { type: Number, default: 0 },
-      fuelChargePerKm: { type: Number, default: 0 },
-      extraKmCharge: { type: Number, default: 0 },
-      withFuel: { type: Number, default: 0 },
-      withoutFuel: { type: Number, default: 0 }
+      fuelChargePerKm: { type: Number, default: 0, set: Math.round },
+      extraKmCharge: { type: Number, default: 0, set: Math.round },
+      withFuel: { type: Number, default: 0, set: Math.round },
+      withoutFuel: { type: Number, default: 0, set: Math.round }
     },
     twelveHour: {
-      baseRate: { type: Number, default: 0 },
-      ratePerHour: { type: Number, default: 0 },
+      baseRate: { type: Number, default: 0, set: Math.round },
+      ratePerHour: { type: Number, default: 0, set: Math.round },
       kmLimit: { type: Number, default: 0 },
-      fuelChargePerKm: { type: Number, default: 0 },
-      extraKmCharge: { type: Number, default: 0 },
-      extraHourCharge: { type: Number, default: 0 },
+      fuelChargePerKm: { type: Number, default: 0, set: Math.round },
+      extraKmCharge: { type: Number, default: 0, set: Math.round },
+      extraHourCharge: { type: Number, default: 0, set: Math.round },
       gracePeriod: { type: Number, default: 0 }, // in minutes
-      withFuel: { type: Number, default: 0 },
-      withoutFuel: { type: Number, default: 0 }
+      withFuel: { type: Number, default: 0, set: Math.round },
+      withoutFuel: { type: Number, default: 0, set: Math.round }
     },
     twentyFourHour: {
-      baseRate: { type: Number, default: 0 },
-      ratePerHour: { type: Number, default: 0 },
+      baseRate: { type: Number, default: 0, set: Math.round },
+      ratePerHour: { type: Number, default: 0, set: Math.round },
       kmLimit: { type: Number, default: 0 },
-      fuelChargePerKm: { type: Number, default: 0 },
-      extraKmCharge: { type: Number, default: 0 },
-      extraHourCharge: { type: Number, default: 0 },
+      fuelChargePerKm: { type: Number, default: 0, set: Math.round },
+      extraKmCharge: { type: Number, default: 0, set: Math.round },
+      extraHourCharge: { type: Number, default: 0, set: Math.round },
       gracePeriod: { type: Number, default: 0 },
-      withFuel: { type: Number, default: 0 },
-      withoutFuel: { type: Number, default: 0 }
+      withFuel: { type: Number, default: 0, set: Math.round },
+      withoutFuel: { type: Number, default: 0, set: Math.round }
     },
     weekly: {
-      baseRate: { type: Number, default: 0 },
+      baseRate: { type: Number, default: 0, set: Math.round },
       kmLimit: { type: Number, default: 0 },
-      extraKmCharge: { type: Number, default: 0 },
-      extraDayCharge: { type: Number, default: 0 },
+      extraKmCharge: { type: Number, default: 0, set: Math.round },
+      extraDayCharge: { type: Number, default: 0, set: Math.round },
       gracePeriod: { type: Number, default: 0 }
     },
     monthly: {
-      baseRate: { type: Number, default: 0 },
+      baseRate: { type: Number, default: 0, set: Math.round },
       kmLimit: { type: Number, default: 0 },
-      extraKmCharge: { type: Number, default: 0 },
-      extraDayCharge: { type: Number, default: 0 }
+      extraKmCharge: { type: Number, default: 0, set: Math.round },
+      extraDayCharge: { type: Number, default: 0, set: Math.round }
     }
   },
 
   // Deposit and Payment Configuration
   depositSettings: {
     requireDeposit: { type: Boolean, default: true },
-    amount: { type: Number, default: 0 }
+    amount: { type: Number, default: 0, set: Math.round }
   },
   paymentSettings: {
     advanceRequired: { type: Boolean, default: false },
@@ -164,7 +164,7 @@ const vehicleSchema = new mongoose.Schema({
     status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Completed' },
     serviceDate: { type: Date, default: Date.now },
     serviceKm: { type: Number },
-    cost: { type: Number, default: 0 },
+    cost: { type: Number, default: 0, set: Math.round },
     vendor: { type: String },
     issue: { type: String },
     workDone: { type: String },

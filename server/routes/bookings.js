@@ -53,8 +53,12 @@ router.get('/', async (req, res) => {
     if (isDbConnected()) {
       const filter = {};
       if (req.query.zoneId) filter.zoneId = req.query.zoneId;
+
+      const start = performance.now();
       const bookings = await Booking.find(filter).sort({ createdAt: -1 });
-      
+      const end = performance.now();
+
+     
       // Auto-fix missing fields for older records
       let needsSave = false;
       for (const b of bookings) {
@@ -78,14 +82,14 @@ router.get('/', async (req, res) => {
           needsSave = true;
         }
       }
-      
+
       return res.json(bookings);
     }
 
     // Memory fallback
     let memBookings = getBookings();
     if (zoneId) memBookings = memBookings.filter(b => b.zoneId === zoneId);
-    
+
     // Very naive filter for in-memory, just returns everything for simplicity 
     // (since it's a small array anyway)
     res.json(memBookings);
@@ -99,8 +103,9 @@ router.get('/dashboard-stats', async (req, res) => {
   try {
     const filter = {};
     if (req.query.zoneId) filter.zoneId = req.query.zoneId;
-    
+
     const allBookings = isDbConnected() ? await Booking.find(filter) : getBookings().filter(b => !req.query.zoneId || b.zoneId === req.query.zoneId);
+
     let totalRevenue = 0;
     let activeRentals = 0;
     let pendingDropoffs = 0;
@@ -117,7 +122,7 @@ router.get('/dashboard-stats', async (req, res) => {
 
       if (['Ongoing', 'Extended', 'Overdue'].includes(b.status)) {
         activeRentals++;
-        
+
         const expectedDrop = b.rentalPeriod?.expectedEndDate || b.expectedDropDate || b.expectedReturnDate;
         if (expectedDrop) {
           const dropDate = new Date(expectedDrop);
@@ -130,12 +135,12 @@ router.get('/dashboard-stats', async (req, res) => {
         upcomingBookings++;
       }
     }
-    
-    res.json({ 
-      completedRevenue: Math.round(totalRevenue), 
-      activeRentalsCount: activeRentals, 
-      pendingPickupsCount: upcomingBookings, 
-      ongoingTripsCount: activeRentals 
+
+    res.json({
+      completedRevenue: Math.round(totalRevenue),
+      activeRentalsCount: activeRentals,
+      pendingPickupsCount: upcomingBookings,
+      ongoingTripsCount: activeRentals
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

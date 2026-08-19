@@ -3,16 +3,14 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dns from 'dns';
-
-dns.setServers(["8.8.8.8", "8.8.4.4"]);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
-dns.setServers([
-  "8.8.8.8",
-  "8.8.4.4",
-]);
+// dns.setServers([
+//   "8.8.8.8",
+//   "8.8.4.4",
+// ]);
 
 
 // Ensure env variables are loaded from server/.env as well
@@ -56,27 +54,33 @@ const connectDB = async (retries = 3) => {
     try {
       mongoose.set('bufferCommands', false);
 
+      const connectStart = performance.now();
+
+      console.log('[DB] Starting MongoDB connection...');
+
       await mongoose.connect(uri, {
-        serverSelectionTimeoutMS: 30000, // 30s for Atlas connections
-        connectTimeoutMS: 30000,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
         socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+        minPoolSize: 1,
       });
 
+      const connectTime = performance.now() - connectStart;
+
       const { host, name } = mongoose.connection;
-      console.log(`[DB] MongoDB Connected: ${host || 'unknown'} — DB: ${name || 'unknown'}`);
 
-      if (!mongoose.connection.listenerCount('disconnected')) {
-        mongoose.connection.on('disconnected', () => {
-          console.warn('[DB] MongoDB disconnected.');
-        });
-        mongoose.connection.on('reconnected', () => {
-          console.log('[DB] MongoDB reconnected successfully.');
-        });
-        mongoose.connection.on('error', (err) => {
-          console.error(`[DB] MongoDB connection error: ${err.message}`);
-        });
-      }
+      console.log(
+        `[DB] MongoDB Connected in ${connectTime.toFixed(2)} ms`
+      );
 
+      console.log(
+        `[DB] Host: ${host || 'unknown'}`
+      );
+
+      console.log(
+        `[DB] Database: ${name || 'unknown'}`
+      );
       return; // Success!
     } catch (error) {
       console.error(`[DB] MongoDB Connection Attempt ${attempt}/${retries} Failed: ${error.message}`);

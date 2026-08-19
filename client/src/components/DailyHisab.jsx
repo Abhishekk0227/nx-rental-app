@@ -835,6 +835,30 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
     }
   };
 
+  const matchWorkerLocal = (opOrId, targetWorker) => {
+    if (!targetWorker || targetWorker === 'All') return true;
+    if (!opOrId || opOrId === 'System') return false;
+    const opStr = String(opOrId).trim().toLowerCase();
+    const targetStr = String(targetWorker).trim().toLowerCase();
+    if (opStr === targetStr) return true;
+
+    const opUser = users.find(u =>
+      String(u._id) === String(opOrId) ||
+      String(u.username).trim().toLowerCase() === opStr ||
+      String(u.name).trim().toLowerCase() === opStr
+    );
+    const targetUser = users.find(u =>
+      String(u._id) === String(targetWorker) ||
+      String(u.username).trim().toLowerCase() === targetStr ||
+      String(u.name).trim().toLowerCase() === targetStr
+    );
+
+    if (opUser && targetUser) return String(opUser._id) === String(targetUser._id);
+    if (opUser) return String(opUser._id) === String(targetWorker) || String(opUser.username).trim().toLowerCase() === targetStr || String(opUser.name).trim().toLowerCase() === targetStr;
+    if (targetUser) return String(targetUser._id) === String(opOrId) || String(targetUser.username).trim().toLowerCase() === opStr || String(targetUser.name).trim().toLowerCase() === opStr;
+    return false;
+  };
+
   const getPaymentOperator = (p, revisions, defaultWorkerId = 'System') => {
     if (p.workerId && p.workerId !== 'System') return p.workerId;
     if (revisions && revisions.length > 0) {
@@ -858,15 +882,11 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
   const getWorkerName = (idOrName) => {
     if (!idOrName || idOrName === 'System') return 'System';
     const found = users.find(u => u._id === idOrName || u.username === idOrName || u.name === idOrName);
-    return found?.name || idOrName;
+    return found ? found.name : idOrName;
   };
 
-  // Helper to parse mixed payments mixed (e.g., "Cash: 100, Online: 200, Card: 300, Vikas: 400")
-  const parseMixedRef = (refStr) => {
-    let cash = 0;
-    let online = 0;
-    let card = 0;
-    let vikas = 0;
+  const parseMixedRef = (refStr = '') => {
+    let cash = 0, online = 0, card = 0, vikas = 0;
     if (!refStr) return { cash, online, card, vikas };
     const cashMatch = refStr.match(/Cash:\s*([\d.]+)/i);
     if (cashMatch) cash = parseFloat(cashMatch[1]) || 0;
@@ -909,19 +929,22 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
     let totalOnlineHandledByWorker = 0;
     let totalVikasHandledByWorker = 0;
 
-    const rentalCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
-    const depositCollections = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
-    const depositRefunds = { cash: 0, upi: 0, card: 0, vikas: 0, total: 0 };
+    const rentalCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositCollections = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
+    const depositRefunds = { cash: 0, online: 0, card: 0, vikas: 0, total: 0 };
 
     const matchedBookingsList = [];
 
     bookings.forEach(b => {
+      const isCreatedToday = safeDateStr(b.createdAt) === dateFilter;
+      const bCreator = b.revisions?.[0]?.operator || b.workerId || 'System';
+
       const todayPayments = b.paymentCollection?.filter(p => safeDateStr(p.timestamp) === dateFilter) || [];
       const todayRevisions = b.revisions?.filter(r => safeDateStr(r.timestamp) === dateFilter) || [];
       const returnDateStr = safeDateStr(b.actualReturnDate || b.rentalPeriod?.actualReturnDate);
       const isRefundToday = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0);
 
-      if (todayPayments.length === 0 && todayRevisions.length === 0 && !isRefundToday) {
+      if (!isCreatedToday && todayPayments.length === 0 && todayRevisions.length === 0 && !isRefundToday) {
         return;
       }
 
@@ -932,11 +955,12 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
       } else {
         const hasPaymentByWorker = todayPayments.some(p => {
           const op = getPaymentOperator(p, b.revisions, b.workerId);
-          return op === workerFilter;
+          return matchWorkerLocal(op, workerFilter);
         });
-        const hasRevisionByWorker = todayRevisions.some(r => (r.operator && r.operator !== 'System' ? r.operator : b.workerId) === workerFilter);
-        let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && (r.operator && r.operator !== 'System' ? r.operator : b.workerId) === workerFilter);
-        hasWorkerActivity = hasPaymentByWorker || hasRevisionByWorker || hasRefundByWorker;
+        const hasRevisionByWorker = todayRevisions.some(r => matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+        const hasCreationByWorker = isCreatedToday && matchWorkerLocal(bCreator, workerFilter);
+        let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+        hasWorkerActivity = hasPaymentByWorker || hasRevisionByWorker || hasCreationByWorker || hasRefundByWorker;
       }
 
       if (!hasWorkerActivity) return;
@@ -948,23 +972,33 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
       // Loop through individual payments
       todayPayments.forEach(p => {
         const op = getPaymentOperator(p, b.revisions, b.workerId);
-        if (workerFilter !== 'All' && op !== workerFilter) return;
+        if (workerFilter !== 'All' && !matchWorkerLocal(op, workerFilter)) return;
 
         let cash = 0;
         let online = 0;
         let card = 0;
         let vikas = 0;
 
-        if (p.mode === 'Cash') cash = p.amount;
-        else if (p.mode === 'Card') card = p.amount;
-        else if (p.mode === 'Vikas') vikas = p.amount;
-        else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) online = p.amount;
-        else if (p.mode === 'Mixed') {
-          const split = parseMixedRef(p.reference);
-          cash = split.cash;
-          online = split.online;
-          card = split.card;
-          vikas = split.vikas;
+        if (p.mode === 'Cash') {
+          cash = p.cashAmount || p.amount || 0;
+        } else if (p.mode === 'Card') {
+          card = p.cardAmount || p.amount || 0;
+        } else if (p.mode === 'Vikas') {
+          vikas = p.vikasAmount || p.amount || 0;
+        } else if (['UPI', 'Online', 'Bank Transfer'].includes(p.mode)) {
+          online = p.onlineAmount || p.amount || 0;
+        } else if (p.mode === 'Mixed') {
+          cash = p.cashAmount || 0;
+          online = p.onlineAmount || 0;
+          card = p.cardAmount || 0;
+          vikas = p.vikasAmount || 0;
+          if (cash === 0 && online === 0 && card === 0 && vikas === 0) {
+            const split = parseMixedRef(p.reference || '');
+            cash = split.cash;
+            online = split.online;
+            card = split.card;
+            vikas = split.vikas;
+          }
         }
 
         rentalCollections.cash += cash;
@@ -973,15 +1007,59 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
         rentalCollections.vikas += vikas;
         rentalCollections.total += (cash + online + card + vikas);
 
-        if (op === workerFilter || workerFilter === 'All') {
+        if (workerFilter === 'All' || matchWorkerLocal(op, workerFilter)) {
           totalCashHandledByWorker += cash;
         }
       });
 
+      // Initial deposit collected on creation date
+      const isDepositByWorker = workerFilter === 'All' || matchWorkerLocal(bCreator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter);
+      if (isCreatedToday && isDepositByWorker) {
+        let initCash = Number(b.depositDetails?.cashAmount) || 0;
+        let initOnline = Number(b.depositDetails?.onlineAmount) || 0;
+        let initCard = Number(b.depositDetails?.cardAmount) || 0;
+        let initVikas = Number(b.depositDetails?.vikasAmount) || 0;
+
+        const breakdownSum = initCash + initOnline + initCard + initVikas;
+        const totalInitDep = breakdownSum > 0 ? breakdownSum : (Number(b.securityDeposit) || Number(b.depositDetails?.amount) || 0);
+
+        if (breakdownSum === 0 && totalInitDep > 0) {
+          const mode = (b.depositDetails?.mode || b.paymentMethod || b.paymentMode || 'Cash').trim();
+          if (mode.toLowerCase() === 'card') {
+            initCard = totalInitDep;
+          } else if (mode.toLowerCase() === 'vikas') {
+            initVikas = totalInitDep;
+          } else if (['online', 'upi', 'bank transfer'].includes(mode.toLowerCase())) {
+            initOnline = totalInitDep;
+          } else if (mode.toLowerCase() === 'mixed') {
+            const split = parseMixedRef(b.depositDetails?.remarks || b.paymentReference || '');
+            initCash = split.cash || 0;
+            initOnline = split.online || 0;
+            initCard = split.card || 0;
+            initVikas = split.vikas || 0;
+            if (initCash === 0 && initOnline === 0 && initCard === 0 && initVikas === 0) {
+              initCash = totalInitDep;
+            }
+          } else {
+            initCash = totalInitDep;
+          }
+        }
+
+        if (totalInitDep > 0) {
+          depositCollections.cash += initCash;
+          depositCollections.online += initOnline;
+          depositCollections.card += initCard;
+          depositCollections.vikas += initVikas;
+          depositCollections.total += (initCash + initOnline + initCard + initVikas);
+          totalCashHandledByWorker += initCash;
+        }
+      }
+
       // Loop through revisions today to find deposit collections
       todayRevisions.forEach(rev => {
-        const op = rev.operator || 'System';
-        if (workerFilter !== 'All' && op !== workerFilter) return;
+        if (rev.revisionNumber === 1 && isCreatedToday) return; // Already counted above
+        const op = rev.operator || b.workerId || 'System';
+        if (workerFilter !== 'All' && !matchWorkerLocal(op, workerFilter)) return;
 
         if (rev.depositDetails && rev.depositDetails.difference > 0) {
           const diff = rev.depositDetails.difference;
@@ -1630,27 +1708,17 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
     // Filter worker profile
     if (workerFilter && workerFilter !== 'All') {
       const hasPaymentByWorker = todayPayments.some(p => {
-        const op = getPaymentOperator(p, b.revisions);
-        return op === workerFilter;
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
+        return matchWorkerLocal(op, workerFilter);
       });
-      const hasRevisionByWorker = todayRevisions.some(r => r.operator === workerFilter);
-      let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && r.operator === workerFilter);
-      const createdByWorker = createdDateStr === dateFilter && (b.workerId === workerFilter || b.revisions?.[0]?.operator === workerFilter);
-      const pickupByWorker = pickupDateStr === dateFilter && (b.handover?.operator === workerFilter || b.workerId === workerFilter);
-      const returnByWorker = returnDateStr === dateFilter && (b.dropDetails?.operator === workerFilter || b.workerId === workerFilter);
+      const hasRevisionByWorker = todayRevisions.some(r => matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+      let hasRefundByWorker = todayRevisions.some(r => r.refundDetails && r.refundDetails.amount > 0 && matchWorkerLocal(r.operator && r.operator !== 'System' ? r.operator : b.workerId, workerFilter));
+      const createdByWorker = createdDateStr === dateFilter && (matchWorkerLocal(b.workerId, workerFilter) || matchWorkerLocal(b.revisions?.[0]?.operator, workerFilter));
+      const pickupByWorker = pickupDateStr === dateFilter && (matchWorkerLocal(b.handover?.operator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter));
+      const returnByWorker = returnDateStr === dateFilter && (matchWorkerLocal(b.dropDetails?.operator, workerFilter) || matchWorkerLocal(b.workerId, workerFilter));
       
       const isCarryOverForWorker = isOperationallyActive && !hasDateActivity && 
-        (b.workerId === workerFilter || b.revisions?.[0]?.operator === workerFilter);
-
-      if (b.status === 'Completed') {
-        console.log(`[DailyHisab DEBUG] Worker filter check for ${b.bookingId}:`, {
-          workerFilter,
-          hasPaymentByWorker, hasRevisionByWorker, hasRefundByWorker,
-          createdByWorker, pickupByWorker, returnByWorker, isCarryOverForWorker,
-          dropDetailsOperator: b.dropDetails?.operator,
-          todayRevisionOperators: todayRevisions.map(r => r.operator),
-        });
-      }
+        (matchWorkerLocal(b.workerId, workerFilter) || matchWorkerLocal(b.revisions?.[0]?.operator, workerFilter));
 
       if (!hasPaymentByWorker && !hasRevisionByWorker && !hasRefundByWorker && !createdByWorker && !pickupByWorker && !returnByWorker && !isCarryOverForWorker) {
         return false;
@@ -1695,8 +1763,8 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
       const matchDate = safeDateStr(p.timestamp) === dateFilter;
       if (!matchDate) return false;
       if (workerFilter && workerFilter !== 'All') {
-        const op = getPaymentOperator(p, b.revisions);
-        return op === workerFilter;
+        const op = getPaymentOperator(p, b.revisions, b.workerId);
+        return matchWorkerLocal(op, workerFilter);
       }
       return true;
     }) || [];
@@ -1706,7 +1774,10 @@ export default function DailyHisab({ userRole, currentWorker, vehicles = [], boo
     const todayRevisions = b.revisions?.filter(r => {
       const matchDate = safeDateStr(r.timestamp) === dateFilter;
       if (!matchDate) return false;
-      if (workerFilter && workerFilter !== 'All' && r.operator !== workerFilter) return false;
+      if (workerFilter && workerFilter !== 'All') {
+        const op = r.operator && r.operator !== 'System' ? r.operator : b.workerId;
+        return matchWorkerLocal(op, workerFilter);
+      }
       return true;
     }) || [];
 

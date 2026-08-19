@@ -110,40 +110,28 @@ router.put('/:vehicleId', async (req, res) => {
       if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
 
       const body = req.body;
-      // Deep merge: for nested objects (bookingConfig, pricingPlans, etc.)
-      // use Object.assign so sibling keys are preserved, then markModified
-      Object.keys(body).forEach(key => {
-        if (key === '_id' || key === '__v') return;
-        if (
-          body[key] !== null &&
-          typeof body[key] === 'object' &&
-          !Array.isArray(body[key]) &&
-          vehicle[key] !== null &&
-          typeof vehicle[key] === 'object' &&
-          !Array.isArray(vehicle[key])
-        ) {
-          Object.assign(vehicle[key], body[key]);
-          vehicle.markModified(key);
-        } else {
-          vehicle[key] = body[key];
-        }
-      });
 
       // Auto-assign worker if zoneId changed
+      let oldZoneId = null;
+      let oldWorker = null;
+      let newWorker = null;
+      let newZone = null;
+      let oldZone = null;
+
       if (body.zoneId && vehicle.zoneId?.toString() !== body.zoneId.toString()) {
-        const oldZoneId = vehicle.zoneId;
-        const oldWorker = vehicle.assignedWorker;
-
-        // Fetch new worker
+        oldZoneId = vehicle.zoneId;
+        oldWorker = vehicle.assignedWorker;
         const worker = await User.findOne({ role: 'worker', zoneId: body.zoneId });
-        const newWorker = worker ? worker.name : 'Unassigned';
-        vehicle.assignedWorker = newWorker;
+        newWorker = worker ? worker.name : 'Unassigned';
+        body.assignedWorker = newWorker;
+        oldZone = oldZoneId ? await Zone.findById(oldZoneId) : null;
+        newZone = await Zone.findById(body.zoneId);
+      }
 
-        // Fetch zones for names
-        const oldZone = oldZoneId ? await Zone.findById(oldZoneId) : null;
-        const newZone = await Zone.findById(body.zoneId);
+      // Update fields
+      vehicle.set(body);
 
-        // Record history
+      if (oldZoneId && body.zoneId) {
         if (!vehicle.zoneChangeHistory) vehicle.zoneChangeHistory = [];
         vehicle.zoneChangeHistory.push({
           previousZoneId: oldZoneId,

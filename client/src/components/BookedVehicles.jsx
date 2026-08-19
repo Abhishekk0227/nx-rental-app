@@ -2054,8 +2054,15 @@ export default function BookedVehicles({
       customerName: editFullName,
       customerPhone: editPhone,
       pickupDate: editPickupDate,
+      actualPickupDate: new Date(editPickupDate),
       expectedDropDate: editExpectedDropDate,
       expectedEndDate: new Date(editExpectedDropDate),
+      rentalPeriod: {
+        ...selectedBooking.rentalPeriod,
+        startDate: new Date(editPickupDate),
+        actualPickupDate: new Date(editPickupDate),
+        expectedEndDate: new Date(editExpectedDropDate)
+      },
       baseFare: Number(editBaseFare),
       discount: Number(editDiscountAmount),
       advancePaid: Number(editAdvancePaid),
@@ -2093,7 +2100,8 @@ export default function BookedVehicles({
       },
       pickupDetails: {
         ...selectedBooking.pickupDetails,
-        odometerStart: Number(editStartKm)
+        odometerStart: Number(editStartKm),
+        pickupTime: new Date(editPickupDate)
       },
       revisions: updatedRevisions,
       durationHours: durationHours,
@@ -2314,33 +2322,28 @@ export default function BookedVehicles({
   const handleDeleteBooking = async () => {
     if (!bookingToDelete) return;
     setDeleteInProgress(true);
-    if (onDeleteBooking) {
-      onDeleteBooking(bookingToDelete.bookingId);
-    } else {
-      try {
+    try {
+      if (onDeleteBooking) {
+        await onDeleteBooking(bookingToDelete.bookingId);
+      } else {
         const res = await fetch(
           `${import.meta.env.VITE_API_BASE_URL || ''}/api/bookings/${bookingToDelete.bookingId}`,
           { method: 'DELETE' }
         );
-        if (res.ok) {
-          // Remove from local bookings array immediately so UI refreshes
-          const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
-          if (idx !== -1) bookings.splice(idx, 1);
-          alert(`Booking ${bookingToDelete.bookingId} permanently deleted.`);
-        } else {
-          const err = await res.json();
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
           alert(`Failed to delete: ${err.message || 'Server error'}`);
         }
-      } catch (e) {
-        // Offline fallback — remove from local array
-        const idx = bookings.findIndex(b => b.bookingId === bookingToDelete.bookingId);
-        if (idx !== -1) bookings.splice(idx, 1);
-        alert(`Booking ${bookingToDelete.bookingId} removed (offline mode).`);
       }
+      alert(`Booking ${bookingToDelete.bookingId} permanently deleted.`);
+    } catch (e) {
+      console.error(e);
+      alert(`Error deleting booking: ${e.message}`);
+    } finally {
+      setDeleteInProgress(false);
+      setViewState('list');
+      setBookingToDelete(null);
     }
-    setDeleteInProgress(false);
-    setViewState('list');
-    setBookingToDelete(null);
   };
 
   const handleAdminOverrideSubmit = (e) => {
